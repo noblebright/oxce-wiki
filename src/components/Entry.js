@@ -51,6 +51,16 @@ function ResearchEntry({ entry, locale, onSelect: setSelect, language = "en-US" 
                     </KeyList>
                 }
                 {
+                    entry.leadsTo && <KeyList label="Leads To" value={entry.leadsTo}>
+                        { x => <a href={`#${x}`} onClick={e => { e.preventDefault(); setSelect(x); }}>{getLabel(x, locale)}</a>}
+                    </KeyList>
+                }
+                {
+                    entry.unlockedBy && <KeyList label="Unlocked By" value={entry.unlockedBy}>
+                        { x => <a href={`#${x}`} onClick={e => { e.preventDefault(); setSelect(x); }}>{getLabel(x, locale)}</a>}
+                    </KeyList>
+                }
+                {
                     entry.unlocks && <KeyList label="Unlocks" value={entry.unlocks}>
                         { x => <a href={`#${x}`} onClick={e => { e.preventDefault(); setSelect(x); }}>{getLabel(x, locale)}</a>}
                     </KeyList>

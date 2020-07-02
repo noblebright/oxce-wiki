@@ -62,6 +62,31 @@ export default class RuleLoader {
     }
 
     augmentResearch() {
-        
+        Object.values(this.rules).forEach(entry => {
+            if(!entry.research) return;
+            const research = entry.research;
+            (research.dependencies || []).forEach(dependency => {
+                if(this.rules[dependency] && this.rules[dependency].research) {
+                    const dependentObj = this.rules[dependency].research;
+                    if(!dependentObj.leadsTo) {
+                        dependentObj.leadsTo = [];
+                    }
+                    dependentObj.leadsTo.push(entry.name);
+                } else {
+                    console.warn(`${entry.name} depends on non-existant topic ${dependency}!`);
+                }
+            });
+            (research.unlocks || []).forEach(unlock => {
+                if(this.rules[unlock] && this.rules[unlock].research) {
+                    const dependentObj = this.rules[unlock].research;
+                    if(!dependentObj.unlockedBy) {
+                        dependentObj.unlockedBy = [];
+                    }
+                    dependentObj.unlockedBy.push(entry.name);
+                } else {
+                    console.warn(`${entry.name} unlocks non-existant topic ${unlock}!`);
+                }
+            });
+        })
     }
 }
