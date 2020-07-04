@@ -1,15 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import {getLabel} from "../model/RuleLoader";
+import { buildTechTree, buildCytoTree } from "../model/treeBuilder";
+import Cytoscape from "./Cytoscape";
+
 import "./Entry.css";
 
 export default function Entry({ db: {rules, strings}, id, onSelect: setSelect, language = "en-US" }) {
+    const [showTree, setShowTree] = useState(false);
     const entry = rules[id];
     const locale = strings[language];
+    const cytoTree = buildCytoTree(rules, strings, id, language);
     return (
         <div className="Entry">
             <h2>{getLabel(entry, locale)}</h2>
             { entry.research && <ResearchEntry locale={locale} entry={entry.research} onSelect={setSelect} language={language}/> }
             <pre>{JSON.stringify(entry, null, 4)}</pre>
+            <button onClick={() => setShowTree(x => !x)}>Show Dependency Tree</button>
+            { showTree && ReactDOM.createPortal(<div className="techTree"><Cytoscape elements={cytoTree}/></div>, document.getElementsByTagName("main")[0]) }
         </div>
     )
 }

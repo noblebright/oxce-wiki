@@ -40,7 +40,8 @@ export default function Cytoscape({elements}) {
         if(!elements || !cy.current) { return; }
         cy.current.remove("*");
         cy.current.add(elements);
-        cy.current.layout(layout).run();
+        cy.current.layout(layout).run()
+        cy.current.fit();
     }, [elements]);
 
     return (

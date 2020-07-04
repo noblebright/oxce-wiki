@@ -1,6 +1,6 @@
 import yaml from "js-yaml";
 
-export function getLabel(entry, locale = "en-US") {
+export function getLabel(entry, locale) {
     if(typeof entry === "string") {
         return locale[entry] || entry;
     }

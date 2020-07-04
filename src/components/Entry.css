@@ -1,4 +1,19 @@
+.Entry {
+    position: relative;
+}
+
 .Entry ul {
-    padding: 0;
-    
+    padding: 0;   
+}
+
+.techTree {
+    position: absolute;
+    z-index: 1;
+    top: 63px;
+    right: 16px;
+    width: 50%;
+    height: 50%;
+    background-color: white;
+    border: 1px solid black;
+    box-shadow: 2px;
 }
