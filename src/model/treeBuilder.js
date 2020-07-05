@@ -3,7 +3,7 @@ import { getLabel } from "./RuleLoader";
 export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     const node = rules[id];
     if(!ctx[node.name]) {
-        ctx[node.name] = { id: node.name, depends: {}, unlockedBy: {}};
+        ctx[node.name] = { id: node.name, depends: {}, unlockedBy: {}, lookupOf: {}};
     }
     const nodeDef = ctx[node.name];
 
@@ -13,6 +13,18 @@ export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     
     if(node.research) {
         const research = node.research;
+        if(research.lookupOf) {
+            if(research.lookupOf.length < 10) {
+                research.lookupOf.forEach(x => {
+                    nodeDef.lookupOf[x] = true;
+                    if(!ctx[x]) {
+                        buildTechTree(rules, x, ctx, maxDepth - 1);
+                    }
+                });
+            } else {
+                nodeDef.culled = true;
+            }
+        }
         if(research.unlockedBy) {
             if(research.unlockedBy.length < 10) {
                 research.unlockedBy.forEach(x => {
@@ -52,7 +64,7 @@ export function buildCytoTree(rules, strings, id, language = "en-US") {
     });
 
     //separate pass for edges, because nodes need to exist first.
-    Object.values(normalizedTree).forEach(({id, depends, unlockedBy}) => {
+    Object.values(normalizedTree).forEach(({id, depends, unlockedBy, lookupOf}) => {
         if(Object.keys(depends).length > 1) {
             Object.keys(depends).forEach(dep => {
                 const depNodeId = `${id}_deps`;
@@ -63,7 +75,7 @@ export function buildCytoTree(rules, strings, id, language = "en-US") {
                     //all to id
                     elements.push({ group: "edges", data: { id: `${depNodeId}=>${id}`, source: depNodeId, target: id }});
                 }
-                const edgeId = `${dep}=>${id}`;
+                const edgeId = `${dep}=>${depNodeId}`;
                 //dep to all
                 elements.push({ group: "edges", data: { id: edgeId, source: dep, target: depNodeId }});
             });
@@ -76,6 +88,11 @@ export function buildCytoTree(rules, strings, id, language = "en-US") {
         Object.keys(unlockedBy).forEach(unlock => {
             const edgeId = `${unlock}=>${id}`;
             elements.push({ group: "edges", data: { id: edgeId, source: unlock, target: id }});
+        });
+
+        Object.keys(lookupOf).forEach(lookup => {
+            const edgeId = `${lookup}=>${id}`;
+            elements.push({ group: "edges", data: { id: edgeId, source: lookup, target: id }});
         });
     });
 

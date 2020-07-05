@@ -17,3 +17,8 @@
     border: 1px solid black;
     box-shadow: 2px;
 }
+
+th {
+    font-weight: bold;
+    text-align: center;
+}

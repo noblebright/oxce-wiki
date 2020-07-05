@@ -87,6 +87,15 @@ export default class RuleLoader {
                     console.warn(`${entry.name} unlocks non-existant topic ${unlock}!`);
                 }
             });
-        })
+            if(research.lookup) {
+                const dependentObj = this.rules[research.lookup]?.research;
+                if(dependentObj) {
+                    if(!dependentObj.lookupOf) {
+                        dependentObj.lookupOf = [];
+                    }
+                    dependentObj.lookupOf.push(entry.name);
+                }
+            }
+        });
     }
 }
