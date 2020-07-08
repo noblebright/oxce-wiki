@@ -37,10 +37,12 @@ export default class RuleLoader {
                     //process each entry in each section
                     ruleFile[sectionName].forEach(entry => {
                         if(entry.delete) {
-                            delete this.rules[entry.delete];
+                            if(this.rules[entry.delete]) { //delete if it exists.
+                                delete this.rules[entry.delete][sectionName];
+                            }
                             return;
                         }
-                        if(!entry.name) return; //-delete or malformed
+                        if(!entry.name) return; //malformed
                         if(!this.rules[entry.name]) {
                             //never seen this before.
                             this.rules[entry.name] = { name: entry.name, [sectionName]: entry };

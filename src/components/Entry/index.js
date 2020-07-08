@@ -3,6 +3,7 @@ import { useParams, Redirect } from "react-router-dom";
 
 import { getLabel } from "../../model/RuleLoader";
 import ResearchEntry from "./ResearchEntry";
+import ManufactureEntry from "./ManufactureEntry";
 import DebugEntry from "./DebugEntry";
 
 import "./Entry.css";
@@ -26,7 +27,8 @@ export default function Entry({ db: {rules, strings}, language = "en-US" }) {
         <div className="Entry">
             <h2>{getLabel(entry, locale)}</h2>
             { entry.research && <ResearchEntry rules={rules} locale={locale} entry={entry.research} /> }
-            <DebugEntry key={entry.name} entry={entry}/>
+            { entry.manufacture && <ManufactureEntry locale={locale} entry={entry.manufacture} /> }
+            <DebugEntry key={entry.name} entry={entry}/>            
         </div>
     )
 }

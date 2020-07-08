@@ -16,7 +16,10 @@ function App() {
   const [selected, setSelected] = useState();
   useEffect(() => {
     const rl = new RuleLoader(["https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/research.rul",
-                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul"], 
+                               "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/manufacture.rul",
+                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul",
+                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/manufacture_XCOMFILES.rul"
+                              ], 
                               ["https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/Language/en-US.yml",
                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Language/en-US.yml"]);
     rl.load().then(setDb);

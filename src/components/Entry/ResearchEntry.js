@@ -13,7 +13,8 @@ export default function ResearchEntry({ rules, entry, locale }) {
 
     return (
         <React.Fragment>
-            <table className="ResearchEntry">
+        <div className="ResearchEntry">
+            <table>
                 <thead>
                     <tr><th colSpan="2">Research</th></tr>
                 </thead>
@@ -32,7 +33,8 @@ export default function ResearchEntry({ rules, entry, locale }) {
                     
                 </tbody>
             </table>
-            <div className="techTree"><Cytoscape elements={cytoTree}/></div>
+        </div>
+        <div className="techTree"><Cytoscape elements={cytoTree}/></div>
         </React.Fragment>
     );
 }

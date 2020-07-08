@@ -12,7 +12,7 @@ export const ListValue = ({label, values, children}) => (
                 }
                 acc[acc.length - 1].push(item);
                 return acc;
-            }, [[]]).map((tuple, idx) => (<tr key={idx}><td>{children(tuple[0])}</td><td>{children(tuple[1])}</td></tr>))
+            }, [[]]).map((tuple, idx) => (<tr key={idx}><td>{children(tuple[0])}</td><td>{tuple[1] && children(tuple[1])}</td></tr>))
         }
     </React.Fragment>
 );

@@ -25,3 +25,25 @@ th {
     font-weight: bold;
     text-align: center;
 }
+
+.ResearchEntry {
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+}
+
+.ResearchEntry table {
+    width: 100%;
+    vertical-align: top;
+}
+
+.ManufactureEntry {
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+}
+
+.ManufactureEntry table {
+    width: 100%;
+    vertical-align: top;
+}
