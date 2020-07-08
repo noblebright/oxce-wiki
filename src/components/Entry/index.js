@@ -1,23 +1,33 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
-import {getLabel} from "../../model/RuleLoader";
-import { buildCytoTree } from "../../model/treeBuilder";
+import { Link, useParams, Redirect } from "react-router-dom";
 import Cytoscape from "../Cytoscape";
-import { SimpleValue, ListValue, Link } from "./utils";
+
+import { getLabel } from "../../model/RuleLoader";
+import { buildCytoTree } from "../../model/treeBuilder";
+import { SimpleValue, ListValue } from "./utils";
 
 import "./Entry.css";
 
-export default function Entry({ db: {rules, strings}, id, onSelect: setSelect, language = "en-US" }) {
-    const [showTree, setShowTree] = useState(false);
+export default function Entry({ db: {rules, strings}, language = "en-US" }) {
+    let { id } = useParams();
+
     const entry = rules[id];
+    
+    if(!entry) {
+        //We got a non-existant entry.  Kick them to the homepage.
+        return (
+            <Redirect to="/"/>
+        );
+    }
+
     const locale = strings[language];
     const cytoTree = buildCytoTree(rules, strings, id, language);
     return (
         <div className="Entry">
             <h2>{getLabel(entry, locale)}</h2>
-            { entry.research && <ResearchEntry locale={locale} entry={entry.research} onSelect={setSelect}/> }
+            { entry.research && <ResearchEntry locale={locale} entry={entry.research} /> }
             <DebugEntry key={entry.name} entry={entry}/>
-            { ReactDOM.createPortal(<div className="techTree"><Cytoscape elements={cytoTree}/></div>, document.getElementsByTagName("main")[0]) }
+            { <div className="techTree"><Cytoscape elements={cytoTree}/></div> }
         </div>
     )
 }
@@ -32,8 +42,8 @@ function DebugEntry({entry}) {
     );
 }
 
-function ResearchEntry({ entry, locale, onSelect: setSelect }) {
-    const linkFn = id => <Link id={id} locale={locale} onClick={setSelect}/>;
+function ResearchEntry({ entry, locale }) {
+    const linkFn = id => <Link to={`/${id}`}>{getLabel(id, locale)}</Link>;
     return (
         <table className="ResearchEntry">
             <thead>
@@ -44,12 +54,14 @@ function ResearchEntry({ entry, locale, onSelect: setSelect }) {
                 <SimpleValue label="Points" value={entry.points}/>
                 {entry.needItem && <SimpleValue label="Requires Item" value="TRUE"/>}
                 {entry.destroyItem && <SimpleValue label="Destroys Item" value="TRUE"/>}
-                {entry.lookup && <SimpleValue label="Lookup" value={entry.lookup}>{ linkFn }</SimpleValue>}
+                {entry.requiresBaseFunc && <ListValue label="Requires Service" values={entry.requiresBaseFunc}>{ x => getLabel(x, locale) }</ListValue>}
+                {entry.lookup && <SimpleValue label="Gives (lookup)" value={entry.lookup}>{ linkFn }</SimpleValue>}
+                {entry.lookupOf && <ListValue label="Get as a Result of " values={entry.lookupOf}>{ linkFn }</ListValue>}
                 {entry.dependencies && <ListValue label="Dependencies" values={entry.dependencies}>{ linkFn }</ListValue>}
                 {entry.leadsTo && <ListValue label="Leads To" values={entry.leadsTo}>{ linkFn }</ListValue>}
                 {entry.unlockedBy && <ListValue label="Unlocked By" values={entry.unlockedBy}>{linkFn}</ListValue>}
                 {entry.unlocks && <ListValue label="Unlocks" values={entry.unlocks}>{ linkFn }</ListValue>}
-                {entry.requiresBaseFunc && <ListValue label="Requires Service" values={entry.requiresBaseFunc}>{linkFn}</ListValue>}
+                
             </tbody>
         </table>
     );

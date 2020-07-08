@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+
 import RuleLoader from "../model/RuleLoader";
 import Sidebar from "./Sidebar";
 import Entry from "./Entry";
@@ -13,18 +15,32 @@ function App() {
   const [db, setDb] = useState({ rules: {}, strings: {} });
   const [selected, setSelected] = useState();
   useEffect(() => {
-    const rl = new RuleLoader(["https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul"], 
-                              ["https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Language/en-US.yml"]);
+    const rl = new RuleLoader(["https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/research.rul",
+                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul"], 
+                              ["https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/Language/en-US.yml",
+                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Language/en-US.yml"]);
     rl.load().then(setDb);
 }, []);
   return (
-    <div className="App">
-      <header>
-        <h1>X-Com Files Tech Tree</h1>
-      </header>
-      <Sidebar db={db} onClick={setSelected}/>
-      <main>{ selected ? <Entry db={db} id={selected} onSelect={setSelected}/> : <Welcome/> }</main>
-    </div>
+    <Router>
+      <div className="App">
+        <header>
+          <h1>X-Com Files Tech Tree</h1>
+        </header>
+        <Sidebar db={db} onClick={setSelected}/>
+        <main>
+          { !db.loaded ? "Loading..." : 
+          <Switch>
+          <Route path="/" exact>
+              <Welcome/>
+            </Route>
+            <Route path="/:id">
+              <Entry db={db}/>
+            </Route>
+          </Switch>}
+        </main>
+      </div>
+    </Router>
   );
 }
 

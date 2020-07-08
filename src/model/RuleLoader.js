@@ -1,6 +1,9 @@
 import yaml from "js-yaml";
 
 export function getLabel(entry, locale) {
+    if(!entry) {
+        return null;
+    }
     if(typeof entry === "string") {
         return locale[entry] || entry;
     }
@@ -20,7 +23,7 @@ export default class RuleLoader {
         this.strings = {};
         return Promise.all([this.loadRules(), this.loadLanguages()])
             .then(() => this.augmentResearch())
-            .then(() => Promise.resolve({rules: this.rules , strings: this.strings}));
+            .then(() => Promise.resolve({rules: this.rules , strings: this.strings, loaded: true}));
     }
 
     loadRules() {
@@ -33,6 +36,10 @@ export default class RuleLoader {
                 Object.keys(ruleFile).forEach(sectionName => {
                     //process each entry in each section
                     ruleFile[sectionName].forEach(entry => {
+                        if(entry.delete) {
+                            delete this.rules[entry.delete];
+                            return;
+                        }
                         if(!entry.name) return; //-delete or malformed
                         if(!this.rules[entry.name]) {
                             //never seen this before.
