@@ -11,10 +11,9 @@
 }
 
 .techTree {
-    position: absolute;
+    display: inline-block;
+    position: relative;
     z-index: 1;
-    top: 0px;
-    right: 16px;
     width: 50%;
     height: 50%;
     background-color: white;

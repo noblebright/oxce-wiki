@@ -1,4 +1,5 @@
 import React, {useEffect, useRef} from "react";
+import {useHistory} from "react-router-dom";
 import cytoscape from "cytoscape";
 import dagre from 'cytoscape-dagre';
 
@@ -29,10 +30,20 @@ const style = [
 
 export default function Cytoscape({elements}) {
     const cy = useRef(null);
+    const history = useHistory();
+
     const fnRef = e => {
         if(!cy.current) {
             cy.current = cytoscape({ container: e, layout, style });
             cy.current.resize();
+            cy.current.on("tap", evt => {
+                if(!evt.target.isNode) {
+                    return; //we clicked on nothing, got core.
+                } 
+                if(evt.target.isNode() && !evt.target.data("synthetic")) {
+                    history.push(`/${evt.target.id()}`);
+                }
+            });
         }
     };
 
@@ -40,6 +51,7 @@ export default function Cytoscape({elements}) {
         if(!elements || !cy.current) { return; }
         cy.current.remove("*");
         cy.current.add(elements);
+        cy.current.autounselectify(true);
         cy.current.layout(layout).run()
         cy.current.fit();
     }, [elements]);

@@ -53,10 +53,9 @@ export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     return ctx;
 }
 
-export function buildCytoTree(rules, strings, id, language = "en-US") {
+export function buildCytoTree(rules, locale, id) {
     const normalizedTree = buildTechTree(rules, id);
     const elements = [];
-    const locale = strings[language];
     const depNodes = new Set();
 
     Object.keys(normalizedTree).forEach(id => {
@@ -71,7 +70,7 @@ export function buildCytoTree(rules, strings, id, language = "en-US") {
                 if(!depNodes.has(depNodeId)) {
                     depNodes.add(depNodeId);
                     //all node
-                    elements.push({ group: "nodes", data: { id: depNodeId, label: "all" }});
+                    elements.push({ group: "nodes", data: { id: depNodeId, label: "all", synthetic: true }});
                     //all to id
                     elements.push({ group: "edges", data: { id: `${depNodeId}=>${id}`, source: depNodeId, target: id }});
                 }
