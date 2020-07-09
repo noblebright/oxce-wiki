@@ -53,6 +53,12 @@ export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     return ctx;
 }
 
+function eqSet(as, bs) {
+    if (as.size !== bs.size) return false;
+    for (var a of as) if (!bs.has(a)) return false;
+    return true;
+}
+
 export function buildCytoTree(rules, locale, id) {
     const normalizedTree = buildTechTree(rules, id);
     const elements = [];
@@ -64,26 +70,6 @@ export function buildCytoTree(rules, locale, id) {
 
     //separate pass for edges, because nodes need to exist first.
     Object.values(normalizedTree).forEach(({id, depends, unlockedBy, lookupOf}) => {
-        if(Object.keys(depends).length > 1) {
-            Object.keys(depends).forEach(dep => {
-                const depNodeId = `${id}_deps`;
-                if(!depNodes.has(depNodeId)) {
-                    depNodes.add(depNodeId);
-                    //all node
-                    elements.push({ group: "nodes", data: { id: depNodeId, label: "all", synthetic: true }});
-                    //all to id
-                    elements.push({ group: "edges", data: { id: `${depNodeId}=>${id}`, source: depNodeId, target: id }});
-                }
-                const edgeId = `${dep}=>${depNodeId}`;
-                //dep to all
-                elements.push({ group: "edges", data: { id: edgeId, source: dep, target: depNodeId }});
-            });
-        } else if(Object.keys(depends).length > 0) {
-            const dep = Object.keys(depends)[0];
-            const edgeId = `${dep}=>${id}`;
-            elements.push({ group: "edges", data: { id: edgeId, source: dep, target: id }});
-        }
-        
         Object.keys(unlockedBy).forEach(unlock => {
             const edgeId = `${unlock}=>${id}`;
             elements.push({ group: "edges", data: { id: edgeId, source: unlock, target: id }});
@@ -93,6 +79,28 @@ export function buildCytoTree(rules, locale, id) {
             const edgeId = `${lookup}=>${id}`;
             elements.push({ group: "edges", data: { id: edgeId, source: lookup, target: id }});
         });
+
+        if(!eqSet(new Set(Object.keys(unlockedBy)), new Set(Object.keys(depends)))) { //don't show dep edges if all dep edges are also unlock edges
+            if(Object.keys(depends).length > 1) {
+                Object.keys(depends).forEach(dep => {
+                    const depNodeId = `${id}_deps`;
+                    if(!depNodes.has(depNodeId)) {
+                        depNodes.add(depNodeId);
+                        //all node
+                        elements.push({ group: "nodes", data: { id: depNodeId, label: "all", synthetic: true }});
+                        //all to id
+                        elements.push({ group: "edges", data: { id: `${depNodeId}=>${id}`, source: depNodeId, target: id }});
+                    }
+                    const edgeId = `${dep}=>${depNodeId}`;
+                    //dep to all
+                    elements.push({ group: "edges", data: { id: edgeId, source: dep, target: depNodeId }});
+                });
+            } else if(Object.keys(depends).length > 0) { //if there's only 1 dep, that's functionally equivalent an unlock, no point in rendering the depNode
+                const dep = Object.keys(depends)[0];
+                const edgeId = `${dep}=>${id}`;
+                elements.push({ group: "edges", data: { id: edgeId, source: dep, target: id }});
+            }
+        }
     });
 
     return elements;
