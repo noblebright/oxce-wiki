@@ -17,8 +17,8 @@ function App() {
     const rl = new RuleLoader([
         "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/research.rul",
                                "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/manufacture.rul",
-                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul",
                                "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/items.rul",
+                               "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul",
                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/manufacture_XCOMFILES.rul",
                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/items_XCOMFILES.rul"
                               ], 
