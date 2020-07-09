@@ -1,8 +1,7 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
 
 import { getLabel } from "../../model/RuleLoader";
-import { SimpleValue, ListValue, getInventoryEntry } from "./utils";
+import { SimpleValue, ListValue, getInventoryEntry, useLink } from "./utils";
 
 
 function getItemTable(randomList) {
@@ -14,17 +13,18 @@ function getItemTable(randomList) {
 	return { denominator, rows};
 }
 
-function RandomProduction({ label, values, locale }) {
+function RandomProduction({ label = "Random Production!", values, locale }) {
     const { denominator, rows } = useMemo(() => getItemTable(values), [values]);
+    const linkFn = useLink(locale);
     return (
         <React.Fragment>
-            <tr><th>Random Production!</th></tr>
+            <tr><th>{label}</th></tr>
             { rows.map(
                 ([weight, items], idx) => (
                 <React.Fragment key={idx}>
                     <tr><th colSpan="2"> {weight}/{denominator} ({(weight * 100 / denominator).toFixed(2)}%)</th></tr>
                     { items.length === 0 ? <tr><td colSpan="2">NOTHING!</td></tr>: items.map(([key, count], subId) => (
-                        <tr key={subId}><td>{getLabel(key, locale)}</td><td>{count}</td></tr>
+                        <tr key={subId}><td>{linkFn(key)}</td><td>{count}</td></tr>
                     ))}
                 </React.Fragment>
             ))}
@@ -33,7 +33,8 @@ function RandomProduction({ label, values, locale }) {
 }
 
 export default function ManufactureEntry({ entry, locale }) {
-    const linkFn = id => <Link to={`/${id}`}>{getLabel(id, locale)}</Link>;
+    const linkFn = useLink(locale);
+    const manufacture = entry.manufacture;
     const inventoryFn = getInventoryEntry(locale);
     return (
         <div className="ManufactureEntry">
@@ -42,13 +43,14 @@ export default function ManufactureEntry({ entry, locale }) {
                     <tr><th colSpan="2">Manufacturing</th></tr>
                 </thead>
                 <tbody>
-                    <SimpleValue label="Category" value={getLabel(entry.category, locale)}/>
-                    <SimpleValue label="Cost" value={entry.cost}/>
-                    <SimpleValue label="Time" value={entry.time}/>
-                    {entry.requires && <ListValue label="Requires Research" values={entry.requires}>{ linkFn }</ListValue>}
-                    {entry.requiresBaseFunc && <ListValue label="Requires Service" values={entry.requiresBaseFunc}>{ x => getLabel(x, locale) }</ListValue>}
-                    {entry.requiredItems && <ListValue label="Requires Items" values={Object.entries(entry.requiredItems)}>{ inventoryFn }</ListValue>}
-                    {entry.randomProducedItems && <RandomProduction label="Random Production" values={entry.randomProducedItems} locale={locale}/>}
+                    <SimpleValue label="Category" value={getLabel(manufacture.category, locale)}/>
+                    <SimpleValue label="Cost" value={manufacture.cost}/>
+                    <SimpleValue label="Time" value={manufacture.time}/>
+                    {manufacture.cost && entry.items.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
+                    {manufacture.requires && <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>}
+                    {manufacture.requiresBaseFunc && <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ x => getLabel(x, locale) }</ListValue>}
+                    {manufacture.requiredItems && <ListValue label="Requires Items" values={Object.entries(manufacture.requiredItems)}>{ inventoryFn }</ListValue>}
+                    {manufacture.randomProducedItems && <RandomProduction label="Random Production" values={manufacture.randomProducedItems} locale={locale}/>}
                 </tbody>
             </table>
         </div>

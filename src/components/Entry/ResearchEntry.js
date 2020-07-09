@@ -1,14 +1,14 @@
 import React, {useMemo} from "react";
-import { Link } from "react-router-dom";
 import Cytoscape from "../Cytoscape";
 
 import { getLabel } from "../../model/RuleLoader";
 import { buildCytoTree } from "../../model/treeBuilder";
-import { SimpleValue, ListValue } from "./utils";
+import { SimpleValue, ListValue, useLink } from "./utils";
 
 export default function ResearchEntry({ rules, entry, locale }) {
-    const linkFn = id => <Link to={`/${id}`}>{getLabel(id, locale)}</Link>;
-    const entityId = entry.name;
+    const linkFn = useLink(locale);
+    const research = entry.research;
+    const entityId = research.name;
     const cytoTree = useMemo(() => buildCytoTree(rules, locale, entityId), [rules, locale, entityId]);
 
     return (
@@ -19,18 +19,18 @@ export default function ResearchEntry({ rules, entry, locale }) {
                     <tr><th colSpan="2">Research</th></tr>
                 </thead>
                 <tbody>
-                    <SimpleValue label="Cost" value={entry.cost}/>
-                    <SimpleValue label="Points" value={entry.points}/>
-                    {entry.needItem && <SimpleValue label="Requires Item" value="TRUE"/>}
-                    {entry.destroyItem && <SimpleValue label="Destroys Item" value="TRUE"/>}
-                    {entry.requiresBaseFunc && <ListValue label="Requires Service" values={entry.requiresBaseFunc}>{ x => getLabel(x, locale) }</ListValue>}
-                    {entry.lookup && <SimpleValue label="Gives (lookup)" value={entry.lookup}>{ linkFn }</SimpleValue>}
-                    {entry.lookupOf && <ListValue label="Get as a Result of " values={entry.lookupOf}>{ linkFn }</ListValue>}
-                    {entry.dependencies && <ListValue label="Dependencies" values={entry.dependencies}>{ linkFn }</ListValue>}
-                    {entry.leadsTo && <ListValue label="Leads To" values={entry.leadsTo}>{ linkFn }</ListValue>}
-                    {entry.unlockedBy && <ListValue label="Unlocked By" values={entry.unlockedBy}>{linkFn}</ListValue>}
-                    {entry.unlocks && <ListValue label="Unlocks" values={entry.unlocks}>{ linkFn }</ListValue>}
-                    {entry.manufacture && <ListValue label="Manufacturing Process" values={entry.manufacture}>{ linkFn }</ListValue>}
+                    <SimpleValue label="Cost" value={research.cost}/>
+                    <SimpleValue label="Points" value={research.points}/>
+                    {research.needItem && <SimpleValue label="Requires Item" value="TRUE"/>}
+                    {research.destroyItem && <SimpleValue label="Destroys Item" value="TRUE"/>}
+                    {research.requiresBaseFunc && <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ x => getLabel(x, locale) }</ListValue>}
+                    {research.lookup && <SimpleValue label="Gives (lookup)" value={research.lookup}>{ linkFn }</SimpleValue>}
+                    {research.lookupOf && <ListValue label="Get as a Result of " values={research.lookupOf}>{ linkFn }</ListValue>}
+                    {research.dependencies && <ListValue label="Dependencies" values={research.dependencies}>{ linkFn }</ListValue>}
+                    {research.leadsTo && <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>}
+                    {research.unlockedBy && <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>}
+                    {research.unlocks && <ListValue label="Unlocks" values={research.unlocks}>{ linkFn }</ListValue>}
+                    {research.manufacture && <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>}
                     
                 </tbody>
             </table>

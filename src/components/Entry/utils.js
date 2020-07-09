@@ -19,3 +19,5 @@ export const ListValue = ({label, values, children}) => (
 );
 
 export const getInventoryEntry = locale => ([id, quantity]) => (<React.Fragment><Link to={`/${id}`}>{getLabel(id, locale)}</Link>: <span>{quantity}</span></React.Fragment>);
+
+export const useLink = locale => id => <Link to={`/${id}`}>{getLabel(id, locale)}</Link>;

@@ -7,7 +7,7 @@ export function getLabel(entry, locale) {
     if(typeof entry === "string") {
         return locale[entry] || entry;
     }
-    return locale[entry.name] || entry.name;
+    return locale[entry.name || entry.type] || entry.name || entry.type;
 }
 
 export default class RuleLoader {
@@ -37,6 +37,9 @@ export default class RuleLoader {
             ruleData.forEach(ruleFile => {
                 //load all sections in each rule file
                 Object.keys(ruleFile).forEach(sectionName => {
+                    if(sectionName === "extended") { //skip extended section for now.
+                        return;
+                    }
                     //process each entry in each section
                     ruleFile[sectionName].forEach(entry => {
                         if(entry.delete) {
@@ -45,12 +48,22 @@ export default class RuleLoader {
                             }
                             return;
                         }
-                        if(!entry.name) return; //malformed
-                        if(!this.rules[entry.name]) {
+                        const name = entry.name || entry.type;
+                        if(!name) return; //malformed
+                        
+                        // SECTION-SPECIFIC LOGIC
+                        if(sectionName === "items") {
+                            if(entry.recover === false) //skip unrecoverable items.
+                                return;
+                        }
+
+                        // END SECTION-SPECIFIC LOGIC
+                        if(!this.rules[name]) {
                             //never seen this before.
-                            this.rules[entry.name] = { name: entry.name, [sectionName]: entry };
+                            this.rules[name] = { name: name, [sectionName]: entry };
                         } else {
-                            Object.assign(this.rules[entry.name], { [sectionName]: entry });
+                            const mergedEntry = Object.assign({}, this.rules[name][sectionName], entry); //if there's an existing entry, merge new data into it.
+                            Object.assign(this.rules[name], { [sectionName]: mergedEntry });
                         }
                     });
                 });
