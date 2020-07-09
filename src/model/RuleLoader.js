@@ -22,7 +22,10 @@ export default class RuleLoader {
         this.rules = {};
         this.strings = {};
         return Promise.all([this.loadRules(), this.loadLanguages()])
-            .then(() => this.augmentResearch())
+            .then(() => {
+                this.augmentResearch();
+                this.augmentManufacturing();
+            })
             .then(() => Promise.resolve({rules: this.rules , strings: this.strings, loaded: true}));
     }
 
@@ -106,5 +109,25 @@ export default class RuleLoader {
                 }
             }
         });
+    }
+
+    augmentManufacturing() {
+        Object.values(this.rules).forEach(entry => {
+            if(!entry.manufacture) return;
+            const requireList = entry.manufacture.requires;
+            if(requireList) {
+                requireList.forEach(id => {
+                    if(this.rules[id].research) {
+                        const research = this.rules[id].research;
+                        if(!research.manufacture) {
+                            research.manufacture = [];
+                        }
+                        research.manufacture.push(entry.name);
+                    } else {
+                        console.warn(`Manufacturing ${entry.name} requires unknown tech ${id}`);
+                    }
+                })
+            }
+        })
     }
 }

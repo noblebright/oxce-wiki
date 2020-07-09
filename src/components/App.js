@@ -13,7 +13,6 @@ function Welcome() {
 }
 function App() {
   const [db, setDb] = useState({ rules: {}, strings: {} });
-  const [selected, setSelected] = useState();
   useEffect(() => {
     const rl = new RuleLoader(["https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/research.rul",
                                "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/manufacture.rul",
@@ -30,7 +29,7 @@ function App() {
         <header>
           <h1>X-Com Files Tech Tree</h1>
         </header>
-        <Sidebar db={db} onClick={setSelected}/>
+        <Sidebar db={db}/>
         <main>
           { !db.loaded ? "Loading..." : 
           <Switch>

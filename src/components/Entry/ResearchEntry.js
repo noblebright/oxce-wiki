@@ -30,6 +30,7 @@ export default function ResearchEntry({ rules, entry, locale }) {
                     {entry.leadsTo && <ListValue label="Leads To" values={entry.leadsTo}>{ linkFn }</ListValue>}
                     {entry.unlockedBy && <ListValue label="Unlocked By" values={entry.unlockedBy}>{linkFn}</ListValue>}
                     {entry.unlocks && <ListValue label="Unlocks" values={entry.unlocks}>{ linkFn }</ListValue>}
+                    {entry.manufacture && <ListValue label="Manufacturing Process" values={entry.manufacture}>{ linkFn }</ListValue>}
                     
                 </tbody>
             </table>
