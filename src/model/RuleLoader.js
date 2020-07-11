@@ -25,6 +25,7 @@ export default class RuleLoader {
             .then(() => {
                 this.augmentResearch();
                 this.augmentManufacturing();
+                this.augmentAmmo();
             })
             .then(() => Promise.resolve({rules: this.rules , strings: this.strings, loaded: true}));
     }
@@ -141,6 +142,37 @@ export default class RuleLoader {
                     }
                 })
             }
+        })
+    }
+
+    augmentAmmo() {
+        Object.values(this.rules).forEach(entry => {
+            if(!entry.items) return;
+            const ammo = entry.items.ammo;
+            const compatibleAmmo = entry.items.compatibleAmmo || [];
+            const ammoSet = new Set();
+            if(compatibleAmmo) {
+                compatibleAmmo.forEach(x => ammoSet.add(x));
+            }
+            if(ammo) {
+                ["0", "1", "2", "3"].forEach(k => {
+                    const compatibleAmmo = ammo[k]?.compatibleAmmo;
+                    if(compatibleAmmo) {
+                        compatibleAmmo.forEach(x => ammoSet.add(x));
+                    }
+                });
+            }
+            [...ammoSet].forEach(key => {
+                const target = this.rules[key];
+                if(!target || !target.items) {
+                    console.warn(`Ammo ${key} not found for item ${entry.name}`);
+                } else {
+                    if(!target.items.compatibleWeapon) {
+                        target.items.compatibleWeapon = [];
+                    }
+                    target.items.compatibleWeapon.push(entry.name);
+                }
+            });
         })
     }
 }

@@ -46,7 +46,7 @@ export default function ManufactureEntry({ entry, locale }) {
                     <SimpleValue label="Category" value={getLabel(manufacture.category, locale)}/>
                     <SimpleValue label="Cost" value={manufacture.cost}/>
                     <SimpleValue label="Time" value={manufacture.time}/>
-                    {manufacture.cost && entry.items.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
+                    {manufacture.cost && entry.items?.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
                     {manufacture.requires && <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>}
                     {manufacture.requiresBaseFunc && <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ x => getLabel(x, locale) }</ListValue>}
                     {manufacture.requiredItems && <ListValue label="Requires Items" values={Object.entries(manufacture.requiredItems)}>{ inventoryFn }</ListValue>}
