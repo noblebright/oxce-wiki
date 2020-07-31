@@ -2,34 +2,38 @@ import Dexie from "dexie";
 import yaml from "js-yaml";
 import deepmerge from "deepmerge";
 
+import { loadJSON, loadText, mappify, possibleLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
 
-const loadJSON = url => fetch(url).then(res => res.json());
-const loadText = url => fetch(url).then(res => res.text());
-
-let config;
-async function getConfig(callback) {
-    if(!config) {
-        callback && callback("LOADING_CONFIG");
-        config = await loadJSON("/config.json");
+async function getConfig(db, callback) {
+    const configArray = await db.config.toArray();
+    if(!configArray.length) {
+        callback && callback(["LOADING_CONFIG"]);
+        let config = await loadJSON("/config.json");
+        await db.config.clear();
+        await db.config.bulkPut(
+            Object.keys(config).map(key => ({ key, value: config[key] }))
+        );
+        return config;
     }
-    return Promise.resolve(config);
+    return mappify(configArray, "key", "value");
 }
 
 function initDexie() {
     const db = new Dexie("xcom");
     db.version(1).stores({
+        config: "key",
         versions: "repo,lastFetched",
         rulesets: "sha,lastFetched",
-        precompiled: "[baseSha+modSha], lastFetched"
+        precompiled: "[baseSha+modSha], lastGenerated"
     });
     return db;
 }
 
 async function getVersions(db, repo, callback) {
     const repoVersions = await db.versions.get(repo);
-
-    if(!repoVersions || ((Date.now() - repoVersions.lastFetched) <  1000 * 60 * 60 * 24)) {
+    
+    if(!repoVersions || ((Date.now() - repoVersions.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
         const loader = new GithubLoader(repo);
         const versions = await loader.loadVersions();
         console.log(`fetching version info for ${repo}...`);
@@ -46,7 +50,7 @@ async function getRuleset(db, repo, sha, path, callback) {
     const ruleset = await db.rulesets.get(sha);
     if(ruleset) {
         console.log(`cached ruleset info found for ${sha}...`);
-        return ruleset;
+        return ruleset.ruleset;
     }
     const loader = new GithubLoader(repo);
     console.log(`loading filelist for ${repo}@${sha}`);
@@ -61,13 +65,13 @@ async function getRuleset(db, repo, sha, path, callback) {
 async function generateRuleset([languageFiles, ruleFiles], callback) {
     const files = [...languageFiles, ...ruleFiles];
     let processed = 0;
-    callback && callback(["LOADING_FILELIST", null, processed, files.length]);
+    callback && callback(["LOADING_FILE", null, processed, files.length]);
     const promises = files.map(url => 
         loadText(url).then(x => {
             try {
                 const result = yaml.safeLoad(x, { json: true });
                 processed++;
-                callback && callback(["LOADING_FILELIST", url, processed, files.length]);
+                callback && callback(["LOADING_FILE", url, processed, files.length]);
                 return result;
             } catch (e) {
                 console.error(url);
@@ -79,12 +83,15 @@ async function generateRuleset([languageFiles, ruleFiles], callback) {
     return fileContents.reduce((acc, obj) => deepmerge(acc, obj));
 }
 
+function getSupportedLanguages(base, mod) {
+    return Object.keys(possibleLanguages).filter(x => base[x] || mod[x]);
+}
 
-export async function load(version, callback) {
+export async function load(version = "master", compiler, callback) {
     const db = initDexie();
 
-    const {baseRepo, basePath, modRepo} = await getConfig(callback);
-
+    const config = await getConfig(db, callback);
+    const {baseRepo, basePath, modRepo} = config;
     const baseVersions = await getVersions(db, baseRepo, callback);
     const modVersions = await getVersions(db, modRepo, callback);
 
@@ -96,9 +103,14 @@ export async function load(version, callback) {
         throw new Error(`Unknown mod version: ${version}`);
     }
 
-    const modRuleset = await getRuleset(db, modRepo, modSha, callback);
-    callback && callback("LOAD_COMPLETE");
-    return [baseRuleset, modRuleset];
+    const modRuleset = await getRuleset(db, modRepo, modSha, null, callback);
+    
+    const supportedLanguages = getSupportedLanguages(baseRuleset, modRuleset);
+    console.log(`supported languages:`, supportedLanguages);
+    callback && callback(["COMPILING_RULESET"]);
+    const ruleset = compiler ? compiler([baseRuleset, modRuleset]) : deepmerge(baseRuleset, modRuleset);
+    callback && callback(["COMPLETE"]);
+    return { config, supportedLanguages, ruleset };
 }
 
 window.xcom = load;

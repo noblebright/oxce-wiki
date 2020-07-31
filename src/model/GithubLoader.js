@@ -1,4 +1,4 @@
-const loadJSON = url => fetch(url).then(res => res.json());
+import { loadJSON } from "./utils";
 
 export default class GithubLoader {
     constructor(repoName) {
