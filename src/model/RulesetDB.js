@@ -29,7 +29,7 @@ function initDexie() {
 async function getVersions(db, repo, callback) {
     const repoVersions = await db.versions.get(repo);
 
-    if(!repoVersions || ((Date.now() - repoVersions.lastFetched) <  - 1000 * 60 * 60 * 24)) {
+    if(!repoVersions || ((Date.now() - repoVersions.lastFetched) <  1000 * 60 * 60 * 24)) {
         const loader = new GithubLoader(repo);
         const versions = await loader.loadVersions();
         console.log(`fetching version info for ${repo}...`);
