@@ -76,7 +76,7 @@ export default function Ruleset({ lang, setLanguage, versions }) {
     }
 
     const { supportedLanguages, ruleset } = result;
-    
+
     return (
         <>
             <Row noGutters>
@@ -93,7 +93,7 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                 </Col>
             </Row>
             <Row noGutters className="content">
-                <Col xs={12} md={3} lg={2}><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>
+                <Col xs={12} md={3} lg={2} className="sidebarContainer"><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>
                 <Col xs={12} md={9} lg={10}>
                     <Switch>
                         <Route path={path} exact>

@@ -12,8 +12,32 @@
     height: 100%;
     border: 0;
 }
-
 .sidebar {
     height: 100%;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #f7f7f7;
+}
+
+.searchList {
+    list-style-type: none;
+    flex-basis: 1px;
+    flex-grow: 1;
     overflow-y: auto;
+    padding: 0;
+    margin: 0;
+}
+
+.searchItem {
+    padding-left: 40px;
+}
+.searchItem:hover {
+    background-color: #999;
+}
+.searchItem:hover a {
+    color: #fff;
+}
+.searchItem a:hover {
+    text-decoration: none;
 }
