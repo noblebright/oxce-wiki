@@ -8,17 +8,19 @@ const handlers = {
     "LOADING_FILELIST": ([repo, sha]) => ({ status:`Loading file list for: ${repo}@${sha}`, min:0, max: 0, now: 0}),
     "LOADING_FILE": ([url, now, max]) => ({ status:`Loading file: ${url}`, min:0, max, now }),
     "COMPILING_RULESET": () => ({ status: "Compiling Ruleset", min:0, max: 100, now: 100}),
-    "COMPLETE": () => ({ status: "Compiling Ruleset", min:0, max: 100, now: 100})
+    "COMPLETE": () => ({ status: "Complete", min:0, max: 100, now: 100})
 }
 
 export default function useRuleset(version) {
     const [status, setStatus] = useState(["INIT"]);
     const [result, setResult] = useState();
     useEffect(() => {
-        load(version, null, setStatus).then(setResult);
+        load(version, null, setStatus).then(result => {
+            setResult(result);
+            setStatus(["COMPLETE"]);
+        });
     }, [version]);
 
     const [key, ...rest] = status;
-    console.log(key);
     return { statusKey: key, status: handlers[key](rest), result };
 }

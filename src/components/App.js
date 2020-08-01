@@ -1,60 +1,29 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 
+import useMetadata from "../hooks/useMetadata";
 import Ruleset from "./Layout/Ruleset";
 
 import './App.css';
 
-// function App() {
-//   const [db, setDb] = useState({ rules: {}, strings: {} });
-//   useEffect(() => {
-//     const rl = new RuleLoader([
-//         "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/research.rul",
-//                                "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/manufacture.rul",
-//                                "https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/items.rul",
-//                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/research_XCOMFILES.rul",
-//                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/manufacture_XCOMFILES.rul",
-//                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Ruleset/items_XCOMFILES.rul"
-//                               ], 
-//                               ["https://raw.githubusercontent.com/OpenXcom/OpenXcom/master/bin/standard/xcom1/Language/en-US.yml",
-//                                "https://raw.githubusercontent.com/SolariusScorch/XComFiles/master/Language/en-US.yml"]);
-//     rl.load().then(setDb);
-// }, []);
-//   return (
-//     <Router>
-//       <div className="App">
-//         <header>
-//           <h1>X-Com Files Tech Tree</h1>
-//         </header>
-//         <Sidebar db={db}/>
-//         <main>
-//           { !db.loaded ? "Loading..." : 
-//           <Switch>
-//           <Route path="/" exact>
-//               <Welcome/>
-//             </Route>
-//             <Route path="/:id">
-//               <Entry db={db}/>
-//             </Route>
-//           </Switch>}
-//         </main>
-//       </div>
-//     </Router>
-//   );
-// }
+function getDefaultVersion(versions) {
+  return Object.keys(versions)[0];
+}
 
 function App() {
-  const loading = true;
+  const { versions, config, setLanguage } = useMetadata();
+
   return (
     <Router>
-        <Switch>
+        {versions && config && <Switch>
           <Route path="/" exact>
-            <Redirect to="/master"/>
+            <Redirect to={`/${getDefaultVersion(versions)}`}/>
           </Route>
           <Route path="/:version">
-            <Ruleset/>
+            <Ruleset lang={config.currentLanguage} setLanguage={setLanguage} versions={versions}/>
           </Route>
         </Switch>
+        }
     </Router>
   )
 }
