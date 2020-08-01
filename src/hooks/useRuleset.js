@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import { load } from "../model/RulesetDB";
+import compile from "../model/RulesetCompiler";
 
 const handlers = {
     "INIT": () => ({ status: "Initializing...", min:0, max: 0, now: 0}),
@@ -15,9 +16,10 @@ export default function useRuleset(version) {
     const [status, setStatus] = useState(["INIT"]);
     const [result, setResult] = useState();
     useEffect(() => {
-        load(version, null, setStatus).then(result => {
+        load(version, compile, setStatus).then(result => {
             setResult(result);
             setStatus(["COMPLETE"]);
+            console.log(result);
         });
     }, [version]);
 

@@ -1,15 +1,3 @@
-export const loadJSON = url => fetch(url).then(res => res.json());
-export const loadText = url => fetch(url).then(res => res.text());
-
-export const mappify = (array, key, value) => {
-    const keyFn = typeof key === "string" ? x => x[key] : key;
-    const valueFn = value ? (typeof value === "string" ? x => x[value] : value) : x => x;
-    return array.reduce((acc, item) => {
-        acc[keyFn(item)] = valueFn(item);
-        return acc;
-    }, {});
-}
-
 export const possibleLanguages = {
     "en-US": "English (US)",
     "en-GB": "English (UK)",
@@ -48,3 +36,19 @@ export const possibleLanguages = {
     "zh-CN": "中文",
     "zh-TW": "文言"
 };
+
+export const loadJSON = url => fetch(url).then(res => res.json());
+export const loadText = url => fetch(url).then(res => res.text());
+
+export const mappify = (array, key, value) => {
+    const keyFn = typeof key === "string" ? x => x[key] : key;
+    const valueFn = value ? (typeof value === "string" ? x => x[value] : value) : x => x;
+    return array.reduce((acc, item) => {
+        acc[keyFn(item)] = valueFn(item);
+        return acc;
+    }, {});
+}
+
+export function getSupportedLanguages(base, mod) {
+    return Object.keys(possibleLanguages).filter(x => base[x] || mod[x]);
+}

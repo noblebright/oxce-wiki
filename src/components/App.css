@@ -13,11 +13,3 @@ html, body, #root {
   display: flex;
   flex-direction: column;
 }
-
-h1 {
-  margin: 10px 20px;
-}
-
-h2 {
-  margin: 10px 0;
-}

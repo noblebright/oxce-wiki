@@ -2,7 +2,7 @@ import Dexie from "dexie";
 import yaml from "js-yaml";
 import deepmerge from "deepmerge";
 
-import { loadJSON, loadText, mappify, possibleLanguages } from "./utils";
+import { loadJSON, loadText, mappify, getSupportedLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
 
 function initDexie() {
@@ -85,12 +85,13 @@ async function generateRuleset([languageFiles, ruleFiles], callback) {
     return fileContents.reduce((acc, obj) => deepmerge(acc, obj));
 }
 
-function getSupportedLanguages(base, mod) {
-    return Object.keys(possibleLanguages).filter(x => base[x] || mod[x]);
-}
-
 export async function updateLanguage(value) {
     return db.config.put({ key: "currentLanguage", value });
+}
+
+export async function clearDB() {
+    await db.delete();
+    window.location.reload();
 }
 
 export async function getMetadata(callback) {
