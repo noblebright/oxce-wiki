@@ -13,7 +13,10 @@ const SearchIcon = () => (
 );
 
 function getFilteredList(ruleset, search, lc) {
-    const list = Object.keys(ruleset.entries).map(x => ({ name: lc(x), value: x })).filter(x => x.name.toLowerCase().includes(search.toLowerCase())).sort((a, b) => a.name < b.name ? -1 : (a.name === b.name ? 0 : 1));
+    const list = Object.keys(ruleset.entries)
+                    .map(x => ({ name: lc(x), value: x }))
+                    .filter(x => x.name.toLowerCase().includes(search.toLowerCase()))
+                    .sort((a, b) => a.name < b.name ? -1 : (a.name === b.name ? 0 : 1));
     return list;
 }
 
@@ -37,7 +40,7 @@ export default function Sidebar({lang, currentVersion, versions, ruleset}) {
                 />
             </InputGroup>
             <ul className="searchList">
-                { list.map(({ name, value }) => <li className="searchItem" key={value}><Link to={`/${currentVersion}/entry/${value}`}>{name}</Link></li>) }
+                { list.map(({ name, value }) => <li className="px-3" key={value}><Link to={`/${currentVersion}/article/${value}`}>{name}</Link></li>) }
             </ul>
         </div>
     );

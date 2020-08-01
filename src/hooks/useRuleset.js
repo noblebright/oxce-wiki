@@ -9,19 +9,24 @@ const handlers = {
     "LOADING_FILELIST": ([repo, sha]) => ({ status:`Loading file list for: ${repo}@${sha}`, min:0, max: 0, now: 0}),
     "LOADING_FILE": ([url, now, max]) => ({ status:`Loading file: ${url}`, min:0, max, now }),
     "COMPILING_RULESET": () => ({ status: "Compiling Ruleset", min:0, max: 100, now: 100}),
-    "COMPLETE": () => ({ status: "Complete", min:0, max: 100, now: 100})
+    "COMPLETE": () => ({ status: "Complete", min:0, max: 100, now: 100}),
+    "INVALID": () => ({ status: "Invalid Version", min:0, max: 0, now: 0})
 }
 
-export default function useRuleset(version) {
+export default function useRuleset(version, versions) {
     const [status, setStatus] = useState(["INIT"]);
     const [result, setResult] = useState();
     useEffect(() => {
-        load(version, compile, setStatus).then(result => {
-            setResult(result);
-            setStatus(["COMPLETE"]);
-            console.log(result);
-        });
-    }, [version]);
+        if(!versions[version]) {
+            setStatus(["INVALID"])
+        } else {
+            load(version, compile, setStatus).then(result => {
+                setResult(result);
+                setStatus(["COMPLETE"]);
+                console.log(result);
+            });
+        }
+    }, [version, versions]);
 
     const [key, ...rest] = status;
     return { statusKey: key, status: handlers[key](rest), result };

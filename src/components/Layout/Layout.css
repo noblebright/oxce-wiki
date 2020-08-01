@@ -29,9 +29,6 @@
     margin: 0;
 }
 
-.searchItem {
-    padding-left: 40px;
-}
 .searchItem:hover {
     background-color: #999;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, useParams, useRouteMatch } from "react-router-dom";
+import { Route, Redirect, Switch, useParams, useRouteMatch } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Row from "react-bootstrap/Row";
@@ -12,6 +12,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 
 import useRuleset from "../../hooks/useRuleset";
 import SideBar from "./Sidebar";
+import Article from "../Article";
 import { possibleLanguages } from "../../model/utils";
 import { clearDB } from "../../model/RulesetDB";
 
@@ -33,7 +34,6 @@ function LoadingDialog({status}) {
         keyboard={false}
         centered >
         <Modal.Body>
-          <div>Loading...</div>
           <ProgressBar min={0} max={status.max} now={status.now} animated/>
           <div>{status.status}</div>
         </Modal.Body>
@@ -68,8 +68,12 @@ const OptionsDropdown = ({title, children}) => (
 
 export default function Ruleset({ lang, setLanguage, versions }) {
     const { version } = useParams();
-    const { result, status, statusKey } = useRuleset(version);
+    const { result, status, statusKey } = useRuleset(version, versions);
     const { path } = useRouteMatch();
+
+    if(!versions[version]) { //invalid version
+        return <Redirect to="/"/>;
+    }
 
     if(statusKey !== "COMPLETE") {
         return <LoadingDialog status={status}/>
@@ -82,7 +86,7 @@ export default function Ruleset({ lang, setLanguage, versions }) {
             <Row noGutters>
                 <Col>
                     <Navbar bg="dark" variant="dark">
-                        <Navbar.Brand className="mr-auto">The X-Com Files</Navbar.Brand>
+                        <Navbar.Brand className="mr-auto">The X-Com Files - {version}</Navbar.Brand>
                         <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
                             { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
                         </NavDropdown>
@@ -99,9 +103,10 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                         <Route path={path} exact>
                             <Welcome/>
                         </Route>
-                        <Route path={`${path}/entry/:id`}>
-                            Entry goes here.
+                        <Route path={`${path}/article/:id`}>
+                            <Article ruleset={ruleset} lang={lang} parent={path}/>
                         </Route>
+                        <Redirect to="/"/>
                     </Switch>
                 </Col>
             </Row>
