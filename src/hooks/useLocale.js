@@ -6,6 +6,6 @@ export default function useLocale(lang, ruleset) {
         if(!strings || !strings[str]) {
             return str;
         }
-        return strings[str];
+        return strings[str].replace(/\{NEWLINE\}/g, "<br/>");
     }, [lang, ruleset]);
 }

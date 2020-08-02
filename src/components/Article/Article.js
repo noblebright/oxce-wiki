@@ -14,8 +14,14 @@ export default function Article({ ruleset, lang, parent }) {
     }
 
     return (
-        <article className="rulesetArticle">
-            {JSON.stringify(article, null, 4)}
-        </article>
+        <main className="articleContainer">
+            <article className="rulesetArticle">
+                <header>{lc(id)}</header>
+                <div dangerouslySetInnerHTML={{__html: article.ufopaedia?.text && lc(article.ufopaedia.text)}}>
+                    
+                </div>
+                <pre>{JSON.stringify(article, null, 4)}</pre>
+            </article>
+        </main>
     )
 }

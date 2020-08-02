@@ -40,7 +40,7 @@ export default function Sidebar({lang, currentVersion, versions, ruleset}) {
                 />
             </InputGroup>
             <ul className="searchList">
-                { list.map(({ name, value }) => <li className="px-3" key={value}><Link to={`/${currentVersion}/article/${value}`}>{name}</Link></li>) }
+                { list.map(({ name, value }) => <li className="searchItem px-3" key={value}><Link to={`/${currentVersion}/article/${value}`}>{name}</Link></li>) }
             </ul>
         </div>
     );
