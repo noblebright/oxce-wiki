@@ -103,8 +103,8 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                 </Col>
             </Row>
             <Row noGutters className="content">
-                <Col xs={12} md={3} lg={2} className="sidebarContainer"><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>
-                <Col xs={12} md={9} lg={10} className="mainContainer">
+                <Col xs={12} sm={4} md={3} lg={2} className="sidebarContainer"><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>
+                <Col xs={12} sm={8} md={9} lg={10} className="mainContainer">
                     <Switch>
                         <Route path={path} exact>
                             <Welcome/>

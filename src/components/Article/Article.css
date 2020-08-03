@@ -28,6 +28,7 @@ article .auto-width { /*specificity fight*/
     width: auto;
     display: inline-table;
     vertical-align: top;
+    margin: 0 1em;
 }
 
 .InventoryQuantity {
