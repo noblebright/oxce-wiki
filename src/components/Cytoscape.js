@@ -7,7 +7,6 @@ cytoscape.use( dagre );
 const layout = {
     name: 'dagre',
     rankDir: "LR",
-    fit: false, // whether to fit the viewport to the graph
     animate: false,
     nodeDimensionsIncludeLabels: true, // Excludes the label when calculating node bounding boxes for the layout algorithm
 };

@@ -85,14 +85,14 @@ export default function Ruleset({ lang, setLanguage, versions }) {
         return <LoadingDialog status={status}/>
     }
 
-    const { supportedLanguages, ruleset } = result;
+    const { config, supportedLanguages, ruleset } = result;
 
     return (
         <>
             <Row noGutters>
                 <Col>
                     <Navbar bg="dark" variant="dark">
-                        <Navbar.Brand className="mr-auto">The X-Com Files - {version}</Navbar.Brand>
+                        <Navbar.Brand className="mr-auto">{config.title} - {version}</Navbar.Brand>
                         <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
                             { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
                         </NavDropdown>

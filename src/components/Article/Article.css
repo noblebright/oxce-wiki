@@ -45,7 +45,10 @@ article .auto-width { /*specificity fight*/
     width: 25%;
     height: 25%;
 }
-
+.TechTree.lg {
+    width: 75%;
+    height: 75%;
+}
 .debugPane {
     max-height: 80vh;
     overflow: auto;

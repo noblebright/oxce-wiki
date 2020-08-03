@@ -1,4 +1,5 @@
 {
+    "title": "The X-Com Files",
     "baseRepo": "OpenXcom/OpenXcom",
     "basePath": "bin/standard/xcom1",
     "modRepo": "SolariusScorch/XComFiles"
