@@ -4,7 +4,7 @@ export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     const node = rules[id];
     const name = node.research.name;
     if(!ctx[name]) {
-        ctx[name] = { id: name, depends: {}, unlockedBy: {}, seeAlso: {}};
+        ctx[name] = { id: name, dependencies: {}, unlockedBy: {}, seeAlso: {}};
     }
     const nodeDef = ctx[name];
 
@@ -16,7 +16,7 @@ export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
         if(!base[attribute]) return;
         if(base[attribute].length < 10) {
             base[attribute].forEach(x => {
-                nodeDef.seeAlso[x] = true;
+                nodeDef[attribute][x] = true;
                 if(!ctx[x]) {
                     buildTechTree(rules, x, ctx, maxDepth - 1);
                 }
@@ -54,7 +54,7 @@ export function buildCytoTree(rules, lc, id) {
     const nodeCount = elements.length;
 
     //separate pass for edges, because nodes need to exist first.
-    Object.values(normalizedTree).forEach(({id, depends, unlockedBy, seeAlso}) => {
+    Object.values(normalizedTree).forEach(({id, dependencies: depends, unlockedBy, seeAlso}) => {
         Object.keys(unlockedBy).forEach(unlock => {
             const edgeId = `${unlock}=>${id}`;
             elements.push({ group: "edges", data: { id: edgeId, source: unlock, target: id }});
@@ -88,5 +88,5 @@ export function buildCytoTree(rules, lc, id) {
         }
     });
 
-    return { elements, nodeCount };
+    return { elements, nodeCount};
 }

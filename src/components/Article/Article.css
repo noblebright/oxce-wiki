@@ -26,6 +26,8 @@ article header {
 
 article .auto-width { /*specificity fight*/
     width: auto;
+    display: inline-table;
+    vertical-align: top;
 }
 
 .InventoryQuantity {
