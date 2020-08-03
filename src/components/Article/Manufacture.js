@@ -49,8 +49,8 @@ export default function Manufacture({ruleset, lang, id, version}) {
             <SectionHeader label="Manufacture"/>
             <tbody>
                 <SimpleValue label="Category" value={lc(manufacture.category)}/>
-                <SimpleValue label="Cost" value={manufacture.cost}/>
-                <SimpleValue label="Time" value={manufacture.time}/>
+                <SimpleValue label="Cost" value={`$${manufacture.cost}`}/>
+                <SimpleValue label="Time" value={`${manufacture.time} Engineer Hours`}/>
                 {manufacture.cost && entry.items?.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
             </tbody>
             {manufacture.requires && <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>}

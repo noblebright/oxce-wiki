@@ -27,3 +27,15 @@ article .auto-width { /*specificity fight*/
     display: inline-block;
     text-align: right;
 }
+
+.TechTree {
+    width: 50%;
+    height: 50%;
+    display: inline-block;
+    border: 1px solid var(--gray);
+}
+
+.TechTree.sm {
+    width: 25%;
+    height: 25%;
+}

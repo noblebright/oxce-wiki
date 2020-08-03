@@ -118,7 +118,7 @@ export default function compile(base, mod) {
         const facilities = entry.facilities || {};
         backLink(ruleset.entries, key, "research", research.dependencies, "leadsTo");
         backLink(ruleset.entries, key, "research", research.unlocks, "unlockedBy");
-        backLink(ruleset.entries, key, "research", research.lookup, "seeAlso");
+        backLink(ruleset.entries, key, "research", [research.lookup], "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.
         backLink(ruleset.entries, key, "research", manufacture.requires, "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.producedItems && Object.keys(manufacture.producedItems), "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.requiredItems && Object.keys(manufacture.requiredItems), "componentOf");

@@ -14,14 +14,14 @@ export default function Research({ruleset, lang, id, version}) {
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Research"/>
             <tbody>
-                <SimpleValue label="Cost" value={research.cost}/>
+                <SimpleValue label="Cost" value={research.cost === undefined ? "NONE" : `${research.cost} Scientist Hours`}/>
                 <SimpleValue label="Points" value={research.points}/>
                 {research.needItem && <SimpleValue label="Requires Item" value="TRUE"/>}
                 {research.destroyItem && <SimpleValue label="Destroys Item" value="TRUE"/>}
                 {research.lookup && <SimpleValue label="Gives (lookup)" value={research.lookup}>{ linkFn }</SimpleValue>}
             </tbody>
             {research.requiresBaseFunc && <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ lc }</ListValue>}
-            {research.lookupOf && <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>}
+            {research.seeAlso && <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>}
             {research.dependencies && <ListValue label="Dependencies" values={research.dependencies}>{ linkFn }</ListValue>}
             {research.leadsTo && <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>}
             {research.unlockedBy && <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>}
