@@ -1,6 +1,6 @@
 {
     "title": "The X-Com Files",
-    "baseRepo": "OpenXcom/OpenXcom",
+    "baseRepo": "MeridianOXC/OpenXcom",
     "basePath": "bin/standard/xcom1",
     "modRepo": "SolariusScorch/XComFiles"
 }

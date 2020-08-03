@@ -7,6 +7,7 @@ import useLocale from "../../hooks/useLocale";
 import Research from "./Research";
 import Manufacture from "./Manufacture";
 import TechTree from "./TechTree";
+import Item from "./Item";
 
 import "./Article.css";
 
@@ -40,8 +41,9 @@ export default function Article({ ruleset, lang, parent }) {
                 {article.research && <Research ruleset={ruleset} lang={lang} id={id} version={version}/>}
                 {article.research && <TechTree ruleset={ruleset} lang={lang} id={id} version={version}/>}
                 {article.manufacture && <Manufacture ruleset={ruleset} lang={lang} id={id} version={version}/>}
+                {article.items && <Item ruleset={ruleset} lang={lang} id={id} version={version}/>}
                 
-                <Modal show={showDebug} onHide={handleHide} centered>
+                <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>
                     </Modal.Header>

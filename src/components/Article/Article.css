@@ -54,5 +54,7 @@ article .auto-width { /*specificity fight*/
 .debugPane {
     max-height: 80vh;
     overflow: auto;
-    max-width: 80vh;
+}
+.modal-80w {
+    max-width: 80% !important;
 }

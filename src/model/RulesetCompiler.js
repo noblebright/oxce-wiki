@@ -67,8 +67,12 @@ function generateAssets(ruleset, assets) {
 }
 
 function backLink(entries, id, targetSection, list, field) {
-    if (!list) return;
-    for (let key of list) {
+    const entry = entries[id];
+    const items = typeof list === "function" ? list(entry) : list;
+    
+    if (!items) return;
+
+    for (let key of items) {
         let back = entries[key]?.[targetSection];
         if (!back) continue;
         back[field] = back[field] || [];
@@ -85,6 +89,23 @@ function augmentServices(entries, id, list) {
         entries[key].providedBy = entries[key].providedBy || [];
         entries[key].providedBy.push(id);
     }
+}
+
+function getCompatibleAmmo(entry) {
+    const ammo = new Set();
+    const item = entry.items || {};
+
+    if(item.compatibleAmmo) {
+        item.compatibleAmmo.forEach(x => ammo.add(x));
+    }
+    if(item.ammo) {
+        Object.values(item.ammo).forEach(def => {
+            if(def.compatibleAmmo) {
+                def.compatibleAmmo.forEach(x => ammo.add(x));
+            }
+        });
+    }
+    return ammo.size ? [...ammo] : undefined;
 }
 
 export default function compile(base, mod) {
@@ -122,6 +143,12 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, "research", manufacture.requires, "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.producedItems && Object.keys(manufacture.producedItems), "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.requiredItems && Object.keys(manufacture.requiredItems), "componentOf");
+        if(entry.items) {
+            entry.items.allCompatibleAmmo = getCompatibleAmmo(entry);
+        }
+        backLink(ruleset.entries, key, "items", entry.items?.allCompatibleAmmo, "ammoFor");
+
+        
         //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
     return ruleset;
