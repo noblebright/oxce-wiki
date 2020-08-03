@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Route, Redirect, Switch, useParams, useRouteMatch } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import ProgressBar from "react-bootstrap/ProgressBar";
@@ -19,9 +19,15 @@ import { clearDB } from "../../model/RulesetDB";
 import "./Layout.css";
 
 function Welcome() {
+    const [content, setContent] = useState();
+    
+    useEffect(() => {
+      fetch("/main.html").then(x => x.text()).then(text => setContent(text));
+    }, []);
+
     return (
       <div className="welcome">
-          <div className="welcomePage">XCOM Viewer</div>
+          <div className="welcomePage" dangerouslySetInnerHTML={{__html: content}} />
       </div>
     )
   }

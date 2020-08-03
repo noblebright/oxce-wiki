@@ -48,18 +48,40 @@ async function getVersions(repo, callback) {
     return repoVersions.versions;
 }
 
+function rewriteFilePaths(ruleset, loader, sha) {
+    const rewriter = entry => {
+        if(entry.fileSingle) {
+            const path = entry.fileSingle;
+            entry.singleFile = loader.getUrl(sha, path); //rewrite to github raw content url
+        } else {
+            console.log(entry);
+            Object.keys(entry.files).forEach(key => {
+                const path = entry.files[key];
+                entry.files[key] = loader.getUrl(sha, path); //rewrite to github raw content url
+            });
+        }
+    }
+    ruleset.extraSprites && ruleset.extraSprites.forEach(rewriter);
+    ruleset.extraSounds && ruleset.extraSounds.forEach(rewriter);
+    return ruleset;
+}
+
 async function getRuleset(repo, sha, path, callback) {
     const ruleset = await db.rulesets.get(sha);
     if(ruleset) {
         console.log(`cached ruleset info found for ${sha}...`);
         return ruleset.ruleset;
     }
+    
     const loader = new GithubLoader(repo);
     console.log(`loading filelist for ${repo}@${sha}`);
     callback && callback(["LOADING_FILELIST", repo, sha]);
     const fileList = await loader.loadSHA(sha, path);
+
     console.log(`generating ruleset for ${repo}@${sha}`);
-    const newRuleset = await generateRuleset(fileList, callback);
+    const rawRuleset = await generateRuleset(fileList, callback);
+    const newRuleset = rewriteFilePaths(rawRuleset, loader, sha);
+    
     await db.rulesets.put({ sha, ruleset: newRuleset, lastFetched: Date.now() });
     return newRuleset;
 }

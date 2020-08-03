@@ -46,6 +46,26 @@ function generateSection(ruleset, rules, metadata) {
     });
 }
 
+function generateAssets(ruleset, assets) {
+    if(!assets) return;
+
+    assets.forEach(asset => {
+        const name = asset.typeSingle || asset.type;
+        if(asset.delete && ruleset[asset.delete]) { //process delete
+            delete ruleset[asset.delete];
+            return;
+        }
+        if(!name) { //malformed entry
+            return;
+        }
+        if(!ruleset[name]) {
+            ruleset[name] = asset;
+        } else {
+            ruleset[name] = deepmerge(ruleset[name], asset);
+        }
+    });
+}
+
 function backLink(entries, id, targetSection, list, field) {
     if (!list) return;
     for (let key of list) {
@@ -68,7 +88,7 @@ function augmentServices(entries, id, list) {
 }
 
 export default function compile(base, mod) {
-    const ruleset = { languages: {}, entries: {} };
+    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {} };
     
     //add languages
     const supportedLanguages = getSupportedLanguages(base, mod);
@@ -82,6 +102,15 @@ export default function compile(base, mod) {
         generateSection(ruleset.entries, mod, metadata);
     });
 
+    //add sprites
+    generateAssets(ruleset.sprites, base.extraSprites);
+    generateAssets(ruleset.sprites, mod.extraSprites);
+
+    //add sounds
+    generateAssets(ruleset.sounds, base.extraSounds);
+    generateAssets(ruleset.sounds, mod.extraSounds);
+
+    //add backreferences
     for(let key in ruleset.entries) {
         const entry = ruleset.entries[key];
         const research = entry.research || {};

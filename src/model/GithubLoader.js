@@ -5,6 +5,10 @@ export default class GithubLoader {
         this.repoName = repoName;
     }
 
+    getUrl(sha, path) {
+        return `https://raw.githubusercontent.com/${this.repoName}/${sha}/${path}`;
+    }
+
     async loadVersions() {
         const branches = await loadJSON(`https://api.github.com/repos/${this.repoName}/branches`);
         const tags = await loadJSON(`https://api.github.com/repos/${this.repoName}/tags`);
@@ -34,10 +38,10 @@ export default class GithubLoader {
                 return;
             }
             if(file.path.match(/Language\/.*\.yml/)) {
-                languageFiles.add(`https://raw.githubusercontent.com/${this.repoName}/${sha}/${file.path}`);
+                languageFiles.add(this.getUrl(sha, file.path));
             }
             if(file.path.match(/.*\.rul/)) {
-                ruleFiles.add(`https://raw.githubusercontent.com/${this.repoName}/${sha}/${file.path}`);
+                ruleFiles.add(this.getUrl(sha, file.path));
             }
         });
         return [languageFiles, ruleFiles];

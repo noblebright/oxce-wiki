@@ -13,3 +13,24 @@ html, body, #root {
   display: flex;
   flex-direction: column;
 }
+
+.SectionHeader { 
+  background-color: var(--gray-dark);
+  color: var(--light);
+  text-align: center;
+  font-weight: 600;
+}
+
+.ListValues {
+  columns: auto 2;
+}
+
+.ListValue {
+  min-width: 200px;
+}
+
+.ListHeader {
+  background-color: var(--gray);
+  color: var(--light);
+  font-weight: 600;
+}
