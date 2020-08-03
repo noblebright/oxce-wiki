@@ -18,6 +18,12 @@ article header {
     margin-bottom: 1em;
 }
 
+.iconButton {
+    border: 0px;
+    background-color: inherit;
+    color: var(--primary);
+}
+
 article .auto-width { /*specificity fight*/
     width: auto;
 }
@@ -38,4 +44,10 @@ article .auto-width { /*specificity fight*/
 .TechTree.sm {
     width: 25%;
     height: 25%;
+}
+
+.debugPane {
+    max-height: 80vh;
+    overflow: auto;
+    max-width: 80vh;
 }
