@@ -37,15 +37,16 @@ function generateSection(ruleset, rules, metadata) {
         if(!name) { //malformed entry
             return;
         }
+        if(filter && !filter(entry, ruleset, name)) {
+            ruleset[name].hide = true;
+        }
         if(!ruleset[name]) {
             ruleset[name] = { [sectionName]: entry };
         } else {
             const mergedEntry = Object.assign({}, ruleset[name][sectionName], entry); //if there's an existing entry, merge new data into it.
             Object.assign(ruleset[name], { [sectionName]: mergedEntry });
         }
-        if(filter && !filter(entry, ruleset, name)) {
-            ruleset[name].hide = true;
-        }
+        
     });
 }
 
