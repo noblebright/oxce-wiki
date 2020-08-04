@@ -6,7 +6,7 @@ import useLocale from "../../hooks/useLocale";
 import useInventory from "../../hooks/useInventory";
 import useLink from "../../hooks/useLink";
 
-function CraftWeapons({crafts, lc}) {
+function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;
     const weaponEntry = [];
 
@@ -26,12 +26,14 @@ export default function Crafts({ruleset, lang, id, version}) {
     const inventoryFn = useInventory(linkFn);
     const crafts = ruleset.entries[id].crafts;
 
+    if(!crafts) return null;
+
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Craft"/>
             <tbody>
                 <SimpleValue label="Weapon Slots" value={crafts.weapons}/>
-                <CraftWeapons crafts={crafts} lc={lc}/>
+                <WeaponSlots crafts={crafts} lc={lc}/>
                 <SimpleValue label="Soldier Capacity" value={crafts.soldiers}/>
                 <SimpleValue label="Vehicle Capacity" value={crafts.vehicles}/>
                 <SimpleValue label="Pilots Required" value={crafts.pilots}/>
@@ -64,6 +66,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <SimpleValue label="Sight Range" value={crafts.sightRange}/>
                 <SimpleValue label="Accuracy Bonus" value={crafts.hitBonus}>{ Percent }</SimpleValue>
                 <SimpleValue label="Power Bonus" value={crafts.powerBonus}>{ Percent }</SimpleValue>
+                <SimpleValue label="Dodge Bonus" value={crafts.avoidBonus}>{ Percent }</SimpleValue>
                 <SimpleValue label="Armor" value={crafts.armor}/>                
            </tbody>
             <ListValue label="Required Research" values={crafts.requires}>{ linkFn }</ListValue>

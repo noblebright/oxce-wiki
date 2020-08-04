@@ -42,9 +42,11 @@ export default function Manufacture({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
     const entry = ruleset.entries[id];
-    const manufacture = entry.manufacture;
     const inventoryFn = useInventory(linkFn);
-
+    const manufacture = entry.manufacture;
+    
+    if(!manufacture) return null;
+    
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Manufacture"/>

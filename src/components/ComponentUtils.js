@@ -4,7 +4,7 @@ export const SectionHeader = ({label}) => (label ? <thead><tr><th className="Sec
 
 export const ListHeader = ({label}) => (<thead>{label && <tr><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
 
-export const SimpleValue = ({label, value, children}) => (value ? <tr><td>{label}</td><td>{children ? children(value) : value}</td></tr> : null);
+export const SimpleValue = ({label, value, children}) => (value ? <tr><td>{label}</td><td>{children ? (console.log(children), children(value)) : value}</td></tr> : null);
 export const BooleanValue = ({label, value}) => (value ? <SimpleValue label={label} value="TRUE"/> : null);
 export const ListValue = ({label, values, children}) => (values && values.length > 0 ?
     <React.Fragment>

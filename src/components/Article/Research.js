@@ -10,6 +10,8 @@ export default function Research({ruleset, lang, id, version}) {
     const linkFn = useLink(version, lc);
     const research = ruleset.entries[id].research;
 
+    if(!research) return null;
+    
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Research"/>

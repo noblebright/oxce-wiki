@@ -17,6 +17,7 @@ const supportedSections = [
     { section: "research", key: "name" },
     { section: "facilities", key: "type" },
     { section: "crafts", key: "type" },
+    { section: "craftWeapons", key: "type" },
     { section: "ufopaedia", key: "id", filter: (x, rs, key) => (rs[key]) }
 ];
 
@@ -138,14 +139,21 @@ export default function compile(base, mod) {
         const research = entry.research || {};
         const manufacture = entry.manufacture || {};
         const facilities = entry.facilities || {};
+        const craftWeapons = entry.craftWeapons || {};
         backLink(ruleset.entries, key, "research", research.dependencies, "leadsTo");
         backLink(ruleset.entries, key, "research", research.unlocks, "unlockedBy");
         backLink(ruleset.entries, key, "research", [research.lookup], "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.
         backLink(ruleset.entries, key, "research", manufacture.requires, "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.producedItems && Object.keys(manufacture.producedItems), "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.requiredItems && Object.keys(manufacture.requiredItems), "componentOf");
+        backLink(ruleset.entries, key, "items", [craftWeapons.launcher], "craftWeapons");
+        backLink(ruleset.entries, key, "items", [craftWeapons.clip], "craftAmmo");
+
         if(entry.items) {
-            entry.items.allCompatibleAmmo = getCompatibleAmmo(entry);
+            const compatibleAmmo = getCompatibleAmmo(entry);
+            if(compatibleAmmo) {
+                entry.items.allCompatibleAmmo = compatibleAmmo;
+            }
         }
         if(entry.facilities?.prisonType) {
             ruleset.prisons[entry.facilities.prisonType] = key;

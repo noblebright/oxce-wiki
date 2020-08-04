@@ -1,5 +1,8 @@
 export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     const node = rules[id];
+    if(!node || !node.research) {
+        return ctx;
+    }
     const name = node.research.name;
     if(!ctx[name]) {
         ctx[name] = { id: name, dependencies: {}, unlockedBy: {}, seeAlso: {}};
@@ -51,6 +54,9 @@ export function buildCytoTree(rules, lc, id) {
 
     const nodeCount = elements.length;
 
+    if(!nodeCount) {
+        return {};
+    }
     //separate pass for edges, because nodes need to exist first.
     Object.values(normalizedTree).forEach(({id, dependencies: depends, unlockedBy, seeAlso}) => {
         Object.keys(unlockedBy).forEach(unlock => {

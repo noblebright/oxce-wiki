@@ -2,7 +2,7 @@ import React, {useMemo} from "react";
 import Table from "react-bootstrap/Table";
 
 import useLocale from "../../hooks/useLocale";
-import { SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
+import { SectionHeader, Money, SimpleValue, ListValue } from "../ComponentUtils.js";
 import useLink from "../../hooks/useLink";
 
 const battleType = [
@@ -26,13 +26,17 @@ export default function Item({ruleset, lang, id, version}) {
     const entry = ruleset.entries[id];
     const items = entry.items;
 
+    if(!items) return null;
+
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Item"/>
             <tbody>
-                <SimpleValue label="Type" value={battleType[items.battleType]}/>
-                <SimpleValue label="Cost" value={items.costBuy}/>
-                <SimpleValue label="Sell Price" value={`$${items.costSell ?? "N/A"}`}/>
+                <SimpleValue label="Type" value={items.battleType}>
+                    {x => battleType[x]}
+                </SimpleValue>
+                <SimpleValue label="Cost" value={items.costBuy}>{ Money }</SimpleValue>
+                <SimpleValue label="Sell Price" value={items.costSell ?? "N/A"}>{ Money }</SimpleValue>
                 <SimpleValue label="Weight" value={items.weight}/>
                 <SimpleValue label="Storage Space" value={items.size}/>
                 {items.invWidth && items.invHeight && <SimpleValue label="Inventory Shape" value={`${items.invWidth}x${items.invHeight}`}/>}
@@ -42,6 +46,8 @@ export default function Item({ruleset, lang, id, version}) {
             <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
             <ListValue label="Ammunition For" values={items.ammoFor}>{ linkFn }</ListValue>
             <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
+            <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>
+            <ListValue label="Craft Ammo For" values={items.craftAmmo}>{ linkFn }</ListValue>
         </Table>
     )
 }

@@ -10,6 +10,7 @@ import TechTree from "./TechTree";
 import Item from "./Item";
 import Facilities from "./Facilities";
 import Crafts from "./Crafts";
+import CraftWeapons from "./CraftWeapons";
 
 import "./Article.css";
 
@@ -34,6 +35,7 @@ export default function Article({ ruleset, lang, parent }) {
     const handleShow = () => setShowDebug(true);
     const handleHide = () => setShowDebug(false);
 
+    const articleProps = {ruleset, lang, id, version};
     return (
         <main className="articleContainer">
             <article className="rulesetArticle">
@@ -42,12 +44,13 @@ export default function Article({ ruleset, lang, parent }) {
                     <button className="iconButton" onClick={handleShow}><Code/></button>
                 </header>
                 <p dangerouslySetInnerHTML={{__html: article.ufopaedia?.text && lc(article.ufopaedia.text)}} />
-                {article.research && <Research ruleset={ruleset} lang={lang} id={id} version={version}/>}
-                {article.research && <TechTree ruleset={ruleset} lang={lang} id={id} version={version}/>}
-                {article.manufacture && <Manufacture ruleset={ruleset} lang={lang} id={id} version={version}/>}
-                {article.items && <Item ruleset={ruleset} lang={lang} id={id} version={version}/>}
-                {article.facilities && <Facilities ruleset={ruleset} lang={lang} id={id} version={version}/>}
-                {article.crafts && <Crafts ruleset={ruleset} lang={lang} id={id} version={version}/>}
+                <Research {...articleProps}/>
+                <TechTree {...articleProps}/>
+                <Manufacture {...articleProps}/>
+                <Item {...articleProps}/>
+                <Facilities {...articleProps}/>
+                <Crafts {...articleProps}/>
+                <CraftWeapons {...articleProps}/>
                 
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
                     <Modal.Header closeButton>

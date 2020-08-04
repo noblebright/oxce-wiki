@@ -24,6 +24,8 @@ export default function TechTree({ruleset, lang, id, version}) {
         history.push(`/${version}/article/${evt.target.id()}`)
     }, [version, history]);
 
+    if(!nodeCount) return null;
+
     const containerStyle = getStyling(nodeCount);
     return <Cytoscape elements={elements} className={containerStyle} onClick={handleClick}/>
 }
