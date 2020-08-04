@@ -20,10 +20,10 @@ export default function FacilitySprite({ ruleset, file, id, size = 1}) {
         } else {
             return (
                 <div className="facilitySprite">
-                    <img src={ruleset.sprites[file].files[`${id}`]}/>
-                    <img src={ruleset.sprites[file].files[`${id + 1}`]} />
-                    <img src={ruleset.sprites[file].files[`${id + 2}`]} />
-                    <img src={ruleset.sprites[file].files[`${id + 3}`]} />
+                    <img src={ruleset.sprites[file].files[`${id}`]} alt=""/>
+                    <img src={ruleset.sprites[file].files[`${id + 1}`]} alt=""/>
+                    <img src={ruleset.sprites[file].files[`${id + 2}`]} alt=""/>
+                    <img src={ruleset.sprites[file].files[`${id + 3}`]} alt=""/>
                 </div>
             );
         }

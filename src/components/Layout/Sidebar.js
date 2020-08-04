@@ -15,7 +15,7 @@ const SearchIcon = () => (
 function getFilteredList(ruleset, search, lc) {
     const list = Object.keys(ruleset.entries)
                     .map(x => ({ name: lc(x), value: x }))
-                    .filter(x => x.name.toLowerCase().includes(search.toLowerCase()))
+                    .filter(x => !ruleset.entries[x.value].hide && x.name.toLowerCase().includes(search.toLowerCase()))
                     .sort((a, b) => a.name < b.name ? -1 : (a.name === b.name ? 0 : 1));
     return list;
 }

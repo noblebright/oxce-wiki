@@ -10,7 +10,7 @@ import { getSupportedLanguages } from "./utils";
 }
 */
 
-//const supportedSections = ["items", "ufos", "units", "armors", "events"];
+//const supportedSections = ["items", "armors", "events", "commendations", "soldierTransforms"];
 const supportedSections = [
     { section: "items", key: "type", filter: (x, rs, key) => x.recover !== false && (x.battleType !== 11 || x.recoverCorpse !== false)},
     { section: "manufacture", key: "name" },
@@ -19,6 +19,7 @@ const supportedSections = [
     { section: "crafts", key: "type" },
     { section: "craftWeapons", key: "type" },
     { section: "ufos", key: "type" },
+    { section: "units", key: "type" },
     { section: "ufopaedia", key: "id", filter: (x, rs, key) => (rs[key]) }
 ];
 
@@ -36,15 +37,14 @@ function generateSection(ruleset, rules, metadata) {
         if(!name) { //malformed entry
             return;
         }
-        if(filter && !filter(entry, ruleset, name)) {
-            //skipped due to filter.
-            return;
-        }
         if(!ruleset[name]) {
             ruleset[name] = { [sectionName]: entry };
         } else {
             const mergedEntry = Object.assign({}, ruleset[name][sectionName], entry); //if there's an existing entry, merge new data into it.
             Object.assign(ruleset[name], { [sectionName]: mergedEntry });
+        }
+        if(filter && !filter(entry, ruleset, name)) {
+            ruleset[name].hide = true;
         }
     });
 }
@@ -143,6 +143,7 @@ export default function compile(base, mod) {
         const craftWeapons = entry.craftWeapons || {};
         backLink(ruleset.entries, key, "research", research.dependencies, "leadsTo");
         backLink(ruleset.entries, key, "research", research.unlocks, "unlockedBy");
+        backLink(ruleset.entries, key, "research", research.getOneFree, "freeFrom");
         backLink(ruleset.entries, key, "research", [research.lookup], "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.
         backLink(ruleset.entries, key, "research", manufacture.requires, "manufacture");
         backLink(ruleset.entries, key, "items", manufacture.producedItems && Object.keys(manufacture.producedItems), "manufacture");

@@ -2,8 +2,26 @@ import React from "react";
 import Table from "react-bootstrap/Table";
 
 import useLocale from "../../hooks/useLocale";
-import { BooleanValue, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
+import { BooleanValue, SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
 import useLink from "../../hooks/useLink";
+
+function ProtectedTopics({topics, linkFn}) {
+    if(!topics) return null;
+    const topicList = Object.entries(topics);
+    return (
+        <React.Fragment>
+            <ListHeader label="Protected Bonus Topics"/>
+            <tbody>
+                {topicList.map(([key, value]) => (
+                    <tr key={key}>
+                        <td>{linkFn(key)}</td>
+                        <td>{value.map(x => <div key={x}>{linkFn(x)}</div>)}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </React.Fragment>
+    )
+}
 
 export default function Research({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
@@ -30,6 +48,9 @@ export default function Research({ruleset, lang, id, version}) {
             <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>
             <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>
             <ListValue label="Unlocks" values={research.unlocks}>{ linkFn }</ListValue>
+            <ListValue label="Bonus Topics" values={research.getOneFree}>{ linkFn }</ListValue>
+            <ProtectedTopics topics={research.getOneFreeProtected} linkFn={linkFn}/>
+            <ListValue label="Free From" values={research.freeFrom}>{ linkFn }</ListValue>
             <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>
         </Table>
     )

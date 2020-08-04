@@ -41,7 +41,7 @@ export default function Research({ruleset, lang, id, version}) {
                 <SimpleValue label="Monthly Cost" value={facilities.monthlyCost}>{ Money }</SimpleValue>
                 <SimpleValue label="Size" value={facilities.size || 1}/>
                 <SimpleValue label="Max Allowed" value={facilities.maxAllowedPerBase}/>
-                <SimpleValue label="Mana Recovery" value={facilities.manaRecoveryPerDay}>{ PerDay }</SimpleValue>
+                <SimpleValue label={lc("manaRecoveryPerDay")} value={facilities.manaRecoveryPerDay}/>
                 <BooleanValue label="Access Lift?" value={facilities.lift}/>
                 <BooleanValue label="Grav Shield?" value={facilities.grav}/>
                 <BooleanValue label="Mind Shield?" value={facilities.mind}/>
