@@ -11,6 +11,7 @@ import Item from "./Item";
 import Facilities from "./Facilities";
 import Crafts from "./Crafts";
 import CraftWeapons from "./CraftWeapons";
+import Ufos from "./Ufos";
 
 import "./Article.css";
 
@@ -51,6 +52,7 @@ export default function Article({ ruleset, lang, parent }) {
                 <Facilities {...articleProps}/>
                 <Crafts {...articleProps}/>
                 <CraftWeapons {...articleProps}/>
+                <Ufos {...articleProps}/>
                 
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
                     <Modal.Header closeButton>

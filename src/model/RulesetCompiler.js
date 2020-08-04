@@ -10,7 +10,7 @@ import { getSupportedLanguages } from "./utils";
 }
 */
 
-//const supportedSections = ["craftWeapons", "crafts", "items", "ufos", "units", "armors", "events"];
+//const supportedSections = ["items", "ufos", "units", "armors", "events"];
 const supportedSections = [
     { section: "items", key: "type", filter: (x, rs, key) => x.recover !== false && (x.battleType !== 11 || x.recoverCorpse !== false)},
     { section: "manufacture", key: "name" },
@@ -18,6 +18,7 @@ const supportedSections = [
     { section: "facilities", key: "type" },
     { section: "crafts", key: "type" },
     { section: "craftWeapons", key: "type" },
+    { section: "ufos", key: "type" },
     { section: "ufopaedia", key: "id", filter: (x, rs, key) => (rs[key]) }
 ];
 

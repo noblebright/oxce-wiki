@@ -56,7 +56,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <SimpleValue label="Max Health" value={crafts.damageMax}/>
                 <SimpleValue label="Max Speed" value={crafts.speedMax}/>
                 <SimpleValue label="Max Shields" value={crafts.shieldCapacity}/>
-                <SimpleValue label="Shield Recharge (Dogfight)" value={crafts.shieldRecharged}/>
+                <SimpleValue label="Shield Recharge (Dogfight)" value={crafts.shieldRecharge}/>
                 <SimpleValue label="Shield Recharge (Flight)" value={crafts.shieldRechargedInGeoscape}/>
                 <SimpleValue label="Shield Recharge (Base)" value={crafts.shieldRechargedAtBase}/>
                 <SimpleValue label="Shield Bleedthrough" value={crafts.shieldBleedThrough}>{ Percent }</SimpleValue>
@@ -67,7 +67,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <SimpleValue label="Accuracy Bonus" value={crafts.hitBonus}>{ Percent }</SimpleValue>
                 <SimpleValue label="Power Bonus" value={crafts.powerBonus}>{ Percent }</SimpleValue>
                 <SimpleValue label="Dodge Bonus" value={crafts.avoidBonus}>{ Percent }</SimpleValue>
-                <SimpleValue label="Armor" value={crafts.armor}/>                
+                <SimpleValue label="Armor" value={crafts.armor}/>
            </tbody>
             <ListValue label="Required Research" values={crafts.requires}>{ linkFn }</ListValue>
             <ListValue label="Required Services" values={crafts.requiresBaseBuyFunc}>{ linkFn }</ListValue>

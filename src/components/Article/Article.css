@@ -87,3 +87,8 @@ div.facilitySprite img:nth-child(4) {
     left: 32px;
     top: 32px;
 }
+
+.singleImage {
+    zoom: 2;
+    image-rendering: pixelated;
+}
