@@ -1,13 +1,14 @@
 import React, {useMemo} from "react";
 import Table from "react-bootstrap/Table";
 
-import { SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
+import { Money, BooleanValue, SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
 import useLocale from "../../hooks/useLocale";
 import useLink from "../../hooks/useLink";
 import useInventory from "../../hooks/useInventory";
 
 function getItemTable(randomList) {
     let denominator = 0;
+    if(!randomList) return {};
     const rows = randomList.map(([weight, items]) => {
         denominator += weight;
         return [weight, Object.entries(items)];
@@ -17,7 +18,7 @@ function getItemTable(randomList) {
 
 function RandomProduction({label, values, children}) {
     const { denominator, rows } = useMemo(() => getItemTable(values), [values]);
-    
+    if(!values) return null;
     return (
         <React.Fragment>
             <ListHeader label={label} />
@@ -49,13 +50,15 @@ export default function Manufacture({ruleset, lang, id, version}) {
             <SectionHeader label="Manufacture"/>
             <tbody>
                 <SimpleValue label="Category" value={lc(manufacture.category)}/>
-                {manufacture.cost && <SimpleValue label="Cost" value={`$${manufacture.cost}`}/>}
-                {manufacture.time && <SimpleValue label="Time" value={`${manufacture.time} Engineer Hours`}/>}
+                <SimpleValue label="Cost" value={manufacture.cost}>{ Money }</SimpleValue>
+                <SimpleValue label="Time" value={manufacture.time}>
+                    { x => `${x} Engineer Hours`}
+                </SimpleValue>
                 {manufacture.cost && entry.items?.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
             </tbody>
             <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>
             <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ lc }</ListValue>
-            {manufacture.requiredItems && <ListValue label="Requires Items" values={Object.entries(manufacture.requiredItems)}>{ inventoryFn }</ListValue>}
+            <ListValue label="Requires Items" values={Object.entries(manufacture.requiredItems || {})}>{ inventoryFn }</ListValue>
             <RandomProduction label="Random Production" values={manufacture.randomProducedItems}>{ inventoryFn }</RandomProduction>
         </Table>
     )

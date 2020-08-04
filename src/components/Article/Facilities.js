@@ -35,7 +35,7 @@ export default function Research({ruleset, lang, id, version}) {
             <tbody>
                 <SimpleValue label="Sprite" value={<FacilitySprite ruleset={ruleset} file="BASEBITS.PCK" id={facilities.size === 2 ? facilities.spriteShape : facilities.spriteFacility} size={facilities.size} />}/>
                 <SimpleValue label="Build Cost" value={facilities.buildCost}> { Money } </SimpleValue>
-                <SimpleValue label="Build Time" value={facilities.buildTime}> {Hours} </SimpleValue>
+                <SimpleValue label="Build Time" value={facilities.buildTime}> { Hours} </SimpleValue>
                 <SimpleValue label="Monthly Cost" value={facilities.monthlyCost}> { Money } </SimpleValue>
                 <SimpleValue label="Size" value={facilities.size || 1}/>
                 <SimpleValue label="Max Allowed" value={facilities.maxAllowedPerBase}/>
