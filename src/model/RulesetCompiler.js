@@ -20,16 +20,17 @@ const supportedSections = [
     { section: "craftWeapons", key: "type" },
     { section: "ufos", key: "type" },
     { section: "units", key: "type" },
-    { section: "ufopaedia", key: "id", filter: (x, rs, key) => (rs[key]) }
+    { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
 function generateSection(ruleset, rules, metadata) {
-    const { section: sectionName, key: keyField, filter } = metadata;
+    const { section: sectionName, key: keyField, filter, omit } = metadata;
 
     const sectionData = rules[sectionName];
     
     sectionData.forEach(entry => {
         const name = entry[keyField];
+        let hide;
         if(entry.delete && ruleset[entry.delete]) { //process delete
             delete ruleset[entry.delete][sectionName];
             return;
@@ -37,8 +38,9 @@ function generateSection(ruleset, rules, metadata) {
         if(!name) { //malformed entry
             return;
         }
-        if(filter && !filter(entry, ruleset, name)) {
-            ruleset[name].hide = true;
+        if(omit && !omit(entry, ruleset, name)) {
+            //don't compile this section.
+            return;
         }
         if(!ruleset[name]) {
             ruleset[name] = { [sectionName]: entry };
@@ -46,7 +48,9 @@ function generateSection(ruleset, rules, metadata) {
             const mergedEntry = Object.assign({}, ruleset[name][sectionName], entry); //if there's an existing entry, merge new data into it.
             Object.assign(ruleset[name], { [sectionName]: mergedEntry });
         }
-        
+        if(filter && !filter(entry, ruleset, name)) {
+            ruleset[name].hide = true;
+        }
     });
 }
 
