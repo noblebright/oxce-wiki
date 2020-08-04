@@ -10,7 +10,7 @@ import { getSupportedLanguages } from "./utils";
 }
 */
 
-//const supportedSections = ["items", "armors", "events", "commendations", "soldierTransforms"];
+//const supportedSections = ["items", "soldiers", "armors", "events", "commendations", "soldierTransforms"];
 const supportedSections = [
     { section: "items", key: "type", filter: (x, rs, key) => x.recover !== false && (x.battleType !== 11 || x.recoverCorpse !== false)},
     { section: "manufacture", key: "name" },
@@ -20,6 +20,7 @@ const supportedSections = [
     { section: "craftWeapons", key: "type" },
     { section: "ufos", key: "type" },
     { section: "units", key: "type" },
+    { section: "soldiers", key: "type" },
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
@@ -30,7 +31,7 @@ function generateSection(ruleset, rules, metadata) {
     
     sectionData.forEach(entry => {
         const name = entry[keyField];
-        let hide;
+
         if(entry.delete && ruleset[entry.delete]) { //process delete
             delete ruleset[entry.delete][sectionName];
             if(!Object.keys(ruleset[entry.delete]).length) {
@@ -159,7 +160,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, "items", [craftWeapons.launcher], "craftWeapons");
         backLink(ruleset.entries, key, "items", [craftWeapons.clip], "craftAmmo");
         backLink(ruleset.entries, key, "facilities", facilities.buildOverFacilities, "upgradesTo");
-
+        backLink(ruleset.entries, key, "soldiers", [manufacture.spawnedPersonType], "manufacture");
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
             if(compatibleAmmo) {

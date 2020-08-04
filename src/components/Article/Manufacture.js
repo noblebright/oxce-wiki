@@ -1,10 +1,10 @@
-import React, {useMemo} from "react";
+import React, { useMemo } from "react";
 import Table from "react-bootstrap/Table";
-
-import { Money, BooleanValue, SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
-import useLocale from "../../hooks/useLocale";
-import useLink from "../../hooks/useLink";
 import useInventory from "../../hooks/useInventory";
+import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale";
+import { ListHeader, ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
+
 
 function getItemTable(randomList) {
     let denominator = 0;
@@ -56,7 +56,10 @@ export default function Manufacture({ruleset, lang, id, version}) {
                 <SimpleValue label="Time" value={manufacture.time}>
                     { x => `${x} Engineer Hours`}
                 </SimpleValue>
-                {manufacture.cost && entry.items?.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
+                <SimpleValue label="Create Staff" value={manufacture.spawnedPersonType}>
+                    { x => ["STR_ENGINEER", "STR_SCIENTIST"].includes(x) ? lc(x) : linkFn(x) }
+                </SimpleValue>
+                {!!manufacture.cost && !!entry.items?.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
             </tbody>
             <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>
             <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ lc }</ListValue>

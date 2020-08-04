@@ -10,7 +10,7 @@ const MissingSprite = ({size = "1em"}) => (
 export default function FacilitySprite({ ruleset, file, id, size = 1}) {
     if(size === 1) {
         if(ruleset.sprites[file]?.files[id]) {
-            return <img src={ruleset.sprites[file].files[`${id}`]} className="facilitySprite"/>;
+            return <img src={ruleset.sprites[file].files[`${id}`]} className="facilitySprite" alt=""/>;
         } else {
             return <MissingSprite size="128px"/>;
         }

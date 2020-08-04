@@ -1,10 +1,9 @@
 import React from "react";
 import Table from "react-bootstrap/Table";
-
-import { SectionHeader, Percent, Hours, Money, BooleanValue, SimpleValue, ListValue } from "../ComponentUtils.js";
-import useLocale from "../../hooks/useLocale";
-import useInventory from "../../hooks/useInventory";
 import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale";
+import { BooleanValue, Hours, ListValue, Money, Percent, SectionHeader, SimpleValue } from "../ComponentUtils.js";
+
 
 function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;
@@ -23,7 +22,6 @@ function WeaponSlots({crafts, lc}) {
 export default function Crafts({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
-    const inventoryFn = useInventory(linkFn);
     const crafts = ruleset.entries[id].crafts;
 
     if(!crafts) return null;

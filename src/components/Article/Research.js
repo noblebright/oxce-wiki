@@ -35,7 +35,7 @@ export default function Research({ruleset, lang, id, version}) {
             <SectionHeader label="Research"/>
             <tbody>
                 <SimpleValue label="Cost" value={research.cost}>
-                    { x => x === undefined ? "NONE" : `${x} Scientist Hours` }
+                    { x => x === undefined ? "NONE" : `${x} Scientist Days` }
                 </SimpleValue>
                 <SimpleValue label="Points" value={research.points}/>
                 <BooleanValue label="Requires Item" value={research.needItem}/>

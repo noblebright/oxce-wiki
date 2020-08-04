@@ -1,9 +1,9 @@
-import React, {useMemo} from "react";
+import React from "react";
 import Table from "react-bootstrap/Table";
-
-import useLocale from "../../hooks/useLocale";
-import { SectionHeader, Money, SimpleValue, ListValue } from "../ComponentUtils.js";
 import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale";
+import { ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
+
 
 const battleType = [
     "None (0)",
@@ -28,6 +28,9 @@ export default function Item({ruleset, lang, id, version}) {
 
     if(!items) return null;
 
+    if(Object.keys(items).length <= 1) {
+        return null; //empty object.
+    }
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Item"/>
@@ -36,7 +39,7 @@ export default function Item({ruleset, lang, id, version}) {
                     {x => battleType[x]}
                 </SimpleValue>
                 <SimpleValue label="Cost" value={items.costBuy}>{ Money }</SimpleValue>
-                <SimpleValue label="Sell Price" value={items.costSell ?? "N/A"}>{ Money }</SimpleValue>
+                <SimpleValue label="Sell Price" value={items.costSell}>{ Money }</SimpleValue>
                 <SimpleValue label="Weight" value={items.weight}/>
                 <SimpleValue label="Storage Space" value={items.size}/>
                 {!!items.invWidth && !!items.invHeight && <SimpleValue label="Inventory Shape" value={`${items.invWidth}x${items.invHeight}`}/>}

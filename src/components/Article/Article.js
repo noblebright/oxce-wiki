@@ -13,6 +13,7 @@ import Crafts from "./Crafts";
 import CraftWeapons from "./CraftWeapons";
 import Ufos from "./Ufos";
 import Units from "./Units";
+import Soldiers from "./Soldiers";
 
 import "./Article.css";
 
@@ -55,6 +56,7 @@ export default function Article({ ruleset, lang, parent }) {
                 <CraftWeapons {...articleProps}/>
                 <Ufos {...articleProps}/>
                 <Units {...articleProps}/>
+                <Soldiers {...articleProps}/>
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>
