@@ -33,6 +33,9 @@ function generateSection(ruleset, rules, metadata) {
         let hide;
         if(entry.delete && ruleset[entry.delete]) { //process delete
             delete ruleset[entry.delete][sectionName];
+            if(!Object.keys(ruleset[entry.delete]).length) {
+                delete ruleset[entry.delete];
+            }
             return;
         }
         if(!name) { //malformed entry
@@ -155,6 +158,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, "items", manufacture.requiredItems && Object.keys(manufacture.requiredItems), "componentOf");
         backLink(ruleset.entries, key, "items", [craftWeapons.launcher], "craftWeapons");
         backLink(ruleset.entries, key, "items", [craftWeapons.clip], "craftAmmo");
+        backLink(ruleset.entries, key, "facilities", facilities.buildOverFacilities, "upgradesTo");
 
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);

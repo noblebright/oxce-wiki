@@ -39,7 +39,7 @@ export default function Item({ruleset, lang, id, version}) {
                 <SimpleValue label="Sell Price" value={items.costSell ?? "N/A"}>{ Money }</SimpleValue>
                 <SimpleValue label="Weight" value={items.weight}/>
                 <SimpleValue label="Storage Space" value={items.size}/>
-                {items.invWidth && items.invHeight && <SimpleValue label="Inventory Shape" value={`${items.invWidth}x${items.invHeight}`}/>}
+                {!!items.invWidth && !!items.invHeight && <SimpleValue label="Inventory Shape" value={`${items.invWidth}x${items.invHeight}`}/>}
             </tbody>
             <ListValue label="Categories" values={items.categories}>{ lc }</ListValue>
             <ListValue label="Required to Purchase" values={items.requiresBuy}>{ linkFn }</ListValue>

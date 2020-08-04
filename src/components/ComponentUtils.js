@@ -24,6 +24,7 @@ export const ListValue = ({label, values, children}) => (values && values.length
 
 export const Money = x => `$${x}`;
 export const Hours = x => `${x} Hours`;
+export const Days = x => `${x} Days`;
 export const PerDay = x => `${x}/Day`;
 export const Percent = x => `${x}%`;
 export const Image = x => ``
