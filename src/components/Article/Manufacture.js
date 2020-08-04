@@ -61,6 +61,7 @@ export default function Manufacture({ruleset, lang, id, version}) {
             <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>
             <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ lc }</ListValue>
             <ListValue label="Requires Items" values={Object.entries(manufacture.requiredItems || {})}>{ inventoryFn }</ListValue>
+            <ListValue label="Produced Items" values={Object.entries(manufacture.producedItems || {})}>{ inventoryFn }</ListValue>
             <RandomProduction label="Random Production" values={manufacture.randomProducedItems}>{ inventoryFn }</RandomProduction>
         </Table>
     )
