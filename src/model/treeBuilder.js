@@ -1,5 +1,3 @@
-import { getLabel } from "./RuleLoader";
-
 export function buildTechTree(rules, id, ctx = {}, maxDepth = 5) {
     const node = rules[id];
     const name = node.research.name;

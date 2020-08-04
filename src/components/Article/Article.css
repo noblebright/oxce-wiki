@@ -59,3 +59,31 @@ article .auto-width { /*specificity fight*/
 .modal-80w {
     max-width: 80% !important;
 }
+
+img.sprite {
+    zoom: 4;
+    image-rendering: pixelated;
+}
+
+div.sprite {
+    position: relative;
+    width: 256px;
+    height: 256px;
+}
+
+div.sprite img {
+    zoom: 4;
+    image-rendering: pixelated;
+    position: absolute;
+}
+
+div.sprite img:nth-child(2) {
+    left: 32px;
+}
+div.sprite img:nth-child(3) {
+    top: 32px;
+}
+div.sprite img:nth-child(4) {
+    left: 32px;
+    top: 32px;
+}

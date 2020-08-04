@@ -109,7 +109,7 @@ function getCompatibleAmmo(entry) {
 }
 
 export default function compile(base, mod) {
-    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {} };
+    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {} };
     
     //add languages
     const supportedLanguages = getSupportedLanguages(base, mod);
@@ -145,6 +145,9 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, "items", manufacture.requiredItems && Object.keys(manufacture.requiredItems), "componentOf");
         if(entry.items) {
             entry.items.allCompatibleAmmo = getCompatibleAmmo(entry);
+        }
+        if(entry.facilities?.prisonType) {
+            ruleset.prisons[entry.facilities.prisonType] = key;
         }
         backLink(ruleset.entries, key, "items", entry.items?.allCompatibleAmmo, "ammoFor");
 

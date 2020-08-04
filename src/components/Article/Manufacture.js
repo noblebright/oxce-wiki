@@ -1,9 +1,10 @@
 import React, {useMemo} from "react";
 import Table from "react-bootstrap/Table";
 
-import useLocale from "../../hooks/useLocale";
 import { SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
+import useLocale from "../../hooks/useLocale";
 import useLink from "../../hooks/useLink";
+import useInventory from "../../hooks/useInventory";
 
 function getItemTable(randomList) {
     let denominator = 0;
@@ -41,8 +42,7 @@ export default function Manufacture({ruleset, lang, id, version}) {
     const linkFn = useLink(version, lc);
     const entry = ruleset.entries[id];
     const manufacture = entry.manufacture;
-
-    const inventoryFn = ([id, quantity]) => (<React.Fragment><span className="InventoryQuantity">{quantity}</span> {linkFn(id)}</React.Fragment>);
+    const inventoryFn = useInventory(linkFn);
 
     return (
         <Table bordered striped size="sm" className="auto-width">
