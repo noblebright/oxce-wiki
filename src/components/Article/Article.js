@@ -9,6 +9,7 @@ import Manufacture from "./Manufacture";
 import TechTree from "./TechTree";
 import Item from "./Item";
 import Facilities from "./Facilities";
+import Crafts from "./Crafts";
 
 import "./Article.css";
 
@@ -46,6 +47,7 @@ export default function Article({ ruleset, lang, parent }) {
                 {article.manufacture && <Manufacture ruleset={ruleset} lang={lang} id={id} version={version}/>}
                 {article.items && <Item ruleset={ruleset} lang={lang} id={id} version={version}/>}
                 {article.facilities && <Facilities ruleset={ruleset} lang={lang} id={id} version={version}/>}
+                {article.crafts && <Crafts ruleset={ruleset} lang={lang} id={id} version={version}/>}
                 
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
                     <Modal.Header closeButton>

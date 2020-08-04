@@ -31,17 +31,17 @@ export default function Item({ruleset, lang, id, version}) {
             <SectionHeader label="Item"/>
             <tbody>
                 <SimpleValue label="Type" value={battleType[items.battleType]}/>
-                {items.costBuy && <SimpleValue label="Cost" value={items.costBuy}/>}
+                <SimpleValue label="Cost" value={items.costBuy}/>
                 <SimpleValue label="Sell Price" value={`$${items.costSell ?? "N/A"}`}/>
                 <SimpleValue label="Weight" value={items.weight}/>
                 <SimpleValue label="Storage Space" value={items.size}/>
                 {items.invWidth && items.invHeight && <SimpleValue label="Inventory Shape" value={`${items.invWidth}x${items.invHeight}`}/>}
             </tbody>
-            {items.categories && <ListValue label="Categories" values={items.categories}>{ lc }</ListValue>}
-            {items.requiresBuy && <ListValue label="Required to Purchase" values={items.requiresBuy}>{ linkFn }</ListValue>}
-            {items.requires && <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>}
-            {items.ammoFor && <ListValue label="Ammunition For" values={items.ammoFor}>{ linkFn }</ListValue>}
-            {items.allCompatibleAmmo && <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>}
+            <ListValue label="Categories" values={items.categories}>{ lc }</ListValue>
+            <ListValue label="Required to Purchase" values={items.requiresBuy}>{ linkFn }</ListValue>
+            <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
+            <ListValue label="Ammunition For" values={items.ammoFor}>{ linkFn }</ListValue>
+            <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
         </Table>
     )
 }

@@ -60,30 +60,30 @@ article .auto-width { /*specificity fight*/
     max-width: 80% !important;
 }
 
-img.sprite {
+img.facilitySprite {
     zoom: 4;
     image-rendering: pixelated;
 }
 
-div.sprite {
+div.facilitySprite {
     position: relative;
     width: 256px;
     height: 256px;
 }
 
-div.sprite img {
+div.facilitySprite img {
     zoom: 4;
     image-rendering: pixelated;
     position: absolute;
 }
 
-div.sprite img:nth-child(2) {
+div.facilitySprite img:nth-child(2) {
     left: 32px;
 }
-div.sprite img:nth-child(3) {
+div.facilitySprite img:nth-child(3) {
     top: 32px;
 }
-div.sprite img:nth-child(4) {
+div.facilitySprite img:nth-child(4) {
     left: 32px;
     top: 32px;
 }

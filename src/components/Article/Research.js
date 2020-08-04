@@ -18,15 +18,15 @@ export default function Research({ruleset, lang, id, version}) {
                 <SimpleValue label="Points" value={research.points}/>
                 {research.needItem && <SimpleValue label="Requires Item" value="TRUE"/>}
                 {research.destroyItem && <SimpleValue label="Destroys Item" value="TRUE"/>}
-                {research.lookup && <SimpleValue label="Gives (lookup)" value={research.lookup}>{ linkFn }</SimpleValue>}
+                <SimpleValue label="Gives (lookup)" value={research.lookup}>{ linkFn }</SimpleValue>
             </tbody>
-            {research.requiresBaseFunc && <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ lc }</ListValue>}
-            {research.seeAlso && <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>}
-            {research.dependencies && <ListValue label="Dependencies" values={research.dependencies}>{ linkFn }</ListValue>}
-            {research.leadsTo && <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>}
-            {research.unlockedBy && <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>}
-            {research.unlocks && <ListValue label="Unlocks" values={research.unlocks}>{ linkFn }</ListValue>}
-            {research.manufacture && <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>}
+            <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ lc }</ListValue>
+            <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>
+            <ListValue label="Dependencies" values={research.dependencies}>{ linkFn }</ListValue>
+            <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>
+            <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>
+            <ListValue label="Unlocks" values={research.unlocks}>{ linkFn }</ListValue>
+            <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>
         </Table>
     )
 }

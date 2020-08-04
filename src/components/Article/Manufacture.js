@@ -49,14 +49,14 @@ export default function Manufacture({ruleset, lang, id, version}) {
             <SectionHeader label="Manufacture"/>
             <tbody>
                 <SimpleValue label="Category" value={lc(manufacture.category)}/>
-                <SimpleValue label="Cost" value={`$${manufacture.cost}`}/>
-                <SimpleValue label="Time" value={`${manufacture.time} Engineer Hours`}/>
+                {manufacture.cost && <SimpleValue label="Cost" value={`$${manufacture.cost}`}/>}
+                {manufacture.time && <SimpleValue label="Time" value={`${manufacture.time} Engineer Hours`}/>}
                 {manufacture.cost && entry.items?.costSell && <SimpleValue label="Profitability" value={`$${Math.trunc((entry.items.costSell - manufacture.cost) / manufacture.time)}/engineer hour`}/>}
             </tbody>
-            {manufacture.requires && <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>}
-            {manufacture.requiresBaseFunc && <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ lc }</ListValue>}
+            <ListValue label="Requires Research" values={manufacture.requires}>{ linkFn }</ListValue>
+            <ListValue label="Requires Service" values={manufacture.requiresBaseFunc}>{ lc }</ListValue>
             {manufacture.requiredItems && <ListValue label="Requires Items" values={Object.entries(manufacture.requiredItems)}>{ inventoryFn }</ListValue>}
-            {manufacture.randomProducedItems && <RandomProduction label="Random Production" values={manufacture.randomProducedItems}>{ inventoryFn }</RandomProduction>}
+            <RandomProduction label="Random Production" values={manufacture.randomProducedItems}>{ inventoryFn }</RandomProduction>
         </Table>
     )
 }
