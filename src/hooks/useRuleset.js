@@ -32,7 +32,7 @@ export default function useRuleset(version, versions) {
             load(version, compile, setStatus).then(result => {
                 setResult(result);
                 setStatus(["COMPLETE"]);
-                console.log(result);
+                window.db = result;
             });
         }
         oldVersion.current = version;

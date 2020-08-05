@@ -92,3 +92,25 @@ div.facilitySprite img:nth-child(4) {
     zoom: 2;
     image-rendering: pixelated;
 }
+
+.PaperDoll {
+    position: relative;
+    width: calc(320 * 2px);
+    height: calc(200 * 2px);
+    background-color: #000;
+}
+
+.PaperDoll>img {
+    position: absolute;
+}
+
+.PaperDoll>select {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    z-index: 1;
+}
+
+.PaperDoll>img:first-child {
+    position: relative;
+}

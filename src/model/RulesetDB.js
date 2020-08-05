@@ -52,7 +52,7 @@ function rewriteFilePaths(ruleset, loader, sha) {
     const rewriter = entry => {
         if(entry.fileSingle) {
             const path = entry.fileSingle;
-            entry.singleFile = loader.getUrl(sha, path); //rewrite to github raw content url
+            entry.fileSingle = loader.getUrl(sha, path); //rewrite to github raw content url
         } else {
             console.log(entry);
             Object.keys(entry.files).forEach(key => {

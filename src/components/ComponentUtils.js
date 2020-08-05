@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 
 export const SectionHeader = ({label}) => (label ? <thead><tr><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
 
@@ -61,3 +61,12 @@ export const HeightStats = ({entity}) => (
         <SimpleValue label="Float Height" value={entity.floatHeight}/>
     </React.Fragment>
 );
+
+export function SimpleSelect({ options, value, onChange }) {
+    const handleChange = useCallback(evt => onChange(evt.target.value), [onChange]);
+    return (
+        <select value={value} onChange={handleChange}>
+            { options.map(x => <option key={x} value={x}>{x}</option>) }
+        </select>
+    );
+}

@@ -1,12 +1,12 @@
-import React from "react";
+import React, {useState, useMemo} from "react";
 import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useBonusString from "../../hooks/useBonusString";
-import { BooleanValue, ListValue, Percent, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
+import { BooleanValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
 import useImage from "../../hooks/useImage";
 
-function Armor({armors, lc}) {
+function ArmorRating({armors, lc}) {
     if(!armors) return null;
     return (
         <Table bordered striped size="sm" className="auto-width">
@@ -70,6 +70,95 @@ function StatRecovery({recovery, bonusFn, lc}) {
     );
 }
 
+
+
+function SingleImage({imageFn, id}) {
+    return <div className="PaperDoll">{imageFn(id)}</div>;
+}
+
+function LayeredDoll({layersDefaultPrefix, layersDefinition, layersSpecificPrefix = {}, imageFn}) {
+    const [selected, setSelected] = useState();
+    if(!selected) { //set selected to default and try again.
+        setSelected(Object.keys(layersDefinition)[0]);
+        return null;
+    }
+    const definition = layersDefinition[selected];
+    const layers = definition.reduce((acc, item, idx) => {
+        if(!item) return acc;
+        const prefix = layersSpecificPrefix[`${idx}`] || layersDefaultPrefix;
+        const spriteKey = `${prefix}__${idx}__${item}`;
+        acc.push(imageFn(spriteKey, { key: idx }));
+        return acc;
+    }, []);
+    
+    return (
+        <div className="PaperDoll">
+            <SimpleSelect options={Object.keys(layersDefinition).sort()} value={selected} onChange={setSelected}/>
+            {layers}
+        </div>
+    );
+}
+
+function ClassicInventory({ruleset, id, imageFn}) {
+    const [selected, setSelected] = useState();
+    const versions = useMemo(() => {
+        let v = {};
+        for(let i = 0; i < 100; i++) { // wooo, infinite!
+            const mKey = `${id}M${i}.SPK`;
+            const fKey = `${id}F${i}.SPK`;
+            if(ruleset.sprites[mKey]) { 
+                //found a male version, put it in;
+                v[`M${i}`] = mKey;
+            }
+            if(ruleset.sprites[fKey]) {
+                //found a female version, put it in;
+                v[`F${i}`] = fKey;
+            }
+            if(!ruleset.sprites[mKey] && !ruleset.sprites[fKey]) { 
+                //didn't find anything, guess we're done.
+                break;
+            }
+        }
+        return v;
+    }, [ruleset, id]);
+
+    if(!Object.keys(versions).length) {
+        return "No sprites found";
+    }
+
+    if(!selected) { //set selected to default and try again.
+        setSelected(Object.keys(versions)[0]);
+        return null;
+    }
+
+    return (
+        <div className="PaperDoll">
+            <SimpleSelect options={Object.keys(versions).sort()} value={selected} onChange={setSelected}/>
+            {imageFn(versions[selected])}
+        </div>
+    );
+}
+
+function PaperDoll({ruleset, armors, imageFn}) {
+    const spriteId = armors.spriteInv;
+    const sprite = ruleset.sprites[spriteId];
+    
+    if(sprite && (sprite.typeSingle || sprite.singleImage)) { //found a single image sprite
+        return <SingleImage imageFn={imageFn} id={spriteId}/>;
+    }
+
+    //no single image, look for paperdoll
+    const { layersDefaultPrefix, layersSpecificPrefix, layersDefinition } = armors;
+    
+    // Build Layered PaperDoll if it exists.
+    if(layersDefaultPrefix && layersDefinition) { 
+        return <LayeredDoll layersDefaultPrefix={layersDefaultPrefix} layersSpecificPrefix={layersSpecificPrefix} layersDefinition={layersDefinition} imageFn={imageFn}/>
+    }
+
+    //attempt to build classic image variant
+    return <ClassicInventory ruleset={ruleset} id={spriteId} imageFn={imageFn}/>;
+}
+
 export default function Armors({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
@@ -84,9 +173,9 @@ export default function Armors({ruleset, lang, id, version}) {
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Armor"/>
             <tbody>
-                <tr><td colSpan="2">{ imageFn(armors.spriteInv) }</td></tr>
+                <tr><td colSpan="2"><PaperDoll ruleset={ruleset} armors={armors} imageFn={imageFn}/></td></tr>
                 <tr>
-                    <td><Armor armors={armors} lc={lc}/></td>
+                    <td><ArmorRating armors={armors} lc={lc}/></td>
                     <td><DamageResists resists={armors.damageModifier} lc={lc}/></td>
                 </tr>
             </tbody>
@@ -125,8 +214,8 @@ export default function Armors({ruleset, lang, id, version}) {
                 <SimpleValue label="Back Dodge Penalty" value={Math.floor(armors.meleeDodgeBackPenalty * 100)}>{ Percent }</SimpleValue>
                 <SimpleValue label="Side Dodge Penalty" value={Math.floor(armors.meleeDodgeBackPenalty * 100) / 2}>{ Percent }</SimpleValue>
                 <HeightStats entity={armors} />
-                <UnitStats stats={armors.stats} lc={lc}/>
             </tbody>
+            <UnitStats stats={armors.stats} lc={lc}/>
             <ListValue label="Corpse Item" values={armors.corpseBattle}>{ linkFn }</ListValue>
             <ListValue label="Built-in Weapons" values={armors.builtInWeapons}>{ linkFn }</ListValue>
             <ListValue label="Categories" values={armors.categories}>{ lc }</ListValue>
