@@ -197,7 +197,7 @@ export default function Armors({ruleset, lang, id, version}) {
                 <SimpleValue label="Camouflage Detection (Night)" value={armors.antiCamouflageAtDark}/>
                 <SimpleValue label="Thermal Vision" value={armors.heatVision}>{ Percent }</SimpleValue>
                 <SimpleValue label="Psi Sense" value={armors.psiVision}/>
-                <SimpleValue label="Overkill Threshold" value={armors.overKill}>{Percent}</SimpleValue>
+                <SimpleValue label="Overkill Threshold" value={armors.overKill * 100 || 50}>{Percent}</SimpleValue>
                 <BooleanValue label="Can Run?" value={armors.allowsRunning}/>
                 <BooleanValue label="Can Kneel?" value={armors.allowsKneeling}/>
                 <BooleanValue label="Can Strafe?" value={armors.allowsStrafing}/>
