@@ -156,6 +156,8 @@ export default function compile(base, mod) {
         const manufacture = entry.manufacture || {};
         const facilities = entry.facilities || {};
         const craftWeapons = entry.craftWeapons || {};
+        const armors = entry.armors || {};
+        
         backLink(ruleset.entries, key, "research", research.dependencies, "leadsTo");
         backLink(ruleset.entries, key, "research", research.unlocks, "unlockedBy");
         backLink(ruleset.entries, key, "research", research.getOneFree, "freeFrom");
@@ -167,6 +169,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, "items", [craftWeapons.clip], "craftAmmo");
         backLink(ruleset.entries, key, "facilities", facilities.buildOverFacilities, "upgradesTo");
         backLink(ruleset.entries, key, "soldiers", [manufacture.spawnedPersonType], "manufacture");
+        backLink(ruleset.entries, key, "soldiers", armors.units, "usableArmors");
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
             if(compatibleAmmo) {

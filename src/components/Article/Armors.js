@@ -103,7 +103,7 @@ function ClassicInventory({ruleset, id, imageFn}) {
     const [selected, setSelected] = useState();
     const versions = useMemo(() => {
         let v = {};
-        for(let i = 0; i < 100; i++) { // wooo, infinite!
+        for(let i = 0; i < 256; i++) { // idx = lookVariant*4 + look (lookVariant: 0-63, look: 0-3. so max is 64 * 4 = 256)
             const mKey = `${id}M${i}.SPK`;
             const fKey = `${id}F${i}.SPK`;
             if(ruleset.sprites[mKey]) { 
@@ -113,10 +113,6 @@ function ClassicInventory({ruleset, id, imageFn}) {
             if(ruleset.sprites[fKey]) {
                 //found a female version, put it in;
                 v[`F${i}`] = fKey;
-            }
-            if(!ruleset.sprites[mKey] && !ruleset.sprites[fKey]) { 
-                //didn't find anything, guess we're done.
-                break;
             }
         }
         return v;
@@ -139,6 +135,7 @@ function ClassicInventory({ruleset, id, imageFn}) {
     );
 }
 
+//FIXME: OXCE falls back LayeredDoll -> ClassicInventory -> SingleImage instead of SingleImage -> LayeredDoll -> ClassicInventory.
 function PaperDoll({ruleset, armors, imageFn}) {
     const spriteId = armors.spriteInv;
     const sprite = ruleset.sprites[spriteId];
@@ -182,6 +179,7 @@ export default function Armors({ruleset, lang, id, version}) {
             <StatRecovery recovery={armors.recovery} lc={lc} bonusFn={bonusFn}/>
             <ListHeader label="Properties"/>
             <tbody>
+                <SimpleValue label="Required to Use" value={armors.requires}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Recovered Corpse" value={armors.corpseGeo}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Inventory Item" value={armors.storeItem}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Special Weapon" value={armors.specialWeapon}>{ linkFn }</SimpleValue>
@@ -216,11 +214,11 @@ export default function Armors({ruleset, lang, id, version}) {
                 <HeightStats entity={armors} />
             </tbody>
             <UnitStats stats={armors.stats} lc={lc}/>
+            <ListValue label="Equippable By" values={armors.units}>{ linkFn }</ListValue>
             <ListValue label="Corpse Item" values={armors.corpseBattle}>{ linkFn }</ListValue>
             <ListValue label="Built-in Weapons" values={armors.builtInWeapons}>{ linkFn }</ListValue>
             <ListValue label="Categories" values={armors.categories}>{ lc }</ListValue>
             <ListValue label="Required to Purchase" values={armors.requiresBuy}>{ linkFn }</ListValue>
-            <ListValue label="Required to Use" values={armors.requires}>{ linkFn }</ListValue>
         </Table>
     );
 }
