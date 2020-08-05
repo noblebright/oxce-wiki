@@ -59,7 +59,7 @@ const recoveryStrings = {
 };
 
 function StatRecovery({recovery, bonusFn, lc}) {
-    if(!recover) return null;
+    if(!recovery) return null;
     return (
         <React.Fragment>
             <ListHeader label="Stat Recovery"/>
