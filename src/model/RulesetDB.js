@@ -4,9 +4,11 @@ import deepmerge from "deepmerge";
 
 import { loadJSON, loadText, mappify, getSupportedLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
+import FallbackDB from "./FallbackDB";
 
 function initDexie() {
     const db = new Dexie("xcom");
+    
     db.version(1).stores({
         config: "key",
         versions: "repo,lastFetched",
@@ -16,7 +18,17 @@ function initDexie() {
     return db;
 }
 
-const db = initDexie();
+async function getDB() {
+    try {
+        const db = initDexie();
+        await db.open();
+        return db;
+    } catch (e) {
+        return FallbackDB;
+    }
+}
+
+let db;
 
 async function getConfig(callback) {
     const configArray = await db.config.toArray();
@@ -117,6 +129,9 @@ export async function clearDB() {
 }
 
 export async function getMetadata(callback) {
+    if(!db) {
+        db = await getDB();
+    }
     const config = await getConfig();
     const {modRepo} = config;
     console.log(modRepo)
@@ -126,6 +141,9 @@ export async function getMetadata(callback) {
 }
 
 export async function load(version, compiler, callback) {
+    if(!db) {
+        db = await getDB();
+    }
     const config = await getConfig();
     const {baseRepo, basePath, modRepo} = config;
     const baseVersions = await getVersions(baseRepo, callback);
@@ -149,3 +167,4 @@ export async function load(version, compiler, callback) {
 }
 
 window.xcom = load;
+window.dexie = Dexie;
