@@ -10,7 +10,7 @@ import { getSupportedLanguages } from "./utils";
 }
 */
 
-//const supportedSections = ["items", "soldiers", "armors", "events", "commendations", "soldierTransforms"];
+//const supportedSections = ["items", "events", "commendations", "soldierTransforms"];
 const supportedSections = [
     { section: "items", key: "type", filter: (x, rs, key) => x.recover !== false && (x.battleType !== 11 || x.recoverCorpse !== false)},
     { section: "manufacture", key: "name" },
@@ -32,9 +32,6 @@ function generateSection(ruleset, rules, metadata) {
     
     sectionData.forEach(entry => {
         const name = entry[keyField];
-        if(sectionName === "armors") {
-            console.log(name);
-        }
 
         if(entry.delete && ruleset[entry.delete]) { //process delete
             delete ruleset[entry.delete][sectionName];

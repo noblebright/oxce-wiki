@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import { load } from "../model/RulesetDB";
 import compile from "../model/RulesetCompiler";
 
@@ -16,7 +16,16 @@ const handlers = {
 export default function useRuleset(version, versions) {
     const [status, setStatus] = useState(["INIT"]);
     const [result, setResult] = useState();
+    const oldVersion = useRef();
+    const oldVersions = useRef();
+
     useEffect(() => {
+        if(oldVersion.current !== version) {
+            console.log("Version changed:", oldVersion.current, version);
+        }
+        if(oldVersions.current !== versions) {
+            console.log("Versions changed:", oldVersions.current, versions);
+        }
         if(!versions[version]) {
             setStatus(["INVALID"])
         } else {
@@ -26,6 +35,8 @@ export default function useRuleset(version, versions) {
                 console.log(result);
             });
         }
+        oldVersion.current = version;
+        oldVersions.current = versions;
     }, [version, versions]);
 
     const [key, ...rest] = status;

@@ -43,3 +43,7 @@
 .searchItem a:hover {
     text-decoration: none;
 }
+
+.navbar-brand a:hover {
+    text-decoration: none;
+}

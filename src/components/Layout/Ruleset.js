@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { Route, Redirect, Switch, useParams, useRouteMatch } from "react-router-dom";
+import { Route, Redirect, Link, Switch, useParams, useRouteMatch } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Row from "react-bootstrap/Row";
@@ -92,7 +92,7 @@ export default function Ruleset({ lang, setLanguage, versions }) {
             <Row noGutters>
                 <Col>
                     <Navbar bg="dark" variant="dark">
-                        <Navbar.Brand className="mr-auto">{config.title} - {version}</Navbar.Brand>
+                        <Navbar.Brand className="mr-auto"><Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
                         <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
                             { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
                         </NavDropdown>

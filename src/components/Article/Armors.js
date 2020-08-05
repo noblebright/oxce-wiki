@@ -4,6 +4,7 @@ import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useBonusString from "../../hooks/useBonusString";
 import { BooleanValue, ListValue, Percent, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
+import useImage from "../../hooks/useImage";
 
 function Armor({armors, lc}) {
     return (
@@ -70,6 +71,7 @@ export default function Armors({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
     const bonusFn = useBonusString(lc);
+    const imageFn = useImage(ruleset, 2);
     const entry = ruleset.entries[id];
     const armors = entry.armors;
 
@@ -79,6 +81,7 @@ export default function Armors({ruleset, lang, id, version}) {
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Armor"/>
             <tbody>
+                <tr><td colSpan="2">{ imageFn(armors.spriteInv) }</td></tr>
                 <tr>
                     <td><Armor armors={armors} lc={lc}/></td>
                     <td><DamageResists resists={armors.damageModifier} lc={lc}/></td>
