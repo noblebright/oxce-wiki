@@ -7,6 +7,7 @@ import { BooleanValue, ListValue, Percent, SectionHeader, ListHeader, SimpleValu
 import useImage from "../../hooks/useImage";
 
 function Armor({armors, lc}) {
+    if(!armors) return null;
     return (
         <Table bordered striped size="sm" className="auto-width">
             <ListHeader label="Armor Rating"/>
@@ -18,7 +19,7 @@ function Armor({armors, lc}) {
                 <SimpleValue showZero label={lc("STR_UNDER_ARMOR")} value={armors.underArmor}/>
             </tbody>
         </Table>
-    )
+    );
 }
 
 const damageKeys = [
@@ -29,6 +30,7 @@ const damageKeys = [
 ];
 
 function DamageResists({resists, lc}) {
+    if(!resists) return null;
     return (
         <Table bordered striped size="sm" className="auto-width">
             <ListHeader label="Damage Resistance"/>
@@ -57,6 +59,7 @@ const recoveryStrings = {
 };
 
 function StatRecovery({recovery, bonusFn, lc}) {
+    if(!recover) return null;
     return (
         <React.Fragment>
             <ListHeader label="Stat Recovery"/>
