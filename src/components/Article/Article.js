@@ -14,6 +14,7 @@ import CraftWeapons from "./CraftWeapons";
 import Ufos from "./Ufos";
 import Units from "./Units";
 import Soldiers from "./Soldiers";
+import Armors from "./Armors";
 
 import "./Article.css";
 
@@ -47,6 +48,8 @@ export default function Article({ ruleset, lang, parent }) {
                     <button className="iconButton" onClick={handleShow}><Code/></button>
                 </header>
                 <p dangerouslySetInnerHTML={{__html: article.ufopaedia?.text && lc(article.ufopaedia.text)}} />
+                <Units {...articleProps}/>
+                <Armors {...articleProps}/>
                 <Research {...articleProps}/>
                 <TechTree {...articleProps}/>
                 <Manufacture {...articleProps}/>
@@ -55,7 +58,6 @@ export default function Article({ ruleset, lang, parent }) {
                 <Crafts {...articleProps}/>
                 <CraftWeapons {...articleProps}/>
                 <Ufos {...articleProps}/>
-                <Units {...articleProps}/>
                 <Soldiers {...articleProps}/>
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
                     <Modal.Header closeButton>

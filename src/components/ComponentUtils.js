@@ -33,7 +33,7 @@ function statValue({min, max, stats}, field) {
     return `${min[field]} - ${max[field]}`;
 }
 
-export const UnitStats = ({label = "Stats", lc, ...stats}) => (
+export const UnitStats = ({label = "Stats", lc, ...stats}) => (stats.stats || (stats.min && stats.max) ?
         <React.Fragment>
             <ListHeader label={label}/>
             <tbody>
@@ -51,4 +51,13 @@ export const UnitStats = ({label = "Stats", lc, ...stats}) => (
                 <SimpleValue showZero label={lc("STR_MANA_POOL")} value={statValue(stats, "mana")}/>
             </tbody>
         </React.Fragment>
+        : null
+);
+
+export const HeightStats = ({entity}) => (
+    <React.Fragment>
+        <SimpleValue label="Stand Height" value={entity.standHeight}/>
+        <SimpleValue label="Kneel Height" value={entity.kneelHeight}/>
+        <SimpleValue label="Float Height" value={entity.floatHeight}/>
+    </React.Fragment>
 );

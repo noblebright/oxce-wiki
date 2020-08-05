@@ -1,7 +1,7 @@
 import React from "react";
 import Table from "react-bootstrap/Table";
 
-import { Percent, BooleanValue, Money, Hours, UnitStats, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
+import { Percent, BooleanValue, Money, Hours, UnitStats, SectionHeader, SimpleValue, HeightStats, ListValue } from "../ComponentUtils.js";
 import useLocale from "../../hooks/useLocale";
 import useLink from "../../hooks/useLink";
 
@@ -34,9 +34,7 @@ export default function Soldiers({ruleset, lang, id, version}) {
                 <SimpleValue label={`Monthly Salary (${lc("STR_CAPTAIN")})`} value={soldiers.costSalaryCaptain}>{ Money }</SimpleValue>
                 <SimpleValue label={`Monthly Salary (${lc("STR_COLONEL")})`} value={soldiers.costSalaryColonel}>{ Money }</SimpleValue>
                 <SimpleValue label={`Monthly Salary (${lc("STR_COMMANDER")})`} value={soldiers.costSalaryCommander}>{ Money }</SimpleValue>
-                <SimpleValue label="Stand Height" value={soldiers.standHeight}/>
-                <SimpleValue label="Kneel Height" value={soldiers.kneelHeight}/>
-                <SimpleValue label="Float Height" value={soldiers.floatHeight}/>
+                <HeightStats entity={soldiers}/> 
                 <SimpleValue label="Score" value={soldiers.value}/>
                 <SimpleValue label="Transfer Time" value={soldiers.transferTime}>{ Hours }</SimpleValue>
                 <SimpleValue label="Morale Loss When Killed" value={soldiers.moraleLossWhenKilled}>{ Percent }</SimpleValue>

@@ -21,6 +21,7 @@ const supportedSections = [
     { section: "ufos", key: "type" },
     { section: "units", key: "type" },
     { section: "soldiers", key: "type" },
+    { section: "armors", key: "type" },
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
@@ -31,6 +32,9 @@ function generateSection(ruleset, rules, metadata) {
     
     sectionData.forEach(entry => {
         const name = entry[keyField];
+        if(sectionName === "armors") {
+            console.log(name);
+        }
 
         if(entry.delete && ruleset[entry.delete]) { //process delete
             delete ruleset[entry.delete][sectionName];
@@ -120,8 +124,10 @@ function getCompatibleAmmo(entry) {
     return ammo.size ? [...ammo] : undefined;
 }
 
+const globalKeys = ["maxViewDistance"];
+
 export default function compile(base, mod) {
-    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {} };
+    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {} };
     
     //add languages
     const supportedLanguages = getSupportedLanguages(base, mod);
@@ -129,6 +135,9 @@ export default function compile(base, mod) {
         ruleset.languages[key] = mod[key] ? deepmerge(base[key], mod[key]) : base[key];
     });
 
+    //add globalVars
+    globalKeys.forEach(key => ruleset.globalVars[key] = base[key] || mod[key]);
+    
     //add entries
     supportedSections.forEach(metadata => {
         generateSection(ruleset.entries, base, metadata);
