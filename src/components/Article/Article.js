@@ -33,7 +33,7 @@ export default function Article({ ruleset, lang, parent }) {
     const article = ruleset.entries[id];
 
     if(!article) { //article doesn't exist
-        return <Redirect to={parent}/>
+        return <Redirect to={`/${version}`}/>
     }
 
     const handleShow = () => setShowDebug(true);

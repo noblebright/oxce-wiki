@@ -110,9 +110,9 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                             <Welcome/>
                         </Route>
                         <Route path={`${path}/article/:id`}>
-                            <Article ruleset={ruleset} lang={lang} parent={path}/>
+                            <Article ruleset={ruleset} lang={lang}/>
                         </Route>
-                        <Redirect to="/"/>
+                        <Redirect to={`/${version}`}/>
                     </Switch>
                 </Col>
             </Row>
