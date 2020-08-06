@@ -66,7 +66,6 @@ function rewriteFilePaths(ruleset, loader, sha) {
             const path = entry.fileSingle;
             entry.fileSingle = loader.getUrl(sha, path); //rewrite to github raw content url
         } else {
-            console.log(entry);
             Object.keys(entry.files).forEach(key => {
                 const path = entry.files[key];
                 entry.files[key] = loader.getUrl(sha, path); //rewrite to github raw content url
@@ -134,7 +133,6 @@ export async function getMetadata(callback) {
     }
     const config = await getConfig();
     const {modRepo} = config;
-    console.log(modRepo)
     const modVersions = await getVersions(modRepo, callback);
 
     return { modVersions, config };

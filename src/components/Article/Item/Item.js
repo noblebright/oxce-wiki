@@ -1,0 +1,109 @@
+import React from "react";
+import Table from "react-bootstrap/Table";
+import useLink from "../../../hooks/useLink";
+import useLocale from "../../../hooks/useLocale";
+import useSprite from "../../../hooks/useSprite";
+import { Hours, ListValue, Money, BooleanValue, SectionHeader, SimpleValue, ListHeader } from "../../ComponentUtils.js";
+
+
+const battleType = [
+    "None (0)",
+    "Firearm (1)",
+    "Ammo (2)",
+    "Melee (3)",
+    "Grenade (4)",
+    "Proximity Grenade (5)",
+    "Medi-Kit (6)",
+    "Motion Scanner (7)",
+    "Mind Probe (8)",
+    "Psi-Amp (9)",
+    "Electro-flare (10)",
+    "Corpse (11)"
+];
+
+const psiTargetMatrix = [
+    "STR_XCOM",
+    "STR_ALIENS",
+    "MALE_CIVILIAN"
+];
+
+function MiscItem({ ruleset, items, lc, linkFn }) {
+    return (
+        <React.Fragment>
+            <ListHeader label="Misc. Properties"/>
+            <tbody>
+                <BooleanValue label="Extinguish Fires?" value={items.isFireExtinguisher}/>
+                <SimpleValue label="Durability" value={items.armor || 20}/>
+                <BooleanValue label="LOS Required?" value={items.LOSRequired}/>
+                <BooleanValue label="Psi Required?" value={items.psiRequired}/>
+                <SimpleValue label="Psi Target Mode" value={items.battleType === 9 && (items.psiTargetMatrix || 6)}>
+                    {
+                        x => psiTargetMatrix.filter((str, idx) => x & (1 << idx)).map(lc).join(", ")
+                    }
+                </SimpleValue>
+                <BooleanValue label={lc("manaRequired")} value={items.manaRequired}/>
+                <BooleanValue label="Underwater Only?" value={items.underwaterOnly}/>
+                <BooleanValue label="Land Only?" value={items.landOnly}/>
+                <SimpleValue label="Zombie Unit" value={items.zombieUnit}>{linkFn}</SimpleValue>
+            </tbody>
+        </React.Fragment>
+    );
+}
+
+function getActionsByAmmo(items) {
+    const ammo = items.ammo;
+}
+
+export default function Item({ruleset, lang, id, version}) {
+    const lc = useLocale(lang, ruleset);
+    const linkFn = useLink(version, lc);
+    const spriteFn = useSprite(ruleset, "BIGOBS.PCK", 32, 48); //BIGOBS.PCK, 32px x 48px
+    const entry = ruleset.entries[id];
+    const items = entry.items;
+
+    if(!items) return null;
+
+    if(Object.keys(items).length <= 1) {
+        return null; //empty object.
+    }
+    return (
+        <Table bordered striped size="sm" className="auto-width">
+            <SectionHeader label="Item"/>
+            <tbody>
+                <SimpleValue label={spriteFn(items.bigSprite)} value="some values"/>
+                <SimpleValue label="Type" value={items.battleType}>
+                    {x => battleType[x]}
+                </SimpleValue>
+                <SimpleValue label="Cost" value={items.costBuy}>{ Money }</SimpleValue>
+                <SimpleValue label="Sell Price" value={items.costSell}>{ Money }</SimpleValue>
+                <SimpleValue label="Transfer Time" value={items.transfer}>{ Hours }</SimpleValue>
+                <SimpleValue label="Weight" value={items.weight}/>
+                <SimpleValue label="Storage Space" value={items.size}/>
+                <SimpleValue label="Name in Inventory" value={items.name}>{lc}</SimpleValue>
+                <SimpleValue label="Ammo Name Modifier" value={items.nameAsAmmo}>{lc}</SimpleValue>
+                <SimpleValue label="Monthly Maintenance" value={items.monthlyMaintenance}>{Money}</SimpleValue>
+                <SimpleValue label="Monthly Salary" value={items.monthlySalary}>{Money}</SimpleValue>
+                <SimpleValue label={lc("manaExperience")} value={items.manaExperience}/>
+                <BooleanValue label="Recoverable?" value={items.recover}/>
+                <BooleanValue label="Corpse Recoverable?" value={items.recoverCorpse}/>
+                <BooleanValue label="Fixed Weapon?" value={items.fixedWeapon}/>
+                <SimpleValue label="Score" value={items.recoveryPoints}/>
+                <BooleanValue label="Live Alien?" value={items.liveAlien}/>
+                <BooleanValue label="Unarmed Attack?" value={items.specialUseEmptyHand}/>
+                {!!items.invWidth && !!items.invHeight && <SimpleValue label="Inventory Shape" value={`${items.invWidth}x${items.invHeight}`}/>}
+            </tbody>
+            <MiscItem ruleset={ruleset} items={items} lc={lc} linkFn={linkFn}/>
+            <ListValue label="Categories" values={items.categories}>{ lc }</ListValue>
+            <ListValue label="Supported Inventory Sections" values={items.supportedInventorySections}>{ lc }</ListValue>
+            <ListValue label="Prison Type" values={ruleset.prisons[items.prisonType]}>{ linkFn }</ListValue>
+            <ListValue label="Research Required to Purchase" values={items.requiresBuy}>{ linkFn }</ListValue>
+            <ListValue label="Services Required to Purchase" values={items.requiresBuyBaseFunc}>{ linkFn }</ListValue>
+            <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
+            <ListValue label="Ammunition For" values={items.ammoFor}>{ linkFn }</ListValue>
+            <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
+            <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>
+            <ListValue label="Craft Ammo For" values={items.craftAmmo}>{ linkFn }</ListValue>
+            <ListValue label="Worn as Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
+        </Table>
+    )
+}

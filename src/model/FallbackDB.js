@@ -1,6 +1,5 @@
 const makeGet = table => key => {
     const tableStr = sessionStorage.getItem(table);
-    console.log(tableStr && JSON.parse(tableStr), key);
     return Promise.resolve(tableStr ? JSON.parse(tableStr)?.[key] : undefined);
 };
 

@@ -157,7 +157,7 @@ export default function compile(base, mod) {
         const facilities = entry.facilities || {};
         const craftWeapons = entry.craftWeapons || {};
         const armors = entry.armors || {};
-        
+
         backLink(ruleset.entries, key, "research", research.dependencies, "leadsTo");
         backLink(ruleset.entries, key, "research", research.unlocks, "unlockedBy");
         backLink(ruleset.entries, key, "research", research.getOneFree, "freeFrom");
@@ -170,6 +170,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, "facilities", facilities.buildOverFacilities, "upgradesTo");
         backLink(ruleset.entries, key, "soldiers", [manufacture.spawnedPersonType], "manufacture");
         backLink(ruleset.entries, key, "soldiers", armors.units, "usableArmors");
+        backLink(ruleset.entries, key, "items", [armors.storeItem], "wearableArmors");
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
             if(compatibleAmmo) {
@@ -177,7 +178,8 @@ export default function compile(base, mod) {
             }
         }
         if(entry.facilities?.prisonType) {
-            ruleset.prisons[entry.facilities.prisonType] = key;
+            ruleset.prisons[entry.facilities.prisonType] = ruleset.prisons[entry.facilities.prisonType] || [];
+            ruleset.prisons[entry.facilities.prisonType].push(key);
         }
         backLink(ruleset.entries, key, "items", entry.items?.allCompatibleAmmo, "ammoFor");
 
