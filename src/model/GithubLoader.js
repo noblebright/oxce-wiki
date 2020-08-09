@@ -9,13 +9,13 @@ export default class GithubLoader {
         return `https://raw.githubusercontent.com/${this.repoName}/${sha}/${path}`;
     }
 
-    async loadVersions() {
+    async loadVersions(branchName = "master") {
         const branches = await loadJSON(`https://api.github.com/repos/${this.repoName}/branches`);
         const tags = await loadJSON(`https://api.github.com/repos/${this.repoName}/tags`);
         
-        const master = branches.find(x => x.name === "master")
+        const branch = branches.find(x => x.name === branchName)
         this.versions = {
-            master: master.commit
+            [branchName]: branch.commit
         };
 
         tags.forEach(x => {
@@ -24,7 +24,7 @@ export default class GithubLoader {
         return this.versions;
     }
 
-    async loadSHA(sha, startPath) {
+    async loadSHA(sha, startPaths) {
         const commitUrl = `https://api.github.com/repos/${this.repoName}/commits/${sha}`;
         const commitData = await loadJSON(commitUrl);
         const treeUrl = commitData.commit.tree.url;
@@ -34,7 +34,7 @@ export default class GithubLoader {
         const languageFiles = new Set();
         const ruleFiles = new Set();        
         fileList.forEach(file => {
-            if(startPath && !file.path.startsWith(startPath)) {
+            if(startPaths && !startPaths.find(x => file.path.startsWith(x))) {
                 return;
             }
             if(file.path.match(/Language\/.*\.yml/)) {

@@ -44,12 +44,12 @@ async function getConfig(callback) {
     return mappify(configArray, "key", "value");
 }
 
-async function getVersions(repo, callback) {
+async function getVersions(repo, branchName, callback) {
     const repoVersions = await db.versions.get(repo);
     
     if(!repoVersions || ((Date.now() - repoVersions.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
         const loader = new GithubLoader(repo);
-        const versions = await loader.loadVersions();
+        const versions = await loader.loadVersions(branchName);
         console.log(`fetching version info for ${repo}...`);
         callback && callback(["LOADING_VERSIONS", repo]);
         await db.versions.put({ repo, lastFetched: Date.now(), versions });
@@ -132,8 +132,8 @@ export async function getMetadata(callback) {
         db = await getDB();
     }
     const config = await getConfig();
-    const {modRepo} = config;
-    const modVersions = await getVersions(modRepo, callback);
+    const {modRepo, modBranch} = config;
+    const modVersions = await getVersions(modRepo, modBranch, callback);
 
     return { modVersions, config };
 }
@@ -143,11 +143,11 @@ export async function load(version, compiler, callback) {
         db = await getDB();
     }
     const config = await getConfig();
-    const {baseRepo, basePath, modRepo} = config;
-    const baseVersions = await getVersions(baseRepo, callback);
-    const modVersions = await getVersions(modRepo, callback);
+    const {baseRepo, basePath, baseBranch = "master", modBranch, modRepo} = config;
+    const baseVersions = await getVersions(baseRepo, baseBranch, callback);
+    const modVersions = await getVersions(modRepo, modBranch, callback);
 
-    const baseSha = baseVersions.master.sha; //
+    const baseSha = baseVersions[baseBranch].sha;
     const baseRuleset = await getRuleset(baseRepo, baseSha, basePath, callback);
     const modSha = modVersions[version]?.sha;
 

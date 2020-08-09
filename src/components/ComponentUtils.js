@@ -1,4 +1,5 @@
 import React, {useCallback} from "react";
+import Table from "react-bootstrap/Table";
 
 export const SectionHeader = ({label}) => (label ? <thead><tr><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
 
@@ -77,3 +78,45 @@ export const MissingSprite = ({size = "1em"}) => (
         <path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
     </svg>
 )
+
+export const battleType = [
+    "None (0)",
+    "Firearm (1)",
+    "Ammo (2)",
+    "Melee (3)",
+    "Grenade (4)",
+    "Proximity Grenade (5)",
+    "Medi-Kit (6)",
+    "Motion Scanner (7)",
+    "Mind Probe (8)",
+    "Psi-Amp (9)",
+    "Electro-flare (10)",
+    "Corpse (11)"
+];
+
+export const getBattleType = (val) => battleType[val];
+
+export const damageKeys = [
+    "STR_DAMAGE_UC", "STR_DAMAGE_ARMOR_PIERCING", "STR_DAMAGE_INCENDIARY", "STR_DAMAGE_HIGH_EXPLOSIVE", "STR_DAMAGE_LASER_BEAM",
+    "STR_DAMAGE_PLASMA_BEAM", "STR_DAMAGE_STUN", "STR_DAMAGE_MELEE", "STR_DAMAGE_ACID", "STR_DAMAGE_SMOKE",
+    "STR_DAMAGE_10", "STR_DAMAGE_11", "STR_DAMAGE_12", "STR_DAMAGE_13", "STR_DAMAGE_14",
+    "STR_DAMAGE_15", "STR_DAMAGE_16", "STR_DAMAGE_17", "STR_DAMAGE_18", "STR_DAMAGE_19"
+];
+
+export const getDamageKey = x => damageKeys[x];
+export const Actions = ({children}) => (<tr><td colSpan="2"><Table>{children}</Table></td></tr>);
+export const ActionHeader = ({label}) => (<thead>{label && <tr><th className="ListHeader">{label}</th><th className="ListHeader">Cost</th><th className="ListHeader">Accuracy</th></tr>}</thead>);
+export const ActionValue = ({label, cost, show, accuracy}) => (
+    show ? 
+    <tr>
+        <td>{label}</td>
+        <td>{cost}</td>
+        <td>{accuracy}</td>
+    </tr> : null
+);
+
+export function Accuracy({items, suffix, bonusFn, defaultAcc}) {
+    return (
+        <div>{items[`accuracy${suffix}`] || defaultAcc} {items.accuracyMultiplier ? ` * (${bonusFn(items.accuracyMultiplier)})` : null} %</div>
+    );
+}

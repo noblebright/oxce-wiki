@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useBonusString from "../../hooks/useBonusString";
-import { BooleanValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
+import { BooleanValue, damageKeys, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
 import useImage from "../../hooks/useImage";
 
 function ArmorRating({armors, lc}) {
@@ -22,18 +22,11 @@ function ArmorRating({armors, lc}) {
     );
 }
 
-const damageKeys = [
-    "STR_DAMAGE_UC", "STR_DAMAGE_ARMOR_PIERCING", "STR_DAMAGE_INCENDIARY", "STR_DAMAGE_HIGH_EXPLOSIVE", "STR_DAMAGE_LASER_BEAM",
-    "STR_DAMAGE_PLASMA_BEAM", "STR_DAMAGE_STUN", "STR_DAMAGE_MELEE", "STR_DAMAGE_ACID", "STR_DAMAGE_SMOKE",
-    "STR_DAMAGE_10", "STR_DAMAGE_11", "STR_DAMAGE_12", "STR_DAMAGE_13", "STR_DAMAGE_14",
-    "STR_DAMAGE_15", "STR_DAMAGE_16", "STR_DAMAGE_17", "STR_DAMAGE_18", "STR_DAMAGE_19"
-];
-
 function DamageResists({resists, lc}) {
     if(!resists) return null;
     return (
         <Table bordered striped size="sm" className="auto-width">
-            <ListHeader label="Damage Resistance"/>
+            <ListHeader label="Damage Modifiers"/>
             <tbody>
                 { resists.map((value, idx) => <SimpleValue key={idx} label={lc(damageKeys[idx])} value={Math.floor(value * 100)}>{Percent}</SimpleValue>) }
             </tbody>

@@ -1,7 +1,7 @@
 const statTypes = {
     flatOne: { value: (x) => !Array.isArray(x) ? x : x.reduce((acc, item, idx) => acc += Math.pow(item, idx + 1), 0) },
     flatHundred: { value: (x) => !Array.isArray(x) ? 100 * x : x.reduce((acc, item, idx) => acc += 100 * Math.pow(item, idx + 1), 0) },
-    psi: { value: "STR_PSI_SKILL_AND_PSI_STRENGTH", parens: true },
+    psi: { vFn: lc => `${lc("STR_PSIONIC_SKILL")} * ${lc("STR_PSIONIC_STRENGTH")}` },
     psiSkill: { value: "STR_PSIONIC_SKILL" },
     psiStrength: { value: "STR_PSIONIC_STRENGTH" },
     throwing: { value: "STR_THROWING_ACCURACY" },
@@ -13,9 +13,9 @@ const statTypes = {
     reactions: { value: "STR_REACTIONS" },
     stamina: { value : "STR_STAMINA", total: true },
     melee: { value: "STR_MELEE_ACCURACY" },
-    strengthMelee: { value: "STR_STRENGTH_AND_MELEE_ACCURACY", parens: true },
-    strengthThrowing: { value: "STR_STRENGTH_AND_THROWING_ACCURACY", parens: true },
-    firingReactions: { value: "STR_FIRING_ACCURACY_AND_REACTIONS", parens: true },
+    strengthMelee: { vFn: lc => `${lc("STR_STRENGTH")} * ${lc("STR_MELEE_ACCURACY")}` },
+    strengthThrowing: { vFn: lc => `${lc("STR_STRENGTH")} * ${lc("STR_THROWING_ACCURACY")}` },
+    firingReactions: { vFn: lc => `${lc("STR_FIRING_ACCURACY")} * ${lc("STR_REACTIONS")}` },
     rank: { value: "STR_RANK" },
     fatalWounds: { value: "STR_FATAL_WOUNDS" },
     healthCurrent: { value: "STR_HEALTH" },
@@ -44,16 +44,20 @@ const useBonusString = lc => formula => {
             if(value > 0) bonuses.push(Math.abs(value));
             if(value < 0) penalties.push(Math.abs(value));    
          } else if(typeof formula[key] === "number") {
-            const { value: label, parens, normalized, total } = statDef;
+            const { value: labelKey, vFn, normalized, total } = statDef;
             const value = formula[key];
-            const str = `${Math.abs(value)}${ normalized ? " * %" : " * "}${parens ? "(" : ""}${ total ? `${lc("STR_TOTAL")} `: ""}${lc(label)}${parens ? ")" : ""}`;
+            const label = vFn ? vFn(lc) : lc(labelKey);
+
+            const str = `${Math.abs(value)}${ normalized ? " * %" : " * "}${ total ? `${lc("STR_TOTAL")} `: ""}${label}`;
             if(value > 0) bonuses.push(str);
             if(value < 0) penalties.push(str);
         } else { //array of polynomial coefficients
             const coefficients = formula[key];
-            const { value: label, parens, normalized, total } = statDef;
+            const { value: labelKey, vFn, parens, normalized, total } = statDef;
+            const label = vFn ? vFn(lc) : lc(labelKey);
+
             coefficients.forEach((co, idx) => {
-                const str = `${Math.abs(co)}${ normalized ? " * %" : " * "}${parens ? "(" : ""}${ total ? `${lc("STR_TOTAL")} `: ""}${lc(label)}${parens ? ")" : ""}${idx ? `^${idx + 1}`: ""}`;
+                const str = `${Math.abs(co)}${ normalized ? " * %" : " * "}${ total ? `${lc("STR_TOTAL")} `: ""}${vFn ? `(${label})` : label}${idx ? `^${idx + 1}`: ""}`;
                 if(co > 0) bonuses.push(str);
                 if(co < 0) penalties.push(str);
             });

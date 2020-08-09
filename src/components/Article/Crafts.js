@@ -40,7 +40,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <SimpleValue label="Rental Cost" value={crafts.costRent}>{ Money }</SimpleValue>
                 <SimpleValue label="Sale Price" value={crafts.costSell}>{ Money }</SimpleValue>
                 <BooleanValue label="Show in Monthly Costs" value={crafts.forceShowInMonthlyCosts}/>
-                <SimpleValue label="Refuel Item" value={crafts.refuelItem}> { linkFn } </SimpleValue>
+                <SimpleValue label="Refuel Item" value={crafts.refuelItem}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Refuel Rate (per 30 min)" value={crafts.repairRate}/>
                 <SimpleValue label="Transfer Time" value={crafts.transferTime}>{ Hours }</SimpleValue>
                 <SimpleValue label="Score Loss (when destroyed)" value={crafts.score}/>
