@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React, { useCallback } from "react";
 import Table from "react-bootstrap/Table";
 
 export const SectionHeader = ({label}) => (label ? <thead><tr><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
@@ -6,7 +6,7 @@ export const SectionHeader = ({label}) => (label ? <thead><tr><th className="Sec
 export const ListHeader = ({label}) => (<thead>{label && <tr><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
 
 export const SimpleValue = ({label, value, children, showZero}) => ((showZero ? (value || value === 0) : value) ? <tr><td>{label}</td><td>{children ? children(value) : value}</td></tr> : null);
-export const BooleanValue = ({label, value}) => (value ? <SimpleValue label={label} value="TRUE"/> : null);
+export const BooleanValue = ({label, value}) => (value !== undefined ? <SimpleValue label={label} value={`${value}`.toUpperCase()}/> : null);
 export const ListValue = ({label, values, children}) => (values && values.length > 0 ?
     <React.Fragment>
         <ListHeader label={label}/>        
@@ -105,13 +105,13 @@ export const damageKeys = [
 
 export const getDamageKey = x => damageKeys[x];
 export const Actions = ({children}) => (<tr><td colSpan="2"><Table>{children}</Table></td></tr>);
-export const ActionHeader = ({label}) => (<thead>{label && <tr><th className="ListHeader">{label}</th><th className="ListHeader">Cost</th><th className="ListHeader">Accuracy</th></tr>}</thead>);
+export const ActionHeader = ({label}) => (<thead>{label && <tr><th className="ListHeader">{label}</th><th className="ListHeader">Accuracy</th><th className="ListHeader">Cost</th></tr>}</thead>);
 export const ActionValue = ({label, cost, show, accuracy}) => (
     show ? 
     <tr>
         <td>{label}</td>
-        <td>{cost}</td>
         <td>{accuracy}</td>
+        <td>{cost}</td>
     </tr> : null
 );
 

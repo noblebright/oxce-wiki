@@ -8,7 +8,6 @@ import Firearm from "./Firearm";
 import Ammo from "./Ammo";
 import Melee from "./Melee";
 import Grenade from "./Grenade";
-import ProxGrenade from "./ProxGrenade";
 import MediKit from "./MediKit";
 import MotionScanner from "./MotionScanner";
 import MindProbe from "./MindProbe";
@@ -58,7 +57,7 @@ const componentMap = [
     Ammo,
     Melee,
     Grenade,
-    ProxGrenade,
+    Grenade,
     MediKit, 
     MotionScanner, 
     MindProbe, 
@@ -97,7 +96,6 @@ export default function Item({ruleset, lang, id, version}) {
             <ListValue label="Research Required to Purchase" values={items.requiresBuy}>{ linkFn }</ListValue>
             <ListValue label="Services Required to Purchase" values={items.requiresBuyBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
-            <ListValue label="Ammunition For" values={items.ammoFor}>{ linkFn }</ListValue>
             <ListValue label="Component Of" values={items.componentOf}>{ linkFn }</ListValue>
             <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
             <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>

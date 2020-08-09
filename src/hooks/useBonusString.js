@@ -53,7 +53,7 @@ const useBonusString = lc => formula => {
             if(value < 0) penalties.push(str);
         } else { //array of polynomial coefficients
             const coefficients = formula[key];
-            const { value: labelKey, vFn, parens, normalized, total } = statDef;
+            const { value: labelKey, vFn, normalized, total } = statDef;
             const label = vFn ? vFn(lc) : lc(labelKey);
 
             coefficients.forEach((co, idx) => {

@@ -1,9 +1,10 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
+import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import Damage from "./Damage";
 import DamageAlter from "./DamageAlter";
-import { ListHeader, SimpleValue, getDamageKey, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
 import Cost, { hasCost } from "./Cost";
 
 const psiTargetMatrix = [
@@ -12,29 +13,23 @@ const psiTargetMatrix = [
     "MALE_CIVILIAN"
 ];
 
-function PsiDamage({ items, lc }) {
-    const bonusFn = useBonusString(lc);
-    const damageLabel = lc(getDamageKey(items.damageAlter?.resistType || items.damageType));
-    return (
-        <React.Fragment>
-            <div>{damageLabel}</div>
-            <div>{items.power}{bonusFn(items.damageBonus)}</div>
-            <Table>
-                <ListHeader label="Damage Properties"/>
-                <tbody>
-                    <DamageAlter alter={items.damageAlter} lc={lc}/>
-                </tbody>
-            </Table>
-        </React.Fragment>
-    )
-}
-
 export default function PsiAmp({ ruleset, items, lc, linkFn, spriteFn }) {
     const bonusFn = useBonusString(lc);
     return (
         <React.Fragment>
             <tbody>
-                <SimpleValue label={spriteFn(items.bigSprite)} value={<PsiDamage items={items} lc={lc} />}/>
+                <SimpleValue label={spriteFn(items.bigSprite)} value={items}>
+                    { x => (
+                        <Damage items={x} lc={lc}>
+                            { x.damageAlter ? <Table>
+                                <ListHeader label="Damage Properties"/>
+                                <tbody>
+                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc}/>
+                                </tbody>
+                            </Table> : null}
+                        </Damage>
+                    )}
+                </SimpleValue>
             </tbody>
             <Actions>
                 <ActionHeader label="Actions"/>

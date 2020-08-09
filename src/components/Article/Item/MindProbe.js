@@ -1,5 +1,5 @@
 import React from "react";
-import { ListHeader, SimpleValue, getBattleType } from "../../ComponentUtils";
+import { ListHeader, SimpleValue } from "../../ComponentUtils";
 import Cost from "./Cost";
 
 export default function MindProbe({ ruleset, items, lc, linkFn, spriteFn}) {
