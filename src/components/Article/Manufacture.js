@@ -12,7 +12,7 @@ function getItemTable(randomList) {
     const rows = randomList.map(([weight, items]) => {
         denominator += weight;
         return [weight, Object.entries(items)];
-    });
+    }).sort((a, b) => b[0] - a[0]);
     return { denominator, rows };
 }
 

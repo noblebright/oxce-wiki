@@ -19,7 +19,7 @@ const Cost = ({value, suffix, lc, defaultTu}) => {
     const cost = {...{ time: tu || defaultTu }, ...costObj};
     return (
         <React.Fragment>
-            { costKeys.map((key, idx) => (cost[key] ? <div key={key}><span>{cost[key]}{cost[`flat${suffix}`]? "" : "%"}</span> <span>{lc(costStrings[idx])}</span></div> : null)) }
+            { costKeys.map((key, idx) => (cost[key] ? <div key={key}><span>{cost[key]}{value["flatRate"] || cost[`flat${suffix}`] || key !== costKeys[0] ? "" : "%"}</span> <span>{lc(costStrings[idx])}</span></div> : null)) }
         </React.Fragment>
     );
 };

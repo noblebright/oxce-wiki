@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
 import Damage from "./Damage";
 import DamageAlter from "./DamageAlter";
 import Cost, { hasCost } from "./Cost";
@@ -56,10 +56,12 @@ export default function PsiAmp({ ruleset, items, lc, linkFn, spriteFn }) {
             </Actions>
             <ListHeader label="Psi-Amp Properties"/>
             <tbody>
-
                 <SimpleValue label="Psi Target Mode" value={items.battleType === 9 && (items.psiTargetMatrix || 6)}>
                     {x => psiTargetMatrix.filter((str, idx) => x & (1 << idx)).map(lc).join(", ")}
                 </SimpleValue>
+                <SimpleValue label="Dropoff" value={items.dropoff}/>
+                <SimpleValue label="Max Range" value={items.maxRange}/>
+                <BooleanValue label="LOS Required" value={items.LOSRequired}/>
             </tbody>
         </React.Fragment>
     );

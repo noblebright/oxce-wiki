@@ -38,6 +38,7 @@ function LoadingDialog({status}) {
         show={true} 
         backdrop="static"
         keyboard={false}
+        animation={false}
         centered >
         <Modal.Body>
           <ProgressBar min={0} max={status.max} now={status.now} animated/>

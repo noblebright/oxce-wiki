@@ -13,6 +13,7 @@ const statTypes = {
     reactions: { value: "STR_REACTIONS" },
     stamina: { value : "STR_STAMINA", total: true },
     melee: { value: "STR_MELEE_ACCURACY" },
+    strength: { value: "STR_STRENGTH" },
     strengthMelee: { vFn: lc => `${lc("STR_STRENGTH")} * ${lc("STR_MELEE_ACCURACY")}` },
     strengthThrowing: { vFn: lc => `${lc("STR_STRENGTH")} * ${lc("STR_THROWING_ACCURACY")}` },
     firingReactions: { vFn: lc => `${lc("STR_FIRING_ACCURACY")} * ${lc("STR_REACTIONS")}` },

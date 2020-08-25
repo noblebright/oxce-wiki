@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../../hooks/useLink";
 import useLocale from "../../../hooks/useLocale";
 import useSprite from "../../../hooks/useSprite";
-import { Hours, ListValue, Money, BooleanValue, getBattleType, SectionHeader, SimpleValue, ListHeader } from "../../ComponentUtils.js";
+import { Hours, ListValue, Money, BooleanValue, getBattleType, SectionHeader, SimpleValue, ListHeader, Percent } from "../../ComponentUtils.js";
 import Firearm from "./Firearm";
 import Ammo from "./Ammo";
 import Melee from "./Melee";
@@ -19,8 +19,8 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
         <React.Fragment>
             <ListHeader label="General Properties"/>
             <tbody>
-            <SimpleValue label="Cost" value={items.costBuy}>{ Money }</SimpleValue>
                 <SimpleValue label="Item Type" value={items.battleType}>{ getBattleType }</SimpleValue>
+                <SimpleValue label="Cost" value={items.costBuy}>{ Money }</SimpleValue>
                 <SimpleValue label="Sell Price" value={items.costSell}>{ Money }</SimpleValue>
                 <SimpleValue label="Transfer Time" value={items.transfer}>{ Hours }</SimpleValue>
                 <SimpleValue label="Weight" value={items.weight}/>
@@ -30,6 +30,10 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
                 <SimpleValue label="Monthly Maintenance" value={items.monthlyMaintenance}>{Money}</SimpleValue>
                 <SimpleValue label="Monthly Salary" value={items.monthlySalary}>{Money}</SimpleValue>
                 <SimpleValue label={lc("manaExperience")} value={items.manaExperience}/>
+                <SimpleValue label="Two-Handed" value={items}>
+                    {x => x.twoHanded ? (x.blockBothHands ? "REQUIRED": "TRUE") : "FALSE"}
+                </SimpleValue>
+                <SimpleValue label="One Handed Accuracy" value={items.twoHanded ? items.oneHandedPenalty || ruleset.oneHandedPenaltyGlobal || 80 : undefined}>{Percent}</SimpleValue>
                 <BooleanValue label="Recoverable?" value={items.recover}/>
                 <BooleanValue label="Corpse Recoverable?" value={items.recoverCorpse}/>
                 <BooleanValue label="Fixed Weapon?" value={items.fixedWeapon}/>
@@ -100,7 +104,7 @@ export default function Item({ruleset, lang, id, version}) {
             <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
             <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>
             <ListValue label="Craft Ammo For" values={items.craftAmmo}>{ linkFn }</ListValue>
-            <ListValue label="Worn as Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
+            <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
         </Table>
     )
 }

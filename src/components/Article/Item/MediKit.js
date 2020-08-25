@@ -17,9 +17,11 @@ const mediKitTargetMatrix = [
 function Doses({item}) {
     return (
         <Table>
-            <SimpleValue label="Heal" value={item.heal}/>
-            <SimpleValue label="Stimulant" value={item.stimulant}/>
-            <SimpleValue label="Painkiller" value={item.painKiller}/>
+            <tbody>
+                <SimpleValue label="Heal" value={item.heal}/>
+                <SimpleValue label="Stimulant" value={item.stimulant}/>
+                <SimpleValue label="Painkiller" value={item.painKiller}/>
+            </tbody>
         </Table>
     )
 }

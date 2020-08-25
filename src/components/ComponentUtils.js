@@ -104,7 +104,7 @@ export const damageKeys = [
 ];
 
 export const getDamageKey = x => damageKeys[x];
-export const Actions = ({children}) => (<tr><td colSpan="2"><Table>{children}</Table></td></tr>);
+export const Actions = ({children}) => (<tbody><tr><td colSpan="2"><Table>{children}</Table></td></tr></tbody>);
 export const ActionHeader = ({label}) => (<thead>{label && <tr><th className="ListHeader">{label}</th><th className="ListHeader">Accuracy</th><th className="ListHeader">Cost</th></tr>}</thead>);
 export const ActionValue = ({label, cost, show, accuracy}) => (
     show ? 
@@ -115,8 +115,33 @@ export const ActionValue = ({label, cost, show, accuracy}) => (
     </tr> : null
 );
 
+function getMultiplier(suffix) {
+    switch(suffix) {
+        case "Melee" : return "meleeMultiplier";
+        case "Throw" : return "throwMultiplier";
+        default: return "accuracyMultiplier";
+    }
+}
+
+function getDefaultAccuracy(suffix) {
+    switch(suffix) {
+        case "Melee": return "melee";
+        case "Throw": return "throwing";
+        default: return "firing";
+    }
+}
+
+function hasMultiplier(items, suffix) {
+    const multiplier = items[getMultiplier(suffix)];
+    if(!multiplier) return false;
+    const keys = Object.keys(multiplier);
+    return keys.length !== 1 || keys[0] !== getDefaultAccuracy(suffix) || multiplier[keys[0]] !== 1;
+}
+
 export function Accuracy({items, suffix, bonusFn, defaultAcc}) {
+    const multiplier = items[getMultiplier(suffix)];
+
     return (
-        <div>{items[`accuracy${suffix}`] || defaultAcc} {items.accuracyMultiplier ? ` * (${bonusFn(items.accuracyMultiplier)})` : null} %</div>
+        <div>{items[`accuracy${suffix}`] || defaultAcc}{ hasMultiplier(items, suffix) ? ` * (${bonusFn(multiplier)})` : null}%</div>
     );
 }

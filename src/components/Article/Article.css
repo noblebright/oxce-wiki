@@ -28,7 +28,7 @@ article .auto-width { /*specificity fight*/
     width: auto;
     display: inline-table;
     vertical-align: top;
-    margin: 0 1em;
+    margin: 0 1em 1em;
 }
 
 .InventoryQuantity {
@@ -113,4 +113,8 @@ div.facilitySprite img:nth-child(4) {
 
 .PaperDoll>img:first-child {
     position: relative;
+}
+
+.damageType {
+    font-weight: 600;
 }
