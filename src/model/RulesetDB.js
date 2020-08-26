@@ -32,22 +32,24 @@ let db;
 
 async function getConfig(callback) {
     const configArray = await db.config.toArray();
-    if(!configArray.length) {
+    const configObj = configArray.length ? mappify(configArray, "key", "value") : null;
+    if(!configObj || !configObj.lastFetched || ((Date.now() - configObj.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
         callback && callback(["LOADING_CONFIG"]);
         let config = await loadJSON("/config.json");
         await db.config.clear();
         await db.config.bulkPut(
             Object.keys(config).map(key => ({ key, value: config[key] }))
         );
+        await db.config.put({key: "lastFetched", value: Date.now() });
         return config;
     }
-    return mappify(configArray, "key", "value");
+    return configObj;
 }
 
 async function getVersions(repo, branchName, callback) {
     const repoVersions = await db.versions.get(repo);
     
-    if(!repoVersions || ((Date.now() - repoVersions.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
+    if(!repoVersions || !repoVersions.lastFetched || ((Date.now() - repoVersions.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
         const loader = new GithubLoader(repo);
         const versions = await loader.loadVersions(branchName);
         console.log(`fetching version info for ${repo}...`);

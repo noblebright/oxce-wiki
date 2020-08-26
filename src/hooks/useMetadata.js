@@ -1,5 +1,5 @@
 import {useEffect, useState, useCallback} from 'react';
-import { getMetadata, updateLanguage } from "../model/RulesetDB";
+import { getMetadata, updateLanguage, clearDB } from "../model/RulesetDB";
 
 export default function useMetadata() {
     const [versions, setVersions] = useState();
@@ -20,5 +20,5 @@ export default function useMetadata() {
         setConfig({...config, currentLanguage: lang});
     }, [config]);
 
-    return {versions, config, setLanguage};
+    return {versions, config, setLanguage, clearDB};
 }

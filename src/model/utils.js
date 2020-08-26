@@ -37,8 +37,9 @@ export const possibleLanguages = {
     "zh-TW": "文言"
 };
 
-export const loadJSON = url => fetch(url).then(res => res.json());
-export const loadText = url => fetch(url).then(res => res.text());
+const load = (url, authed) => fetch(url, authed && sessionStorage.getItem("auth") ? { headers: { Authorization: `Basic ${sessionStorage.getItem("auth")}`}} : undefined);
+export const loadJSON = (url, authed) => load(url, authed).then(res => res.json());
+export const loadText = (url, authed) => load(url, authed).then(res => res.text());
 
 export const mappify = (array, key, value) => {
     const keyFn = typeof key === "string" ? x => x[key] : key;

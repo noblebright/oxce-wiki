@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 
 import useMetadata from "../hooks/useMetadata";
@@ -10,14 +10,24 @@ function getDefaultVersion(versions) {
   return Object.keys(versions)[0];
 }
 
+function ClearDB({clear}) {
+  useEffect(() => {
+    clear();
+  }, []);
+  return <Redirect to="/"/>;
+}
+
 function App() {
-  const { versions, config, setLanguage } = useMetadata();
+  const { versions, config, setLanguage, clearDB } = useMetadata();
 
   return (
     <Router>
         {versions && config && <Switch>
           <Route path="/" exact>
             <Redirect to={`/${getDefaultVersion(versions)}`}/>
+          </Route>
+          <Route path="/admin/_clearDB" exact>
+            <ClearDB clear={clearDB}/>
           </Route>
           <Route path="/:version">
             <Ruleset lang={config.currentLanguage} setLanguage={setLanguage} versions={versions}/>

@@ -10,8 +10,8 @@ export default class GithubLoader {
     }
 
     async loadVersions(branchName = "master") {
-        const branches = await loadJSON(`https://api.github.com/repos/${this.repoName}/branches`);
-        const tags = await loadJSON(`https://api.github.com/repos/${this.repoName}/tags`);
+        const branches = await loadJSON(`https://api.github.com/repos/${this.repoName}/branches`, true);
+        const tags = await loadJSON(`https://api.github.com/repos/${this.repoName}/tags`, true);
         
         const branch = branches.find(x => x.name === branchName)
         this.versions = {
@@ -26,9 +26,9 @@ export default class GithubLoader {
 
     async loadSHA(sha, startPaths) {
         const commitUrl = `https://api.github.com/repos/${this.repoName}/commits/${sha}`;
-        const commitData = await loadJSON(commitUrl);
+        const commitData = await loadJSON(commitUrl, true);
         const treeUrl = commitData.commit.tree.url;
-        const treeData = await loadJSON(`${treeUrl}?recursive=true`);
+        const treeData = await loadJSON(`${treeUrl}?recursive=true`, true);
         const fileList = treeData.tree;
         
         const languageFiles = new Set();
