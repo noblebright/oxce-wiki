@@ -48,7 +48,7 @@ export default function PsiAmp({ ruleset, items, lc, linkFn, spriteFn }) {
                                 accuracy={<Accuracy items={items} suffix="Use" bonusFn={bonusFn}/>}
                     />
                     <ActionValue label={lc("STR_THROW")}
-                                show={true}
+                                show={!items.fixedWeapon}
                                 cost={<Cost value={items} suffix="Throw" lc={lc} defaultTu={25}/>}
                                 accuracy={<Accuracy items={items} suffix="Throw" bonusFn={bonusFn} defaultAcc={100}/>}
                     />

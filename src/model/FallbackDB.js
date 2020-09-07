@@ -18,6 +18,8 @@ const FallbackDB = {
             const config = sessionStorage.getItem("config");
             return Promise.resolve(config ? JSON.parse(config) : []);
         },
+        put: makePut("config", "repo"),
+        get: makeGet("config"),
         clear() {
             sessionStorage.removeItem("config");
             return Promise.resolve();
