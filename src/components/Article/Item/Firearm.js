@@ -40,7 +40,7 @@ const GunAmmo = ({lc, linkFn, item, integral}) => (
         <td>{integral ? "-" : linkFn(item.type)}</td>
         <td>
             <div>{lc("clipSize")}: {item.clipSize}</div>
-            <div><DamageAlter type={item.damageType} alter={item.damageAlter} lc={lc}/></div>
+            <div><DamageAlter type={item.damageType} alter={item.damageAlter} blastRadius={item.blastRadius} lc={lc}/></div>
         </td>
         <td>
             <Damage items={item} lc={lc}/>
@@ -70,7 +70,18 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
     return (
         <React.Fragment>
             <tbody>
-                <SimpleValue label={spriteFn(items.bigSprite)} value={integralAmmo ? <Damage items={items} lc={lc}/> : "As Ammo"}/>
+                <SimpleValue label={spriteFn(items.bigSprite)} value={items}>
+                { x => integralAmmo ?  (
+                        <Damage items={x} lc={lc}>
+                            { x.damageAlter ? <Table>
+                                <ListHeader label="Damage Properties"/>
+                                <tbody>
+                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} melee/>
+                                </tbody>
+                            </Table> : null}
+                        </Damage>
+                    ) : "As Ammo" }
+                </SimpleValue>
             </tbody>
             <Actions>
                 <ActionHeader label="Actions"/>
@@ -83,9 +94,9 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
                 <SimpleValue label="Shotgun Spread" value={items.shotgunSpread}/>
                 <SimpleValue label="Shotgun Choke" value={items.shotgunChoke}/>
                 <SimpleValue label="Max Range" value={items.maxRange || 200}/>
-                <SimpleValue label="Aim Range" value={items.aimRange || 200}/>
-                <SimpleValue label="Snap Range" value={items.snapRange || 15}/>
-                <SimpleValue label="Auto Range" value={items.autoRange || 7}/>
+                {hasCost(items, "Aimed") && <SimpleValue label="Aim Range" value={items.aimRange || 200}/>}
+                {hasCost(items, "Snap") && <SimpleValue label="Snap Range" value={items.snapRange || 15}/>}
+                {hasCost(items, "Auto") && <SimpleValue label="Auto Range" value={items.autoRange || 7}/>}
                 <SimpleValue label="Min Range" value={items.minRange}/>
                 <SimpleValue label="Dropoff" value={items.dropoff}/>
                 <SimpleValue label="Effective Range" value={items.powerRangeThreshold}/>

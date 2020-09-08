@@ -79,8 +79,16 @@ function AlterEntry({ alter, suffix, label }) {
     );
 }
 
-export default function DamageAlter({type, alter, lc, melee}) {
-    const mergedAlter = {...defaultProps[type], ...alter};
+export default function DamageAlter({type, alter, lc, blastRadius, melee}) {
+    let blastRadiusObj = {};
+    if(!alter?.FixRadius) {
+        blastRadiusObj.FixRadius = blastRadius;
+        if(blastRadius === 0) {
+            blastRadiusObj.RadiusEffectiveness = 0;
+            blastRadiusObj.IgnoreDirection = null;
+        }
+    }
+    const mergedAlter = {...defaultProps[type], ...alter, ...blastRadiusObj};
     return alter ? (
         <React.Fragment>
             <SimpleValue label="Random Type" value={mergedAlter.RandomType}>

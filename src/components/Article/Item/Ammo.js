@@ -20,7 +20,7 @@ export default function Ammo({ ruleset, items, lc, linkFn, spriteFn }) {
                 <React.Fragment>
                     <ListHeader label="Ammo Properties"/>
                     <tbody>
-                        <DamageAlter type={items.damageType} alter={items.damageAlter} lc={lc}/>
+                        <DamageAlter type={items.damageType} alter={items.damageAlter} blastRadius={items.blastRadius} lc={lc}/>
                     </tbody>
                 </React.Fragment>
             ) : null}

@@ -202,8 +202,8 @@ export default function Armors({ruleset, lang, id, version}) {
                 <BooleanValue label="CQC Capable?" value={armors.createsMeleeThread}/>
                 <SimpleValue label="Psi Defense" value={armors.psiDefense}>{ bonusFn }</SimpleValue>
                 <SimpleValue label="Melee Dodge" value={armors.meleeDodge}>{ bonusFn }</SimpleValue>
-                <SimpleValue label="Back Dodge Penalty" value={Math.floor(armors.meleeDodgeBackPenalty * 100)}>{ Percent }</SimpleValue>
-                <SimpleValue label="Side Dodge Penalty" value={Math.floor(armors.meleeDodgeBackPenalty * 100) / 2}>{ Percent }</SimpleValue>
+                <SimpleValue label="Back Dodge Penalty" value={Math.floor(armors.meleeDodgeBackPenalty * 100)} showZero>{ Percent }</SimpleValue>
+                <SimpleValue label="Side Dodge Penalty" value={Math.floor(armors.meleeDodgeBackPenalty * 100) / 2} showZero>{ Percent }</SimpleValue>
                 <HeightStats entity={armors} />
             </tbody>
             <UnitStats stats={armors.stats} lc={lc}/>
