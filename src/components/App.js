@@ -13,7 +13,7 @@ function getDefaultVersion(versions) {
 function ClearDB({clear}) {
   useEffect(() => {
     clear();
-  }, []);
+  }, [clear]);
   return <Redirect to="/"/>;
 }
 

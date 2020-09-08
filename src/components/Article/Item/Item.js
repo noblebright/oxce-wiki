@@ -44,7 +44,7 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
                 <BooleanValue label="Extinguish Fires?" value={items.isFireExtinguisher}/>
                 <SimpleValue label="Durability" value={items.armor || 20}/>
                 <BooleanValue label="LOS Required?" value={items.LOSRequired}/>
-                <BooleanValue label="Psi Required?" value={items.psiRequired}/>
+                <BooleanValue label="Psi Required?" value={items.psiRequired ?? items.battleType === 9}/>
 
                 <BooleanValue label={lc("manaRequired")} value={items.manaRequired}/>
                 <BooleanValue label="Underwater Only?" value={items.underwaterOnly}/>

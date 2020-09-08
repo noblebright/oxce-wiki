@@ -2,8 +2,8 @@ import React from "react";
 import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
-import { BooleanValue, Hours, ListValue, Money, Percent, SectionHeader, SimpleValue } from "../ComponentUtils.js";
-
+import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
+import CraftStats from "./CraftStats";
 
 function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;
@@ -50,22 +50,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <BooleanValue label="Auto Patrol?" value={crafts.autoPatrol}/>
                 <SimpleValue label="Max Altitude" value={crafts.maxAltitude}/>
                 <SimpleValue label="Max Items" value={crafts.maxItems}/>
-                <SimpleValue label="Max Fuel" value={crafts.fuelMax}/>
-                <SimpleValue label="Max Health" value={crafts.damageMax}/>
-                <SimpleValue label="Max Speed" value={crafts.speedMax}/>
-                <SimpleValue label="Max Shields" value={crafts.shieldCapacity}/>
-                <SimpleValue label="Shield Recharge (Dogfight)" value={crafts.shieldRecharge}/>
-                <SimpleValue label="Shield Recharge (Flight)" value={crafts.shieldRechargedInGeoscape}/>
-                <SimpleValue label="Shield Recharge (Base)" value={crafts.shieldRechargedAtBase}/>
-                <SimpleValue label="Shield Bleedthrough" value={crafts.shieldBleedThrough}>{ Percent }</SimpleValue>
-                <SimpleValue label="Acceleration" value={crafts.accel}/>
-                <SimpleValue label="Radar Range" value={crafts.radarRange}/>
-                <SimpleValue label="Radar Detection Chance" value={crafts.radarChance}>{ Percent }</SimpleValue>
-                <SimpleValue label="Sight Range" value={crafts.sightRange}/>
-                <SimpleValue label="Accuracy Bonus" value={crafts.hitBonus}>{ Percent }</SimpleValue>
-                <SimpleValue label="Power Bonus" value={crafts.powerBonus}>{ Percent }</SimpleValue>
-                <SimpleValue label="Dodge Bonus" value={crafts.avoidBonus}>{ Percent }</SimpleValue>
-                <SimpleValue label="Armor" value={crafts.armor}/>
+                <CraftStats stats={crafts}/>
            </tbody>
             <ListValue label="Required Research" values={crafts.requires}>{ linkFn }</ListValue>
             <ListValue label="Required Services" values={crafts.requiresBaseBuyFunc}>{ linkFn }</ListValue>

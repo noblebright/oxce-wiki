@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { BooleanValue, ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
 import DamageAlter from "./DamageAlter";
 import Damage from "./Damage";
 import Cost, { hasCost } from "./Cost";
