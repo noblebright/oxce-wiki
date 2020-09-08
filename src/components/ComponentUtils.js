@@ -106,10 +106,10 @@ export const damageKeys = [
 export const getDamageKey = x => damageKeys[x];
 export const Actions = ({children}) => (<tbody><tr><td colSpan="2"><Table>{children}</Table></td></tr></tbody>);
 export const ActionHeader = ({label}) => (<thead>{label && <tr><th className="ListHeader">{label}</th><th className="ListHeader">Accuracy</th><th className="ListHeader">Cost</th></tr>}</thead>);
-export const ActionValue = ({label, cost, show, accuracy}) => (
+export const ActionValue = ({label, cost, show, accuracy, shots}) => (
     show ? 
     <tr>
-        <td>{label}</td>
+        <td>{label}{shots ? ` (x${shots})` : ""}</td>
         <td>{accuracy}</td>
         <td>{cost}</td>
     </tr> : null
