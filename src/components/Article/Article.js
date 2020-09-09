@@ -59,7 +59,7 @@ export default function Article({ ruleset, lang, parent }) {
                 <CraftWeapons {...articleProps}/>
                 <Ufos {...articleProps}/>
                 <Soldiers {...articleProps}/>
-                <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered>
+                <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered animation={false}>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>
                     </Modal.Header>

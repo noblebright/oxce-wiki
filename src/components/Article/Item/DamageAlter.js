@@ -82,19 +82,22 @@ function AlterEntry({ alter, suffix, label }) {
 export default function DamageAlter({type, alter, lc, blastRadius, melee}) {
     let blastRadiusObj = {};
     if(!alter?.FixRadius) {
-        blastRadiusObj.FixRadius = blastRadius;
+        if(blastRadius !== undefined){
+            blastRadiusObj.FixRadius = blastRadius;
+        }
         if(blastRadius === 0) {
             blastRadiusObj.RadiusEffectiveness = 0;
             blastRadiusObj.IgnoreDirection = null;
         }
     }
+    console.log(blastRadiusObj);
     const mergedAlter = {...defaultProps[type], ...alter, ...blastRadiusObj};
-    return alter ? (
+    return mergedAlter ? (
         <React.Fragment>
             <SimpleValue label="Random Type" value={mergedAlter.RandomType}>
                 { x => randomType[x]}
             </SimpleValue>
-            {!melee && <SimpleValue label="Blast Radius Type" value={mergedAlter.FixRadius}>
+            {!melee && <SimpleValue label="Blast Radius" value={mergedAlter.FixRadius}>
                 { x => x === -1 ? "Dynamic" : `${x} Tiles` }
             </SimpleValue>}
             <BooleanValue label="Use Fire Radius?" value={mergedAlter.FireBlastCalc} />

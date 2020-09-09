@@ -73,10 +73,11 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
                 <SimpleValue label={spriteFn(items.bigSprite)} value={items}>
                 { x => integralAmmo ?  (
                         <Damage items={x} lc={lc}>
+                            {x.clipSize !== -1 && <div>{lc("clipSize")}: {x.clipSize}</div>}
                             { x.damageAlter ? <Table>
                                 <ListHeader label="Damage Properties"/>
                                 <tbody>
-                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} melee/>
+                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius}/>
                                 </tbody>
                             </Table> : null}
                         </Damage>

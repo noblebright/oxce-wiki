@@ -4,6 +4,7 @@ import Table from "react-bootstrap/Table";
 import useBonusString from "../../../hooks/useBonusString";
 import { BooleanValue, ListHeader, SimpleValue, Percent, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
 import Damage from "./Damage";
+import DamageAlter from "./DamageAlter";
 import Cost, { hasCost } from "./Cost";
 
 function FuseTrigger({triggers}) {
@@ -25,7 +26,16 @@ export default function Grenade({ ruleset, items, lc, linkFn, spriteFn }) {
     return (
         <React.Fragment>
             <tbody>
-                <SimpleValue label={spriteFn(items.bigSprite)} value={<Damage items={items} lc={lc} />}/>
+                <SimpleValue label={spriteFn(items.bigSprite)} value={items}>
+                    {x => <Damage items={x} lc={lc}>
+                        { x.damageAlter ? <Table>
+                            <ListHeader label="Damage Properties"/>
+                            <tbody>
+                                <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} />
+                            </tbody>
+                        </Table> : null}
+                    </Damage>}
+                </SimpleValue>
             </tbody>
             <Actions>
                 <ActionHeader label="Actions"/>
