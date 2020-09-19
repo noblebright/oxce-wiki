@@ -35,6 +35,7 @@ export default function Soldiers({ruleset, lang, id, version}) {
                 <SimpleValue label={`Monthly Salary (${lc("STR_COLONEL")})`} value={soldiers.costSalaryColonel}>{ Money }</SimpleValue>
                 <SimpleValue label={`Monthly Salary (${lc("STR_COMMANDER")})`} value={soldiers.costSalaryCommander}>{ Money }</SimpleValue>
                 <HeightStats entity={soldiers}/> 
+                <SimpleValue label="Special Weapon" value={soldiers.specialWeapon}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Score" value={soldiers.value}/>
                 <SimpleValue label="Transfer Time" value={soldiers.transferTime}>{ Hours }</SimpleValue>
                 <SimpleValue label="Morale Loss When Killed" value={soldiers.moraleLossWhenKilled}>{ Percent }</SimpleValue>

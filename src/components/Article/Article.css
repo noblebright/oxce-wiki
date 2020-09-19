@@ -41,6 +41,7 @@ article .auto-width { /*specificity fight*/
     width: 50%;
     height: 50%;
     display: inline-block;
+    position: relative;
     border: 1px solid var(--gray);
 }
 
@@ -52,6 +53,13 @@ article .auto-width { /*specificity fight*/
     width: 75%;
     height: 75%;
 }
+
+.TechTree .centerButton {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
 .debugPane {
     max-height: 80vh;
     overflow: auto;

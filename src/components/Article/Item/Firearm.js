@@ -7,13 +7,13 @@ import DamageAlter from "./DamageAlter";
 import Damage from "./Damage";
 import Cost, { hasCost } from "./Cost";
 
-const actionTypes = ["Aimed", "Snap", "Auto", "Melee"];
+const actionTypes = ["Aimed", "Snap", "Auto"];
 const actionLabel = {
     "Aimed": "STR_AIMED_SHOT", 
     "Snap": "STR_SNAP_SHOT", 
-    "Auto": "STR_AUTO_SHOT", 
+    "Auto": "STR_AUTO_SHOT",
     "Melee": "STR_HIT_MELEE"
-}
+};
 
 function getActionKey(item, suffix) {
     const customName = item[`conf${suffix}`]?.name;
@@ -35,21 +35,23 @@ const GunAction = ({suffix, item, lc, bonusFn}) => (
     />
 );
 
-const GunAmmo = ({lc, linkFn, item, integral}) => (
+const GunAmmo = ({lc, linkFn, item, integral, melee}) => (
     <tr>
         <td>{integral ? "-" : linkFn(item.type)}</td>
         <td>
-            <div>{lc("clipSize")}: {item.clipSize}</div>
+            {item.clipSize ? <div>{lc("clipSize")}: {item.clipSize}</div> : null}
             <div>
                 <Table>
                     <tbody>
-                        <DamageAlter type={item.damageType} alter={item.damageAlter} blastRadius={item.blastRadius} lc={lc}/>
+                        <DamageAlter type={melee ? item.meleeType : item.damageType} 
+                                     alter={melee ? item.meleeAlter : item.damageAlter} 
+                                     blastRadius={item.blastRadius} lc={lc}/>
                     </tbody>
                 </Table>
             </div>
         </td>
         <td>
-            <Damage items={item} lc={lc}/>
+            <Damage items={item} lc={lc} melee={melee}/>
         </td>
     </tr>
 );
@@ -58,7 +60,23 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     let result;
 
     const getAction = list => list.map(x => <GunAction key={x} suffix={x} item={item} lc={lc} bonusFn={bonusFn}/>);
-    const getAmmo = ammoList => ammoList.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items}/>)
+    const getAmmo = ammoList => (
+        <tr>
+            <td></td>
+            <td colSpan="2">
+                <Table>
+                    <tbody>
+                        {ammoList.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items}/>)}
+                    </tbody>      
+                </Table>
+            </td>
+        </tr>
+    );
+
+    const melee = hasCost(item, "Melee") ? [
+        <GunAction key="Melee" suffix="Melee" item={item} lc={lc} bonusFn={bonusFn}/>,
+        <tr><td></td><td colSpan="2"><GunAmmo key="MeleeAmmo" lc={lc} linkFn={linkFn} item={item} integral melee/></td></tr>
+    ] : [];
 
     if(!item.compatibleAmmo && !item.ammo) {
         //this item does not use external ammo (no ammo or integral ammo like throwing knives)
@@ -67,7 +85,8 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     }
     if(!item.ammo) { //compatibleAmmo only, so only one segment.
         result = getAction(actionTypes);
-        return result.concat(getAmmo(item.compatibleAmmo));
+        result = result.concat(getAmmo(item.compatibleAmmo));
+        return result.concat(melee);
     }
     //heterogenous ammo case.
     result = [];
@@ -75,7 +94,8 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
         const actions = getAction(actionTypes.filter(x => `${item[`conf${x}`]?.ammoSlot}` === key)); //cast to string
         result = result.concat(actions);
         result = result.concat(getAmmo(item.ammo[key].compatibleAmmo));
-    })
+    });
+    result = result.concat(melee);
     return result;
 }
 
@@ -102,7 +122,14 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
             </tbody>
             <Actions>
                 <ActionHeader label="Actions"/>
-                <tbody>{ buildActions(items, lc, linkFn, bonusFn, ruleset) }</tbody>
+                <tbody>
+                    { buildActions(items, lc, linkFn, bonusFn, ruleset) }
+                    <ActionValue label={lc("STR_THROW")}
+                                show={!items.fixedWeapon}
+                                cost={<Cost value={items} suffix="Throw" lc={lc} defaultTu={25}/>}
+                                accuracy={<Accuracy items={items} suffix="Throw" bonusFn={bonusFn} defaultAcc={100}/>}
+                    />
+                </tbody>
             </Actions>
             <ListHeader label="Firearm Properties"/>
             <tbody>
