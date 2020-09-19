@@ -90,7 +90,6 @@ export default function DamageAlter({type, alter, lc, blastRadius, melee}) {
             blastRadiusObj.IgnoreDirection = null;
         }
     }
-    console.log(blastRadiusObj);
     const mergedAlter = {...defaultProps[type], ...alter, ...blastRadiusObj};
     return mergedAlter ? (
         <React.Fragment>

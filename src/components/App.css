@@ -34,3 +34,11 @@ html, body, #root {
   color: var(--light);
   font-weight: 600;
 }
+
+.KeyValue {
+  display: flex;
+}
+
+.KeyValue>span:first-child {
+  flex-grow: 1;
+}

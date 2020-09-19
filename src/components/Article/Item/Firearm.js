@@ -40,7 +40,13 @@ const GunAmmo = ({lc, linkFn, item, integral}) => (
         <td>{integral ? "-" : linkFn(item.type)}</td>
         <td>
             <div>{lc("clipSize")}: {item.clipSize}</div>
-            <div><DamageAlter type={item.damageType} alter={item.damageAlter} blastRadius={item.blastRadius} lc={lc}/></div>
+            <div>
+                <Table>
+                    <tbody>
+                        <DamageAlter type={item.damageType} alter={item.damageAlter} blastRadius={item.blastRadius} lc={lc}/>
+                    </tbody>
+                </Table>
+            </div>
         </td>
         <td>
             <Damage items={item} lc={lc}/>
@@ -50,17 +56,27 @@ const GunAmmo = ({lc, linkFn, item, integral}) => (
 
 function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     let result;
+
+    const getAction = list => list.map(x => <GunAction key={x} suffix={x} item={item} lc={lc} bonusFn={bonusFn}/>);
+    const getAmmo = ammoList => ammoList.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items}/>)
+
     if(!item.compatibleAmmo && !item.ammo) {
         //this item does not use external ammo (no ammo or integral ammo like throwing knives)
-        result = actionTypes.map(x => <GunAction key={x} suffix={x} item={item} lc={lc} bonusFn={bonusFn}/>);
+        result = getAction(actionTypes);
         return result;
     }
     if(!item.ammo) { //compatibleAmmo only, so only one segment.
-        result = actionTypes.map(x => <GunAction key={x} suffix={x} item={item}lc={lc} bonusFn={bonusFn}/>);
-        return result.concat(item.compatibleAmmo.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items}/>));
+        result = getAction(actionTypes);
+        return result.concat(getAmmo(item.compatibleAmmo));
     }
-    //ammo, so possibly heterogenous ammo case.
-    return null;
+    //heterogenous ammo case.
+    result = [];
+    Object.keys(item.ammo).forEach(key => {
+        const actions = getAction(actionTypes.filter(x => `${item[`conf${x}`]?.ammoSlot}` === key)); //cast to string
+        result = result.concat(actions);
+        result = result.concat(getAmmo(item.ammo[key].compatibleAmmo));
+    })
+    return result;
 }
 
 export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {

@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useBonusString from "../../hooks/useBonusString";
-import { BooleanValue, damageKeys, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
+import { BooleanValue, damageKeys, KeyValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
 import useImage from "../../hooks/useImage";
 
 function ArmorRating({armors, lc}) {
@@ -28,7 +28,7 @@ function DamageResists({resists, lc}) {
         <Table bordered striped size="sm" className="auto-width">
             <ListHeader label="Damage Modifiers"/>
             <tbody>
-                { resists.map((value, idx) => <SimpleValue key={idx} label={lc(damageKeys[idx])} value={Math.floor(value * 100)}>{Percent}</SimpleValue>) }
+                { resists.map((value, idx) => <SimpleValue key={idx} label={lc(damageKeys[idx])} value={Math.floor(value * 100)} showZero>{Percent}</SimpleValue>) }
             </tbody>
         </Table>
     );
@@ -212,6 +212,7 @@ export default function Armors({ruleset, lang, id, version}) {
             <ListValue label="Built-in Weapons" values={armors.builtInWeapons}>{ linkFn }</ListValue>
             <ListValue label="Categories" values={armors.categories}>{ lc }</ListValue>
             <ListValue label="Required to Purchase" values={armors.requiresBuy}>{ linkFn }</ListValue>
+            <ListValue label="Tags" values={Object.entries(armors.tags || {})}>{ KeyValue }</ListValue>
         </Table>
     );
 }
