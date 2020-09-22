@@ -10,7 +10,7 @@ function getAliens(ruleset, race, rank) {
     if(!raceEntry) {
         return null;
     }
-    return raceEntry.membersRandom[rank] || [raceEntry.members[rank]];
+    return raceEntry.membersRandom?.[rank] || [raceEntry.members[rank]];
 }
 
 function NumberAppearing({deployment}) {
