@@ -71,6 +71,7 @@ export default function Ufos({ruleset, lang, id, version}) {
             <ListValue label="Unlocked By" values={ufos.unlockedBy}>{linkFn}</ListValue>
             <ListValue label="Unlocks" values={ufos.unlocks}>{ linkFn }</ListValue>
             <ListValue label="Manufacturing Process" values={ufos.manufacture}>{ linkFn }</ListValue>
+            <ListValue label="Contains Items" values={ufos.containsItems}>{ linkFn }</ListValue>
         </Table>
     )
 }

@@ -22,6 +22,8 @@ const supportedSections = [
     { section: "units", key: "type" },
     { section: "soldiers", key: "type" },
     { section: "armors", key: "type" },
+    { section: "alienDeployments", key: "type"},
+    { section: "alienRaces", key: "id", filter: (x, rs, key) => (rs[key]) },
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
@@ -79,7 +81,21 @@ function generateAssets(ruleset, assets) {
     });
 }
 
-function backLink(entries, id, targetSection, list, field) {
+const backlinkSets = [];
+
+function backLinkSet(entries, id, list, targetSection, field) {
+    if(!list) return;
+
+    for(let key of list) {
+        let back = entries[key]?.[targetSection];
+        if (!back) continue;
+        back[field] = back[field] || new Set();
+        back[field].add(id);
+        backlinkSets.push([back, field]);
+    }
+}
+
+function backLink(entries, id, list, targetSection, field) {
     const entry = entries[id];
     const items = typeof list === "function" ? list(entry) : list;
     
@@ -157,34 +173,74 @@ export default function compile(base, mod) {
         const facilities = entry.facilities || {};
         const craftWeapons = entry.craftWeapons || {};
         const armors = entry.armors || {};
+        const ufos = entry.ufos || {};
+        const units = entry.units || {};
+        const alienDeployments = entry.alienDeployments || {};
 
-        backLink(ruleset.entries, key, "research", research.dependencies, "leadsTo");
-        backLink(ruleset.entries, key, "research", research.unlocks, "unlockedBy");
-        backLink(ruleset.entries, key, "research", research.getOneFree, "freeFrom");
-        backLink(ruleset.entries, key, "research", [research.lookup], "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.
-        backLink(ruleset.entries, key, "research", manufacture.requires, "manufacture");
-        backLink(ruleset.entries, key, "items", manufacture.producedItems && Object.keys(manufacture.producedItems), "manufacture");
-        backLink(ruleset.entries, key, "items", manufacture.requiredItems && Object.keys(manufacture.requiredItems), "componentOf");
-        backLink(ruleset.entries, key, "items", [craftWeapons.launcher], "craftWeapons");
-        backLink(ruleset.entries, key, "items", [craftWeapons.clip], "craftAmmo");
-        backLink(ruleset.entries, key, "facilities", facilities.buildOverFacilities, "upgradesTo");
-        backLink(ruleset.entries, key, "soldiers", [manufacture.spawnedPersonType], "manufacture");
-        backLink(ruleset.entries, key, "soldiers", armors.units, "usableArmors");
-        backLink(ruleset.entries, key, "items", [armors.storeItem], "wearableArmors");
+        backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
+        backLink(ruleset.entries, key, research.unlocks, "research", "unlockedBy");
+        backLink(ruleset.entries, key, research.getOneFree, "research", "freeFrom");
+        backLink(ruleset.entries, key, [research.lookup], "research", "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.
+        backLink(ruleset.entries, key, manufacture.requires, "research", "manufacture");
+        backLink(ruleset.entries, key, manufacture.producedItems && Object.keys(manufacture.producedItems), "items", "manufacture");
+        backLink(ruleset.entries, key, manufacture.requiredItems && Object.keys(manufacture.requiredItems), "items", "componentOf");
+        backLink(ruleset.entries, key, [craftWeapons.launcher], "items", "craftWeapons");
+        backLink(ruleset.entries, key, [craftWeapons.clip], "items", "craftAmmo");
+        backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
+        backLink(ruleset.entries, key, [manufacture.spawnedPersonType], "soldiers", "manufacture");
+        backLink(ruleset.entries, key, armors.units, "soldiers", "usableArmors");
+        backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
             if(compatibleAmmo) {
                 entry.items.allCompatibleAmmo = compatibleAmmo;
             }
         }
+
         if(entry.facilities?.prisonType) {
             ruleset.prisons[entry.facilities.prisonType] = ruleset.prisons[entry.facilities.prisonType] || [];
             ruleset.prisons[entry.facilities.prisonType].push(key);
         }
-        backLink(ruleset.entries, key, "items", entry.items?.allCompatibleAmmo, "ammoFor");
+        backLink(ruleset.entries, key, entry.items?.allCompatibleAmmo, "items", "ammoFor");
 
-        
+        //Items from alienDeployments
+        const deploymentItems = alienDeployments.data?.reduce((acc, deployment) => {
+            deployment.itemSets.forEach(itemSet => {
+                itemSet.forEach(item => {
+                    acc.add(item);
+                });
+            });
+            return acc;
+        }, new Set()) || null;
+        backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "foundFrom");
+        backLinkSet(ruleset.entries, key, [alienDeployments.missionBountyItem], "items", "foundFrom");
+
+        //Items from UFOs (guaranteed only for now)
+        const ufoItems = ufos.battlescapeTerrainData?.mapBlocks?.reduce((acc, block) => {
+            if(!block.items) return acc;
+            Object.keys(block.items).forEach(item => acc.add(item));
+            return acc;
+        }, new Set());
+
+        if(entry.ufos) {
+            if(ufoItems.size) {
+                entry.ufos.containsItems = ufoItems;
+            }
+        }
+        backLinkSet(ruleset.entries, key, ufoItems && [...ufoItems], "items", "foundFrom");
+
+        //Items from Units
+        const unitItems = units.builtInWeaponSets?.reduce((acc, weaponSet) => {
+            weaponSet.forEach(item => acc.add(item));
+            return acc;
+        }, new Set());
+        backLinkSet(ruleset.entries, key, unitItems && [...unitItems], "items", "foundFrom");
+ 
         //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
+
+    backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
+        obj[key] = [...obj[key]];
+    });
     return ruleset;
 }

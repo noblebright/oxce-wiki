@@ -61,7 +61,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
 
     const getAction = list => list.map(x => <GunAction key={x} suffix={x} item={item} lc={lc} bonusFn={bonusFn}/>);
     const getAmmo = ammoList => (
-        <tr>
+        <tr key="getAmmo">
             <td></td>
             <td colSpan="2">
                 <Table>
@@ -75,7 +75,16 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
 
     const melee = hasCost(item, "Melee") ? [
         <GunAction key="Melee" suffix="Melee" item={item} lc={lc} bonusFn={bonusFn}/>,
-        <tr><td></td><td colSpan="2"><GunAmmo key="MeleeAmmo" lc={lc} linkFn={linkFn} item={item} integral melee/></td></tr>
+        <tr key="MeleeAmmo">
+            <td></td>
+            <td colSpan="2">
+                <Table>
+                    <tbody>
+                        <GunAmmo lc={lc} linkFn={linkFn} item={item} integral melee/>
+                    </tbody>
+                </Table>
+            </td>
+        </tr>
     ] : [];
 
     if(!item.compatibleAmmo && !item.ammo) {

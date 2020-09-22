@@ -105,6 +105,7 @@ export default function Item({ruleset, lang, id, version}) {
             <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>
             <ListValue label="Craft Ammo For" values={items.craftAmmo}>{ linkFn }</ListValue>
             <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
+            <ListValue label="Sources" values={items.foundFrom}>{ linkFn }</ListValue>
             <ListValue label="Script Tags" values={Object.entries(items.tags || {})}/>
         </Table>
     )

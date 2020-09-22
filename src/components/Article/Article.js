@@ -15,6 +15,8 @@ import Ufos from "./Ufos";
 import Units from "./Units";
 import Soldiers from "./Soldiers";
 import Armors from "./Armors";
+import AlienDeployments from "./AlienDeployments";
+import AlienRaces from "./AlienRaces";
 
 import "./Article.css";
 
@@ -59,6 +61,8 @@ export default function Article({ ruleset, lang, parent }) {
                 <CraftWeapons {...articleProps}/>
                 <Ufos {...articleProps}/>
                 <Soldiers {...articleProps}/>
+                <AlienDeployments {...articleProps}/>
+                <AlienRaces {...articleProps}/>
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered animation={false}>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>

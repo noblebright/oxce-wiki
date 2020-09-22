@@ -2,6 +2,7 @@ import React from "react";
 import { SimpleValue, Percent } from "../ComponentUtils";
 
 export default function CraftStats({stats}) {
+  if(!stats) return null;
   return (
     <React.Fragment>
       <SimpleValue label="Acceleration" value={stats.accel}/>

@@ -62,9 +62,12 @@ export default function Cytoscape({elements, onClick, className}) {
         cy.current.remove("*");
         cy.current.add(elements);
         cy.current.autounselectify(true);
-        cy.current.layout(layout).run()
-        cy.current.resize();
-        cy.current.fit(undefined, 10);
+        const cyLayout = cy.current.layout(layout);
+        cyLayout.promiseOn('layoutstop').then(() => {
+            cy.current.resize();
+            cy.current.fit(undefined, 10);
+        })
+        cyLayout.run();
     }, [elements]);
 
     const handleRecenter = useCallback(() => {

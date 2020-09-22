@@ -2,9 +2,9 @@ import React, { useCallback } from "react";
 import Table from "react-bootstrap/Table";
 
 export const SectionHeader = ({label}) => (label ? <thead><tr><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
-
 export const ListHeader = ({label}) => (<thead>{label && <tr><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
 
+export const ContainerValue = ({children}) => <tr><td colSpan="2">{children}</td></tr>;
 export const SimpleValue = ({label, value, children, showZero}) => ((showZero ? (value || value === 0) : value) ? <tr><td>{label}</td><td>{children ? children(value) : value}</td></tr> : null);
 export const BooleanValue = ({label, value}) => (value !== undefined && value !== null ? <SimpleValue label={label} value={`${value}`.toUpperCase()}/> : null);
 export const ListValue = ({label, values, children}) => (values && values.length > 0 ?
@@ -14,7 +14,7 @@ export const ListValue = ({label, values, children}) => (values && values.length
             <tr>
                 <td colSpan="2" className="ListValues">
                         { values.map((val, idx) => (
-                            <div className="ListValue" key={idx}>{children ? children(val) : val}</div>
+                            <div className="ListValue" key={idx}>{children ? children(val, idx) : val}</div>
                         ))}
                 </td>
             </tr>
