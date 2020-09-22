@@ -60,8 +60,8 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     let result;
 
     const getAction = list => list.map(x => <GunAction key={x} suffix={x} item={item} lc={lc} bonusFn={bonusFn}/>);
-    const getAmmo = ammoList => (
-        <tr key="getAmmo">
+    const getAmmo = (ammoList, key = "getAmmo") => (
+        <tr key={key}>
             <td></td>
             <td colSpan="2">
                 <Table>
@@ -102,7 +102,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     Object.keys(item.ammo).forEach(key => {
         const actions = getAction(actionTypes.filter(x => `${item[`conf${x}`]?.ammoSlot}` === key)); //cast to string
         result = result.concat(actions);
-        result = result.concat(getAmmo(item.ammo[key].compatibleAmmo));
+        result = result.concat(getAmmo(item.ammo[key].compatibleAmmo, `ammo${key}`));
     });
     result = result.concat(melee);
     return result;
