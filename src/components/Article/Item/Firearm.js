@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, Percent } from "../../ComponentUtils";
 import DamageAlter from "./DamageAlter";
 import Damage from "./Damage";
 import Cost, { hasCost } from "./Cost";
@@ -150,6 +150,7 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
                 {hasCost(items, "Aimed") && <SimpleValue label="Aim Range" value={items.aimRange || 200}/>}
                 {hasCost(items, "Snap") && <SimpleValue label="Snap Range" value={items.snapRange || 15}/>}
                 {hasCost(items, "Auto") && <SimpleValue label="Auto Range" value={items.autoRange || 7}/>}
+                <SimpleValue label="CQC Accuracy" value={items.accuracyCloseQuarters}>{ Percent }</SimpleValue>
                 <SimpleValue label="Min Range" value={items.minRange}/>
                 <SimpleValue label="Dropoff" value={items.dropoff}/>
                 <SimpleValue label="Effective Range" value={items.powerRangeThreshold}/>
