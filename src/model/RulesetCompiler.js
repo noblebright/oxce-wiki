@@ -35,9 +35,13 @@ function generateSection(ruleset, rules, metadata) {
     sectionData.forEach(entry => {
         const name = entry[keyField];
 
-        if(entry.delete && ruleset[entry.delete]) { //process delete
-            delete ruleset[entry.delete][sectionName];
-            if(!Object.keys(ruleset[entry.delete]).length) {
+        if(entry.delete) { //process delete
+            if(ruleset[entry.delete]){
+                delete ruleset[entry.delete][sectionName];
+            }
+            if(ruleset[entry.delete] && 
+                !Object.keys(ruleset[entry.delete])
+                    .filter(x => x !== "hide").length) {
                 delete ruleset[entry.delete];
             }
             return;

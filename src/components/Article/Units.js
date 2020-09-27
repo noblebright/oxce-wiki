@@ -13,6 +13,21 @@ const specAb = [
     "Burns Floor and Explodes on Death"
 ];
 
+function getLivingWeapon(entries, id) {
+    const weaponStr = id.substr(4);
+    if(entries[`${weaponStr}_WEAPON`]) {
+        return `${weaponStr}_WEAPON`;
+    }
+    const parts = weaponStr.split("_");
+    while(parts.length) {
+        parts.pop();
+        const key = `${parts.join("_")}_WEAPON`;
+        if(entries[key]) {
+            return key;
+        }
+    }
+    return null;
+}
 export default function Units(props) {
     const {ruleset, lang, id, version} = props;
     const lc = useLocale(lang, ruleset);
@@ -20,6 +35,8 @@ export default function Units(props) {
     const units = ruleset.entries[id].units;
 
     if(!units) return null;
+    
+    const livingWeaponLink = units.livingWeapon ? getLivingWeapon(ruleset.entries, id) : null;
     
     return (
         <React.Fragment>
@@ -44,7 +61,8 @@ export default function Units(props) {
                         { x => specAb[x] }
                     </SimpleValue>
                     <SimpleValue label="Spawn on Death" value={units.spawnUnit}>{ linkFn }</SimpleValue>
-                    <BooleanValue label="Living Weapon" value={units.livingWeapon}/>
+                    <BooleanValue label="Is Living Weapon" value={units.livingWeapon}/>
+                    <SimpleValue label="Living Weapon" value={livingWeaponLink}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Melee Weapon" value={units.meleeWeapon}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Psi Weapon" value={units.psiWeapon}>{ linkFn }</SimpleValue>
                     <BooleanValue label="Capturable" value={units.capturable}/>
