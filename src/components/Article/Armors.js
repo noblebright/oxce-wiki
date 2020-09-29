@@ -207,7 +207,7 @@ export default function Armors({ruleset, lang, id, version}) {
                 <HeightStats entity={armors} />
             </tbody>
             <UnitStats stats={armors.stats} lc={lc}/>
-            <ListValue label="Equippable By" values={armors.units}>{ linkFn }</ListValue>
+            <ListValue label="Equippable By" values={armors.units || armors.npcUnits}>{ linkFn }</ListValue>
             <ListValue label="Corpse Item" values={armors.corpseBattle}>{ linkFn }</ListValue>
             <ListValue label="Built-in Weapons" values={armors.builtInWeapons}>{ linkFn }</ListValue>
             <ListValue label="Categories" values={armors.categories}>{ lc }</ListValue>

@@ -22,7 +22,7 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
                 <SimpleValue label="Item Type" value={items.battleType}>{ getBattleType }</SimpleValue>
                 <SimpleValue label="Cost" value={items.costBuy}>{ Money }</SimpleValue>
                 <SimpleValue label="Sell Price" value={items.costSell}>{ Money }</SimpleValue>
-                <SimpleValue label="Transfer Time" value={items.transfer}>{ Hours }</SimpleValue>
+                <SimpleValue label="Transfer Time" value={items.transferTime}>{ Hours }</SimpleValue>
                 <SimpleValue label="Weight" value={items.weight}/>
                 <SimpleValue label="Storage Space" value={items.size}/>
                 <SimpleValue label="Name in Inventory" value={items.name}>{lc}</SimpleValue>

@@ -23,7 +23,8 @@ const supportedSections = [
     { section: "soldiers", key: "type" },
     { section: "armors", key: "type" },
     { section: "alienDeployments", key: "type"},
-    { section: "alienRaces", key: "id", filter: (x, rs, key) => (rs[key]) },
+    { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
+    { section: "terrains", key: "name", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) },
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
@@ -143,6 +144,17 @@ function getCompatibleAmmo(entry) {
 
 const globalKeys = ["maxViewDistance"];
 
+function getMapBlockItems(block, items, randomItems) {
+    if(block.items) {
+        Object.keys(block.items).forEach(x => items.add(x));
+    }
+    if(block.randomizedItems) {
+        block.randomizedItems.forEach(random => {
+            random.itemList.forEach(x => randomItems.add(x));
+        })
+    }
+}
+
 export default function compile(base, mod) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {} };
     
@@ -192,7 +204,8 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, [craftWeapons.clip], "items", "craftAmmo");
         backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
         backLink(ruleset.entries, key, [manufacture.spawnedPersonType], "soldiers", "manufacture");
-        backLink(ruleset.entries, key, armors.units, "soldiers", "usableArmors");
+        backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
+        backLink(ruleset.entries, key, units.units, "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
@@ -219,19 +232,44 @@ export default function compile(base, mod) {
         backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "foundFrom");
         backLinkSet(ruleset.entries, key, [alienDeployments.missionBountyItem], "items", "foundFrom");
 
-        //Items from UFOs (guaranteed only for now)
-        const ufoItems = ufos.battlescapeTerrainData?.mapBlocks?.reduce((acc, block) => {
-            if(!block.items) return acc;
-            Object.keys(block.items).forEach(item => acc.add(item));
+        //Items from terrain
+        const terrainResults = alienDeployments.terrains?.reduce((acc, terrainKey) => {
+            const terrain = ruleset.entries[terrainKey].terrains;
+            const [items, randomItems] = acc;
+            terrain.mapBlocks.forEach(block => {
+                getMapBlockItems(block, items, randomItems);
+            });
             return acc;
-        }, new Set());
+        }, [new Set(), new Set()]);
 
-        if(entry.ufos) {
-            if(ufoItems.size) {
-                entry.ufos.containsItems = ufoItems;
-            }
+        const [terrainItems, terrainRandomItems] = terrainResults || [];
+
+        if(terrainItems && terrainItems.size) {
+            entry.alienDeployments.terrainItems = [...terrainItems];
+            backLinkSet(ruleset.entries, key, [...terrainItems], "items", "foundFrom");
         }
-        backLinkSet(ruleset.entries, key, ufoItems && [...ufoItems], "items", "foundFrom");
+        if(terrainRandomItems && terrainRandomItems.size) {
+            entry.alienDeployments.terrainRandomItems = [...terrainRandomItems];
+            backLinkSet(ruleset.entries, key, [...terrainItems], "items", "foundFrom");
+        }
+
+        //Items from UFOs
+        const ufoResults = ufos.battlescapeTerrainData?.mapBlocks?.reduce((acc, block) => {
+            const [items, randomItems] = acc;
+            getMapBlockItems(block, items, randomItems);
+            return acc;
+        }, [new Set(), new Set()]);
+
+        const [ufoItems, ufoRandomItems] = ufoResults || [];
+
+        if(ufoItems && ufoItems.size) {
+            entry.ufos.ufoItems = [...ufoItems];
+            backLinkSet(ruleset.entries, key, [...ufoItems], "items", "foundFrom");
+        }
+        if(ufoRandomItems && ufoRandomItems.size) {
+            entry.ufos.ufoRandomItems = [...ufoRandomItems];
+            backLinkSet(ruleset.entries, key, [...ufoRandomItems], "items", "foundFrom");
+        }
 
         //Items from Units
         const unitItems = units.builtInWeaponSets?.reduce((acc, weaponSet) => {

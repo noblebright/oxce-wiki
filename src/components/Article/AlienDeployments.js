@@ -90,6 +90,8 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 <SimpleValue label="Abort Penalty" value={alienDeployments.abortPenalty}/>
                 <SimpleValue label="Turn Limit" value={alienDeployments.turnLimit}/>
             </tbody>
+            <ListValue label="Map Items" values={alienDeployments.terrainItems}>{ linkFn }</ListValue>
+            <ListValue label="Map Items (Random)" values={alienDeployments.terrainRandomItems}>{ linkFn }</ListValue>
             <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>
             {alienDeployments.data.map((x, idx) => <Deployment key={idx} ruleset={ruleset} linkFn={linkFn} deployment={x} race={alienDeployments.race} idx={idx}/>)}
         </Table>
