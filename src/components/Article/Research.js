@@ -41,11 +41,13 @@ export default function Research({ruleset, lang, id, version}) {
                 <BooleanValue label="Requires Item" value={research.needItem}/>
                 <BooleanValue label="Destroys Item" value={research.destroyItem}/>
                 <SimpleValue label="Gives (lookup)" value={research.lookup}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Spawns Item" value={research.spawnedItem}>{ linkFn }</SimpleValue>
             </tbody>
             <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ lc }</ListValue>
             <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>
             <ListValue label="Dependencies" values={research.dependencies}>{ linkFn }</ListValue>
             <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>
+            <ListValue label="Disabled" values={research.disables}>{ linkFn }</ListValue>
             <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>
             <ListValue label="Unlocks" values={research.unlocks}>{ linkFn }</ListValue>
             <ListValue label="Bonus Topics" values={research.getOneFree}>{ linkFn }</ListValue>

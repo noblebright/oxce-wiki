@@ -1,5 +1,6 @@
 import deepmerge from "deepmerge";
 import { getSupportedLanguages } from "./utils";
+import generateMissions from "./MissionMapper";
 
 /*
 {
@@ -155,8 +156,9 @@ function getMapBlockItems(block, items, randomItems) {
     }
 }
 
+
 export default function compile(base, mod) {
-    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {} };
+    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };
     
     //add languages
     const supportedLanguages = getSupportedLanguages(base, mod);
@@ -181,6 +183,9 @@ export default function compile(base, mod) {
     generateAssets(ruleset.sounds, base.extraSounds);
     generateAssets(ruleset.sounds, mod.extraSounds);
 
+    //add globe lookups
+    generateMissions(ruleset.lookups, base);
+    generateMissions(ruleset.lookups, mod);
     //add backreferences
     for(let key in ruleset.entries) {
         const entry = ruleset.entries[key];
@@ -207,6 +212,8 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
         backLink(ruleset.entries, key, units.units, "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
+        backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "foundFrom");
+
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
             if(compatibleAmmo) {
