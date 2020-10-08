@@ -1,6 +1,6 @@
 import deepmerge from "deepmerge";
 import { getSupportedLanguages } from "./utils";
-import generateMissions from "./MissionMapper";
+import { joinRaces, compileMissions } from "./MissionMapper";
 
 /*
 {
@@ -183,9 +183,11 @@ export default function compile(base, mod) {
     generateAssets(ruleset.sounds, base.extraSounds);
     generateAssets(ruleset.sounds, mod.extraSounds);
 
-    //add globe lookups
-    generateMissions(ruleset.lookups, base);
-    generateMissions(ruleset.lookups, mod);
+    //handle globe/region/mission/missionscript/deployment relationships
+    compileMissions(ruleset.lookups, base);
+    compileMissions(ruleset.lookups, mod);
+    joinRaces(ruleset.lookups);
+
     //add backreferences
     for(let key in ruleset.entries) {
         const entry = ruleset.entries[key];
@@ -212,7 +214,23 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
         backLink(ruleset.entries, key, units.units, "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
+        backLinkSet(ruleset.entries, key, [alienDeployments.nextStage], "alienDeployments", "$prevStage");
         backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "foundFrom");
+
+        if(ufos.raceBonus) {
+            Object.entries(ufos.raceBonus).forEach(([race, data]) => {
+                if(data.craftCustomDeploy) {
+                    ruleset.lookups.raceByDeployment[data.craftCustomDeploy] = ruleset.lookups.raceByDeployment[data.craftCustomDeploy] || new Set();
+                    ruleset.lookups.raceByDeployment[data.craftCustomDeploy].add(race);
+                    backLinkSet(ruleset.entries, key, [data.craftCustomDeploy], "alienDeployments", "$variant");
+                }
+                if(data.missionCustomDeploy) {
+                    ruleset.lookups.raceByDeployment[data.missionCustomDeploy] = ruleset.lookups.raceByDeployment[data.missionCustomDeploy] || new Set();
+                    ruleset.lookups.raceByDeployment[data.missionCustomDeploy].add(race);
+                    backLinkSet(ruleset.entries, key, [data.missionCustomDeploy], "alienDeployments", "$variant");
+                }
+            });
+        }
 
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
@@ -289,7 +307,9 @@ export default function compile(base, mod) {
     }
 
     backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
-        obj[key] = [...obj[key]];
+        if(obj[key] instanceof Set) {
+            obj[key] = [...obj[key]];
+        }
     });
     return ruleset;
 }

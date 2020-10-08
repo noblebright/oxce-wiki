@@ -17,6 +17,7 @@ import { possibleLanguages } from "../../model/utils";
 import { clearDB } from "../../model/RulesetDB";
 
 import "./Layout.css";
+import ErrorBoundary from "../Article/ArticleError";
 
 function Welcome() {
     const [content, setContent] = useState();
@@ -111,7 +112,10 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                             <Welcome/>
                         </Route>
                         <Route path={`${path}/article/:id`}>
-                            <Article ruleset={ruleset} lang={lang}/>
+                            <ErrorBoundary config={config}>
+                              <Article ruleset={ruleset} lang={lang} />
+                            </ErrorBoundary>
+                            
                         </Route>
                         <Redirect to={`/${version}`}/>
                     </Switch>

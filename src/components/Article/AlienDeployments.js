@@ -1,9 +1,9 @@
-import React from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useInventory from "../../hooks/useInventory";
-import { BooleanValue, SectionHeader, ListHeader, ContainerValue, SimpleValue, ListValue } from "../ComponentUtils.js";
+import { BooleanValue, SectionHeader, ListHeader, ContainerValue, SimpleValue, SimpleSelect, ListValue } from "../ComponentUtils.js";
 
 function getAliens(ruleset, race, rank) {
     const raceEntry = ruleset.entries[race]?.alienRaces;
@@ -66,6 +66,25 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
     const inventoryFn = useInventory(linkFn);
     const entry = ruleset.entries[id];
     const alienDeployments = entry.alienDeployments;
+    const alienRace = alienDeployments?.race;
+    const randomRace = alienDeployments?.randomRace;
+    const prevStage = alienDeployments?.$prevStage;
+    const raceByDeployment = ruleset.lookups.raceByDeployment;
+
+    const availableRaces = useMemo(() => {
+        if(!alienDeployments) return [null];
+        if(randomRace) return randomRace;
+        if(alienRace) return [alienRace];
+        if(raceByDeployment[id]) return [...raceByDeployment[id]];
+        if(raceByDeployment[prevStage]) return [...raceByDeployment[prevStage]]; //check previous stage if this is the second part of a two-parter.
+        return [undefined]; //I dunno mang.... give up.
+    }, [id, alienDeployments, alienRace, randomRace, prevStage, raceByDeployment]);
+    const [race, setRace] = useState(availableRaces[0]);
+
+    useEffect(() => {
+        //reset race when the list of races changes (due to switching to a different deployment, for example)
+        setRace(availableRaces[0]);
+    }, [availableRaces]);
 
     if(!alienDeployments) return null;
 
@@ -79,7 +98,6 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 <SimpleValue label="Min Light" value={alienDeployments.minShade}/>
                 <SimpleValue label="Max Light" value={alienDeployments.maxShade}/>
                 <SimpleValue label="Next Stage" value={alienDeployments.nextStage}>{ linkFn }</SimpleValue>
-                <SimpleValue label="Race Override" value={alienDeployments.race}>{ lc }</SimpleValue>
                 <BooleanValue label="Final Mission" value={alienDeployments.finalDestination} />
                 <SimpleValue label="Alert" value={alienDeployments.alert}>{ lc }</SimpleValue>
                 <SimpleValue label="Duration" value={alienDeployments.duration}>{ x => `${x[0]} - ${x[1]}` }</SimpleValue>
@@ -89,11 +107,15 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 <SimpleValue label="Despawn Penalty" value={alienDeployments.despawnPenalty}/>
                 <SimpleValue label="Abort Penalty" value={alienDeployments.abortPenalty}/>
                 <SimpleValue label="Turn Limit" value={alienDeployments.turnLimit}/>
+                <SimpleValue label="Alien Race" value={availableRaces}>
+                    { availableRaces.length > 1 ? (x => <SimpleSelect options={x} value={race} onChange={setRace}>{ x => `${lc(x)} [${x}]` }</SimpleSelect>) : x => lc(x[0])}
+                </SimpleValue>
             </tbody>
+            <ListValue label="Variant Of" values={alienDeployments.$variant}>{ linkFn }</ListValue>
             <ListValue label="Map Items" values={alienDeployments.terrainItems}>{ linkFn }</ListValue>
             <ListValue label="Map Items (Random)" values={alienDeployments.terrainRandomItems}>{ linkFn }</ListValue>
             <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>
-            {alienDeployments.data.map((x, idx) => <Deployment key={idx} ruleset={ruleset} linkFn={linkFn} deployment={x} race={alienDeployments.race} idx={idx}/>)}
+            {alienDeployments.data.map((x, idx) => <Deployment key={idx} ruleset={ruleset} linkFn={linkFn} deployment={x} race={race} idx={idx}/>)}
         </Table>
     );
 }

@@ -3,5 +3,7 @@
     "baseRepo": "MeridianOXC/OpenXcom",
     "baseBranch": "oxce-plus",
     "basePath": ["bin/standard/xcom1", "bin/common"],
-    "modRepo": "SolariusScorch/XComFiles"
+    "modRepo": "SolariusScorch/XComFiles",
+    "contactURL": "https://discordapp.com/invite/XrQQTPg",
+    "contactLabel": "XCF Discord"
 }

@@ -28,7 +28,7 @@ const Code = () =>(
     </svg>
 );
 
-export default function Article({ ruleset, lang, parent }) {
+export default function Article({ ruleset, lang }) {
     const { id, version } = useParams();
     const lc = useLocale(lang, ruleset);
     const [showDebug, setShowDebug] = useState(false);

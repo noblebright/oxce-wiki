@@ -22,7 +22,7 @@ export default function AlienRaces({ruleset, lang, id, version}) {
             { alienRaces.membersRandom ? 
               <ListValue label="Members" values={alienRaces.membersRandom}>{ 
                 (x, idx) => (
-                <div><div>Rank {idx}</div>{x.map(m => <div key={m}>{linkFn(m)}</div>)}</div>
+                <div key={idx}><div>Rank {idx}</div>{x.map((m, idx) => <div key={idx}>{linkFn(m)}</div>)}</div>
                 ) }
               </ListValue> : null}
         </Table>

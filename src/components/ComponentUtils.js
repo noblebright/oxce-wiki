@@ -64,11 +64,11 @@ export const HeightStats = ({entity}) => (
     </React.Fragment>
 );
 
-export function SimpleSelect({ options, value, onChange }) {
+export function SimpleSelect({ options, value, onChange, children }) {
     const handleChange = useCallback(evt => onChange(evt.target.value), [onChange]);
     return (
         <select value={value} onChange={handleChange}>
-            { options.map(x => <option key={x} value={x}>{x}</option>) }
+            { options.map(x => <option key={x} value={x}>{children ? children(x) : x}</option>) }
         </select>
     );
 }
