@@ -9,9 +9,11 @@ function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;
     const weaponEntry = [];
 
+    const weaponTypes = (crafts.weaponTypes || [0,0,0,0]).map(x => [].concat(x));
+    const weaponStrings = (crafts.weaponStrings || ["STR_WEAPON_ONE", "STR_WEAPON_TWO"]);
+
     for(let i = 0; i < crafts.weapons; i++) {
-        const weaponTypes = Array.isArray(crafts.weaponTypes[i]) ? crafts.weaponTypes[i] : [crafts.weaponTypes[i]];
-        weaponEntry.push([`Weapon Slot ${i + 1}`, `${lc(crafts.weaponStrings[i])} (Type: ${weaponTypes.join(", ")})`]);
+        weaponEntry.push([`Weapon Slot ${i + 1}`, `${lc(weaponStrings[i])} (Type: ${weaponTypes[i].join(", ")})`]);
     }
     return (
         <React.Fragment>
