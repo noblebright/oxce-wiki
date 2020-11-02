@@ -14,6 +14,42 @@ import MindProbe from "./MindProbe";
 import PsiAmp from "./PsiAmp";
 import ElectroFlare from "./ElectroFlare";
 
+const experienceStrings = [
+    "ETM_DEFAULT",
+    "ETM_MELEE_100",
+    "ETM_MELEE_50",
+    "ETM_MELEE_33",
+    "ETM_FIRING_100",
+    "ETM_FIRING_50",
+    "ETM_FIRING_33",
+    "ETM_THROWING_100",
+    "ETM_THROWING_50",
+    "ETM_THROWING_33",
+    "ETM_FIRING_AND_THROWING",
+    "ETM_FIRING_OR_THROWING",
+    "ETM_REACTIONS",
+    "ETM_REACTIONS_AND_MELEE",
+    "ETM_REACTIONS_AND_FIRING",
+    "ETM_REACTIONS_AND_THROWING",
+    "ETM_REACTIONS_OR_MELEE",
+    "ETM_REACTIONS_OR_FIRING",
+    "ETM_REACTIONS_OR_THROWING",
+    "ETM_BRAVERY",
+    "ETM_BRAVERY_2X",
+    "ETM_BRAVERY_AND_REACTIONS",
+    "ETM_BRAVERY_OR_REACTIONS",
+    "ETM_BRAVERY_OR_REACTIONS_2X",
+    "ETM_PSI_STRENGTH",
+    "ETM_PSI_STRENGTH_2X",
+    "ETM_PSI_SKILL",
+    "ETM_PSI_SKILL_2X",
+    "ETM_PSI_STRENGTH_AND_SKILL",
+    "ETM_PSI_STRENGTH_AND_SKILL_2X",
+    "ETM_PSI_STRENGTH_OR_SKILL",
+    "ETM_PSI_STRENGTH_OR_SKILL_2X",
+    "ETM_NOTHING"
+];
+
 function MiscItem({ ruleset, items, lc, linkFn }) {
     return (
         <React.Fragment>
@@ -30,6 +66,7 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
                 <SimpleValue label="Monthly Maintenance" value={items.monthlyMaintenance}>{Money}</SimpleValue>
                 <SimpleValue label="Monthly Salary" value={items.monthlySalary}>{Money}</SimpleValue>
                 <SimpleValue label={lc("manaExperience")} value={items.manaExperience}/>
+                <SimpleValue label="Training Mode" value={items.experienceTrainingMode}>{ x => lc(experienceStrings[x || 0]) }</SimpleValue>
                 <SimpleValue label="Two-Handed" value={items}>
                     {x => x.twoHanded ? (x.blockBothHands ? "REQUIRED": "TRUE") : "FALSE"}
                 </SimpleValue>

@@ -22,7 +22,7 @@ function getActionKey(item, suffix) {
 
 function getShots(item, suffix) {
     const confShots = item[`conf${suffix}`]?.shots;
-    const autoShots = suffix === "Auto" ? item.autoShots : undefined;
+    const autoShots = suffix === "Auto" ? (item.autoShots || 3) : undefined;
     return confShots || autoShots || undefined;
 }
 
