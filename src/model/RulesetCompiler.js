@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
 import { getSupportedLanguages } from "./utils";
 import { joinRaces, compileMissions } from "./MissionMapper";
-
+import { mapItemSources } from "./ItemSourceMapper";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -22,6 +22,7 @@ const supportedSections = [
     { section: "ufos", key: "type" },
     { section: "units", key: "type" },
     { section: "soldiers", key: "type" },
+    { section: "soldierTransformation", key: "name"},
     { section: "armors", key: "type" },
     { section: "alienDeployments", key: "type"},
     { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
@@ -29,10 +30,14 @@ const supportedSections = [
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
+const supportedLookups = [
+    { section: "soldierBonuses", key: "name" }
+];
+
 function generateSection(ruleset, rules, metadata) {
     const { section: sectionName, key: keyField, filter, omit } = metadata;
 
-    const sectionData = rules[sectionName];
+    const sectionData = rules[sectionName] || [];
     
     sectionData.forEach(entry => {
         const name = entry[keyField];
@@ -63,6 +68,41 @@ function generateSection(ruleset, rules, metadata) {
         }
         if(filter && !filter(entry, ruleset, name)) {
             ruleset[name].hide = true;
+        }
+    });
+}
+
+function generateLookup(ruleset, rules, metadata) {
+    const { section: sectionName, key: keyField, omit } = metadata;
+
+    const sectionData = rules[sectionName] || [];
+    
+    if(!ruleset[sectionName]) {
+        ruleset[sectionName] = {};
+    }
+    
+    const lookup = ruleset[sectionName];
+
+    sectionData.forEach(entry => {
+        const name = entry[keyField];
+
+        if(entry.delete) { //process delete
+            if(lookup[entry.delete]){
+                delete lookup[entry.delete];
+            }
+            return;
+        }
+        if(!name) { //malformed entry
+            return;
+        }
+        if(omit && !omit(entry, ruleset, name)) {
+            //don't compile this section.
+            return;
+        }
+        if(!lookup[name]) {
+            lookup[name] = entry;
+        } else {
+            Object.assign(lookup[name], entry);
         }
     });
 }
@@ -145,18 +185,6 @@ function getCompatibleAmmo(entry) {
 
 const globalKeys = ["maxViewDistance"];
 
-function getMapBlockItems(block, items, randomItems) {
-    if(block.items) {
-        Object.keys(block.items).forEach(x => items.add(x));
-    }
-    if(block.randomizedItems) {
-        block.randomizedItems.forEach(random => {
-            random.itemList.forEach(x => randomItems.add(x));
-        })
-    }
-}
-
-
 export default function compile(base, mod) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };
     
@@ -173,6 +201,12 @@ export default function compile(base, mod) {
     supportedSections.forEach(metadata => {
         generateSection(ruleset.entries, base, metadata);
         generateSection(ruleset.entries, mod, metadata);
+    });
+
+    //add lookups
+    supportedLookups.forEach(metadata => {
+        generateLookup(ruleset.lookups, base, metadata);
+        generateLookup(ruleset.lookups, mod, metadata);
     });
 
     //add sprites
@@ -199,6 +233,7 @@ export default function compile(base, mod) {
         const ufos = entry.ufos || {};
         const units = entry.units || {};
         const alienDeployments = entry.alienDeployments || {};
+        const soldierTransformation = entry.soldierTransformation || {};
 
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
         backLink(ruleset.entries, key, research.unlocks, "research", "unlockedBy");
@@ -214,6 +249,8 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
         backLink(ruleset.entries, key, units.units, "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
+        backLink(ruleset.entries, key, soldierTransformation.requires, "research", "$allowsTransform");
+        backLink(ruleset.entries, key, soldierTransformation.allowedSoldierTypes, "soldiers", "$allowedTransform");
         backLinkSet(ruleset.entries, key, [alienDeployments.nextStage], "alienDeployments", "$prevStage");
         backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "foundFrom");
 
@@ -245,64 +282,8 @@ export default function compile(base, mod) {
         }
         backLink(ruleset.entries, key, entry.items?.allCompatibleAmmo, "items", "ammoFor");
 
-        //Items from alienDeployments
-        const deploymentItems = alienDeployments.data?.reduce((acc, deployment) => {
-            deployment.itemSets.forEach(itemSet => {
-                itemSet.forEach(item => {
-                    acc.add(item);
-                });
-            });
-            return acc;
-        }, new Set()) || null;
-        backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "foundFrom");
-        backLinkSet(ruleset.entries, key, [alienDeployments.missionBountyItem], "items", "foundFrom");
+        mapItemSources(backLinkSet, ruleset, key);
 
-        //Items from terrain
-        const terrainResults = alienDeployments.terrains?.reduce((acc, terrainKey) => {
-            const terrain = ruleset.entries[terrainKey].terrains;
-            const [items, randomItems] = acc;
-            terrain.mapBlocks.forEach(block => {
-                getMapBlockItems(block, items, randomItems);
-            });
-            return acc;
-        }, [new Set(), new Set()]);
-
-        const [terrainItems, terrainRandomItems] = terrainResults || [];
-
-        if(terrainItems && terrainItems.size) {
-            entry.alienDeployments.terrainItems = [...terrainItems];
-            backLinkSet(ruleset.entries, key, [...terrainItems], "items", "foundFrom");
-        }
-        if(terrainRandomItems && terrainRandomItems.size) {
-            entry.alienDeployments.terrainRandomItems = [...terrainRandomItems];
-            backLinkSet(ruleset.entries, key, [...terrainItems], "items", "foundFrom");
-        }
-
-        //Items from UFOs
-        const ufoResults = ufos.battlescapeTerrainData?.mapBlocks?.reduce((acc, block) => {
-            const [items, randomItems] = acc;
-            getMapBlockItems(block, items, randomItems);
-            return acc;
-        }, [new Set(), new Set()]);
-
-        const [ufoItems, ufoRandomItems] = ufoResults || [];
-
-        if(ufoItems && ufoItems.size) {
-            entry.ufos.ufoItems = [...ufoItems];
-            backLinkSet(ruleset.entries, key, [...ufoItems], "items", "foundFrom");
-        }
-        if(ufoRandomItems && ufoRandomItems.size) {
-            entry.ufos.ufoRandomItems = [...ufoRandomItems];
-            backLinkSet(ruleset.entries, key, [...ufoRandomItems], "items", "foundFrom");
-        }
-
-        //Items from Units
-        const unitItems = units.builtInWeaponSets?.reduce((acc, weaponSet) => {
-            weaponSet.forEach(item => acc.add(item));
-            return acc;
-        }, new Set());
-        backLinkSet(ruleset.entries, key, unitItems && [...unitItems], "items", "foundFrom");
- 
         //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
 

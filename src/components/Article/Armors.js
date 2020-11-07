@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useBonusString from "../../hooks/useBonusString";
-import { BooleanValue, damageKeys, KeyValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, UnitStats } from "../ComponentUtils.js";
+import { BooleanValue, damageKeys, KeyValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, StatRecovery, UnitStats } from "../ComponentUtils.js";
 import useImage from "../../hooks/useImage";
 
 function ArmorRating({armors, lc}) {
@@ -41,29 +41,6 @@ const moveType = [
     "Floating",
     "Sinking"
 ];
-
-const recoveryStrings = {
-    time: "STR_TIME_UNITS",
-    energy: "STR_ENERGY",
-    morale: "STR_MORALE",
-    health: "STR_HEALTH",
-    stun: "STR_STUN",
-    mana: "STR_MANA_CURRENT"
-};
-
-function StatRecovery({recovery, bonusFn, lc}) {
-    if(!recovery) return null;
-    return (
-        <React.Fragment>
-            <ListHeader label="Stat Recovery"/>
-            <tbody>
-                { Object.keys(recovery).map((key, idx) => <SimpleValue key={idx} label={lc(recoveryStrings[key])} value={recovery[key]}>{ bonusFn }</SimpleValue>) }
-            </tbody>
-        </React.Fragment>
-    );
-}
-
-
 
 function SingleImage({imageFn, id}) {
     return <div className="PaperDoll">{imageFn(id)}</div>;

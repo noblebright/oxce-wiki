@@ -54,6 +54,7 @@ export default function Research({ruleset, lang, id, version}) {
             <ProtectedTopics topics={research.getOneFreeProtected} linkFn={linkFn}/>
             <ListValue label="Free From" values={research.freeFrom}>{ linkFn }</ListValue>
             <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>
+            <ListValue label="Allows Transformation" values={research.$allowsTransform}>{ linkFn }</ListValue>
         </Table>
     )
 }
