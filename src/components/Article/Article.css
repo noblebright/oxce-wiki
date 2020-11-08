@@ -126,3 +126,13 @@ div.facilitySprite img:nth-child(4) {
 .damageType {
     font-weight: 600;
 }
+
+.CommendationCriteria {
+    display: flex;
+}
+
+.CommendationCriteria aside {
+    padding-left: 20px;
+    border-left: 1px solid var(--gray);
+    margin-left: 10px;
+}

@@ -1,14 +1,13 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
 
 import { StatRecovery, UnitStats, SectionHeader, SimpleValue } from "../ComponentUtils.js";
 
-export default function SoldierBonus({bonus, lc}) {
+export default function SoldierBonus({bonus, lc, showHeader = true}) {
     if(!bonus) return null;
     
     return (
         <React.Fragment>
-            <SectionHeader label="Soldier Bonus"/>
+            { showHeader && <SectionHeader label="Soldier Bonus"/> }
             <tbody>
                 <SimpleValue label="Night Vision" value={bonus.visibilityAtDark}/>
             </tbody>

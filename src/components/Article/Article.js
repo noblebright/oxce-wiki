@@ -18,6 +18,7 @@ import Armors from "./Armors";
 import AlienDeployments from "./AlienDeployments";
 import AlienRaces from "./AlienRaces";
 import SoldierTransformation from "./SoldierTransformation";
+import Commendation from "./Commendation";
 
 import "./Article.css";
 
@@ -65,6 +66,7 @@ export default function Article({ ruleset, lang }) {
                 <AlienDeployments {...articleProps}/>
                 <AlienRaces {...articleProps}/>
                 <SoldierTransformation {...articleProps}/>
+                <Commendation {...articleProps}/>
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered animation={false}>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>

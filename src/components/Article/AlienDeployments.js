@@ -108,7 +108,7 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 <SimpleValue label="Abort Penalty" value={alienDeployments.abortPenalty}/>
                 <SimpleValue label="Turn Limit" value={alienDeployments.turnLimit}/>
                 <SimpleValue label="Alien Race" value={availableRaces}>
-                    { availableRaces.length > 1 ? (x => <SimpleSelect options={x} value={race} onChange={setRace}>{ x => `${lc(x)} [${x}]` }</SimpleSelect>) : x => lc(x[0])}
+                    { availableRaces.length > 1 ? (x => <SimpleSelect options={x} value={race || ""} onChange={setRace}>{ x => `${lc(x)} [${x}]` }</SimpleSelect>) : x => lc(x[0])}
                 </SimpleValue>
             </tbody>
             <ListValue label="Variant Of" values={alienDeployments.$variant}>{ linkFn }</ListValue>

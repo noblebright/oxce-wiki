@@ -23,6 +23,7 @@ const supportedSections = [
     { section: "units", key: "type" },
     { section: "soldiers", key: "type" },
     { section: "soldierTransformation", key: "name"},
+    { section: "commendations", key: "type"},
     { section: "armors", key: "type" },
     { section: "alienDeployments", key: "type"},
     { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
