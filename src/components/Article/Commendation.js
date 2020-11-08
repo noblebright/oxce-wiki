@@ -30,7 +30,7 @@ const Criteria = ({ criteria, kcLabel }) => (
         return (
             <div key={idx} className="CommendationCriteria">
                 <div>{label}</div>
-                <aside>{criteria[key]}</aside>
+                <aside>x{criteria[key]}</aside>
             </div>
         );
     })
