@@ -47,3 +47,14 @@
 .navbar-brand a:hover {
     text-decoration: none;
 }
+
+.bi-list {
+    margin-right: 10px;
+}
+
+.mobileSidebarContainer {
+    position: absolute;
+    height: 100%;
+    background-color: white;
+    z-index: 1;
+}

@@ -20,7 +20,7 @@ function getFilteredList(ruleset, search, lc) {
     return list;
 }
 
-export default function Sidebar({lang, currentVersion, versions, ruleset}) {
+export default function Sidebar({lang, currentVersion, versions, ruleset, onClick}) {
     const [search, setSearch] = useState("");
     const lc = useLocale(lang, ruleset);
     const list = useMemo(() => getFilteredList(ruleset, search, lc), [ruleset, search, lc]);
@@ -40,7 +40,7 @@ export default function Sidebar({lang, currentVersion, versions, ruleset}) {
                 />
             </InputGroup>
             <ul className="searchList">
-                { list.map(({ name, value }) => <li className="searchItem px-3" key={value}><Link to={`/${currentVersion}/article/${value}`}>{name}</Link></li>) }
+                { list.map(({ name, value }) => <li className="searchItem px-3" key={value}><Link to={`/${currentVersion}/article/${value}`} onClick={onClick}>{name}</Link></li>) }
             </ul>
         </div>
     );

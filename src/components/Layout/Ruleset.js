@@ -11,6 +11,7 @@ import NavLink from "react-bootstrap/NavLink";
 import Dropdown from "react-bootstrap/Dropdown";
 
 import useRuleset from "../../hooks/useRuleset";
+import useMobileLayout from "../../hooks/useMobileLayout";
 import SideBar from "./Sidebar";
 import Article from "../Article";
 import { possibleLanguages } from "../../model/utils";
@@ -56,6 +57,12 @@ const Gear = () => (
     </svg>
 );
 
+const Hamburger = (props) => (
+  <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <path fillRule="evenodd" d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+  </svg>
+);
+
 //Clone of NavDropdown that supports alignRight.
 const OptionsDropdown = ({title, children}) => (
     <Dropdown as={NavItem}>
@@ -78,6 +85,8 @@ export default function Ruleset({ lang, setLanguage, versions }) {
     const { version } = useParams();
     const { result, status, statusKey } = useRuleset(version, versions);
     const { path } = useRouteMatch();
+    const isMobile = useMobileLayout();
+    const [showSidebar, setShowSidebar] = useState(false);
 
     if(!versions[version]) { //invalid version
         return <Redirect to="/"/>;
@@ -94,10 +103,10 @@ export default function Ruleset({ lang, setLanguage, versions }) {
             <Row noGutters>
                 <Col>
                     <Navbar bg="dark" variant="dark">
-                        <Navbar.Brand className="mr-auto"><Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
-                        <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
+                        <Navbar.Brand className="mr-auto">{isMobile && <Hamburger onClick={() => setShowSidebar(!showSidebar)}/>}<Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
+                        {!isMobile && <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
                             { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
-                        </NavDropdown>
+                        </NavDropdown>}
                         <OptionsDropdown title={<Gear/>}>
                             <NavDropdown.Item onClick={clearDB}>Clear Local DB</NavDropdown.Item>
                         </OptionsDropdown>
@@ -105,7 +114,8 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                 </Col>
             </Row>
             <Row noGutters className="content">
-                <Col xs={12} sm={4} md={3} lg={2} className="sidebarContainer"><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>
+                {!isMobile && <Col xs={12} sm={4} md={3} lg={2} className="sidebarContainer"><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>}
+                {isMobile && <div className={`mobileSidebarContainer ${showSidebar ? "" : "hide"}`}><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset} onClick={() => setShowSidebar(false)}/></div>}
                 <Col xs={12} sm={8} md={9} lg={10} className="mainContainer">
                     <Switch>
                         <Route path={path} exact>
