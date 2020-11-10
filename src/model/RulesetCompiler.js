@@ -184,6 +184,23 @@ function getCompatibleAmmo(entry) {
     return ammo.size ? [...ammo] : undefined;
 }
 
+function getKillCriteriaItems(ruleset, killCriteria) {
+    const items = new Set();
+    if(!killCriteria) {
+        return null;
+    }
+    killCriteria.forEach(orCriteria => {
+        orCriteria.forEach(([count, details]) => {
+            details.forEach(detail => {
+                if(ruleset[detail]?.items) {
+                    items.add(detail);
+                }
+            });
+        })
+    });
+    return [...items];
+}
+
 const globalKeys = ["maxViewDistance"];
 
 export default function compile(base, mod) {
@@ -235,6 +252,7 @@ export default function compile(base, mod) {
         const units = entry.units || {};
         const alienDeployments = entry.alienDeployments || {};
         const soldierTransformation = entry.soldierTransformation || {};
+        const commendations = entry.commendations || {};
 
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
         backLink(ruleset.entries, key, research.unlocks, "research", "unlockedBy");
@@ -252,6 +270,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
         backLink(ruleset.entries, key, soldierTransformation.requires, "research", "$allowsTransform");
         backLink(ruleset.entries, key, soldierTransformation.allowedSoldierTypes, "soldiers", "$allowedTransform");
+        backLink(ruleset.entries, key, getKillCriteriaItems(ruleset.entries, commendations.killCriteria), "items", "$givesCommendation");
         backLinkSet(ruleset.entries, key, [alienDeployments.nextStage], "alienDeployments", "$prevStage");
         backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "foundFrom");
 
