@@ -60,7 +60,7 @@ function getDetailString(count, details, lc) {
     detailSet.delete(statusKey);
     detailSet.delete(factionKey);
     const usingString = `using ${[...detailSet].map(lc).join(", ")}`;
-    return `${count} ${unitFaction[factionKey] || ""}${unitStatus[statusKey]} ${detailSet.size ? usingString : ""}`;
+    return `${count} ${unitFaction[factionKey] || ""}${unitStatus[statusKey] || "defeated"} ${detailSet.size ? usingString : ""}`;
 }
 
 function getKillString(killCriteria, lc) {
