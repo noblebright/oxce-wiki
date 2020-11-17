@@ -70,6 +70,7 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
                 <SimpleValue label="Two-Handed" value={items}>
                     {x => x.twoHanded ? (x.blockBothHands ? "REQUIRED": "TRUE") : "FALSE"}
                 </SimpleValue>
+                <SimpleValue label="Kneeling Bonus" value={items.kneelBonus}>{Percent}</SimpleValue>
                 <SimpleValue label="One Handed Accuracy" value={items.twoHanded ? items.oneHandedPenalty || ruleset.oneHandedPenaltyGlobal || 80 : undefined}>{Percent}</SimpleValue>
                 <BooleanValue label="Recoverable?" value={items.recover}/>
                 <BooleanValue label="Corpse Recoverable?" value={items.recoverCorpse}/>
