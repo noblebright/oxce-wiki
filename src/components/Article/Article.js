@@ -19,6 +19,7 @@ import AlienDeployments from "./AlienDeployments";
 import AlienRaces from "./AlienRaces";
 import SoldierTransformation from "./SoldierTransformation";
 import Commendation from "./Commendation";
+import Events from "./Events";
 
 import "./Article.css";
 
@@ -67,6 +68,7 @@ export default function Article({ ruleset, lang }) {
                 <AlienRaces {...articleProps}/>
                 <SoldierTransformation {...articleProps}/>
                 <Commendation {...articleProps}/>
+                <Events {...articleProps}/>
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered animation={false}>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>

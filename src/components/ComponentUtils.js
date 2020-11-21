@@ -29,7 +29,6 @@ export const Days = x => `${x} Days`;
 export const PerDay = x => `${x}/Day`;
 export const Percent = x => `${x}%`;
 export const KeyValue = ([k, v]) => <span className="KeyValue"><span>{k}</span><span>{v}</span></span>;
-
 function statValue({min, max, stats}, field) {
     if(stats) return stats[field];
     return (min && max) ? `${min[field]} - ${max[field]}` : null;

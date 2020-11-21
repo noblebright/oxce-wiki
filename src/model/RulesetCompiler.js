@@ -24,6 +24,7 @@ const supportedSections = [
     { section: "soldiers", key: "type" },
     { section: "soldierTransformation", key: "name"},
     { section: "commendations", key: "type"},
+    { section: "events", key: "name"},
     { section: "armors", key: "type" },
     { section: "alienDeployments", key: "type"},
     { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
@@ -296,11 +297,16 @@ export default function compile(base, mod) {
             }
         }
 
+        backLink(ruleset.entries, key, entry.items?.allCompatibleAmmo, "items", "ammoFor");
+
         if(entry.facilities?.prisonType !== undefined) {
             ruleset.prisons[entry.facilities.prisonType] = ruleset.prisons[entry.facilities.prisonType] || [];
             ruleset.prisons[entry.facilities.prisonType].push(key);
         }
-        backLink(ruleset.entries, key, entry.items?.allCompatibleAmmo, "items", "ammoFor");
+        
+        if(entry.alienDeployments && !ruleset.lookups.raceByDeployment[key]?.size) {
+            entry.hide = true;
+        }
 
         mapItemSources(backLinkSet, ruleset, key);
 
