@@ -296,7 +296,7 @@ export default function compile(base, mod) {
             }
         }
 
-        if(entry.facilities?.prisonType) {
+        if(entry.facilities?.prisonType !== undefined) {
             ruleset.prisons[entry.facilities.prisonType] = ruleset.prisons[entry.facilities.prisonType] || [];
             ruleset.prisons[entry.facilities.prisonType].push(key);
         }
