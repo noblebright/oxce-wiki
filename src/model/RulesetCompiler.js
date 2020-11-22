@@ -2,6 +2,7 @@ import deepmerge from "deepmerge";
 import { getSupportedLanguages } from "./utils";
 import { joinRaces, compileMissions } from "./MissionMapper";
 import { mapItemSources } from "./ItemSourceMapper";
+import { mapEventScripts } from "./EventMapper";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -33,7 +34,8 @@ const supportedSections = [
 ];
 
 const supportedLookups = [
-    { section: "soldierBonuses", key: "name" }
+    { section: "soldierBonuses", key: "name" },
+    { section: "eventScripts", key: "type" }
 ];
 
 function generateSection(ruleset, rules, metadata) {
@@ -240,6 +242,8 @@ export default function compile(base, mod) {
     compileMissions(ruleset.lookups, base);
     compileMissions(ruleset.lookups, mod);
     joinRaces(ruleset.lookups);
+
+    mapEventScripts(ruleset.lookups);
 
     //add backreferences
     for(let key in ruleset.entries) {

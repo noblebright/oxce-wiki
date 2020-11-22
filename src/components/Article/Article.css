@@ -136,3 +136,17 @@ div.facilitySprite img:nth-child(4) {
     border-left: 1px solid var(--gray);
     margin-left: 10px;
 }
+
+.EventTrigger {
+    clear: both;
+}
+
+.EventTrigger .TriggerLabel {
+    float: left;
+}
+
+.EventTrigger .TriggerStatus {
+    float: right;
+    min-width: 40px;
+    padding-left: 10px; 
+}
