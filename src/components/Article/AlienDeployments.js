@@ -84,7 +84,7 @@ function Reinforcement({ruleset, linkFn, race, idx, data}) {
                 { !turnsOrObjective && <SimpleValue label="Maximum Turn" value={data.maxTurn}/> }
                 <SimpleValue label="Execution Odds" value={data.executionOdds || 100}>{ Percent }</SimpleValue>
                 <BooleanValue label="Use Spawn Nodes?" value={data.useSpawnNodes ?? true}/>
-                <BooleanValue label="Spawn Mode" value={data.useSpawnNodes}>{ x => SPAWN_MODE[x] }</BooleanValue>
+                <SimpleValue label="Spawn Mode" showZero value={data.mapBlockFilterType}>{ x => SPAWN_MODE[x] }</SimpleValue>
                 <BooleanValue label="Randomize Z-Levels?" value={data.randomizeZLevels ?? true}/>
                 <SimpleValue label="Spawn Z-Levels" value={data.spawnZLevels?.join?.(", ")}/>
                 <SimpleValue label="Minimum Distance from X-Com Units" value={data.minDistanceFromXcomUnits}/>
