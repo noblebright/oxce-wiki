@@ -72,12 +72,18 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
     const raceByDeployment = ruleset.lookups.raceByDeployment;
 
     const availableRaces = useMemo(() => {
+        const possibleRaces = new Set();
         if(!alienDeployments) return [null];
-        if(randomRace) return randomRace;
-        if(alienRace) return [alienRace];
-        if(raceByDeployment[id]) return [...raceByDeployment[id]];
-        if(raceByDeployment[prevStage]) return [...raceByDeployment[prevStage]]; //check previous stage if this is the second part of a two-parter.
-        return [undefined]; //I dunno mang.... give up.
+        if(randomRace) possibleRaces.add(randomRace);
+        if(alienRace) possibleRaces.add(alienRace);
+        if(raceByDeployment[id]) {
+            raceByDeployment[id].forEach(x => possibleRaces.add(x));
+        }
+        if(raceByDeployment[prevStage]) {
+            raceByDeployment[prevStage].forEach(x => possibleRaces.add(x)); //check previous stage if this is the second part of a two-parter.
+        }
+        console.log([...possibleRaces]);
+        return [...possibleRaces];
     }, [id, alienDeployments, alienRace, randomRace, prevStage, raceByDeployment]);
     const [race, setRace] = useState(availableRaces[0]);
 

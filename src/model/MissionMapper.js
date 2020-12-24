@@ -76,20 +76,39 @@ function processMissionScripts(lookups, rules) {
         const missions = getWeightValues(script.missionWeights);
         const races = getWeightValues(script.raceWeights);
 
-        regions.forEach(region => {
-            lookups.missionsByRegion[region] = lookups.missionsByRegion[region] || new Set();
-            lookups.raceByRegion[region] = lookups.raceByRegion[region] || new Set();
+        if(!regions.size) { // ufo-based missions
             missions.forEach(mission => {
-                lookups.missionsByRegion[region].add(mission);
-                const deployments = lookups.deploymentsByRegion[region] || new Set();
+                const deployments = lookups.deploymentsByMission[mission] || new Set();
                 deployments.forEach(deployment => {
                     lookups.missionsByDeployment[deployment] = lookups.missionsByDeployment[deployment] || new Set();
                     lookups.missionsByDeployment[deployment].add(mission);
+                    lookups.deploymentsByMission[mission] = lookups.deploymentsByMission[mission] || new Set();
+                    lookups.deploymentsByMission[mission].add(deployment);
+                    lookups.raceByDeployment[deployment] = lookups.raceByDeployment[deployment] || new Set();
+                    races.forEach(race => {
+                        lookups.raceByDeployment[deployment].add(race);
+                    });
+                });
+                races.forEach(race => {
+                    lookups.raceByMission[race] = lookups.raceByMission[race] || new Set();
+                    lookups.raceByMission[race].add(mission);
                 });
             });
-            races.forEach(race => lookups.raceByRegion[region].add(race));
-        });
-        
+        } else { // site-based missions
+            regions.forEach(region => {
+                lookups.missionsByRegion[region] = lookups.missionsByRegion[region] || new Set();
+                lookups.raceByRegion[region] = lookups.raceByRegion[region] || new Set();
+                missions.forEach(mission => {
+                    lookups.missionsByRegion[region].add(mission);
+                    const deployments = lookups.deploymentsByRegion[region] || new Set();
+                    deployments.forEach(deployment => {
+                        lookups.missionsByDeployment[deployment] = lookups.missionsByDeployment[deployment] || new Set();
+                        lookups.missionsByDeployment[deployment].add(mission);
+                    });
+                });
+                races.forEach(race => lookups.raceByRegion[region].add(race));
+            });
+        }
     })
 }
 
