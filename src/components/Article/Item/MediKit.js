@@ -10,8 +10,8 @@ const mediKitTargetMatrix = [
     ["STR_TARGET_FRIEND"],
     ["STR_TARGET_NEUTRAL", "STR_TARGET_ON_THE_GROUND"],
     ["STR_TARGET_NEUTRAL"],
-    ["STR_TARGET_ENEMY"],
-    ["STR_TARGET_ENEMY", "STR_TARGET_ON_THE_GROUND"]
+    ["STR_TARGET_ENEMY", "STR_TARGET_ON_THE_GROUND"],
+    ["STR_TARGET_ENEMY"]
 ];
 
 function Doses({item}) {
