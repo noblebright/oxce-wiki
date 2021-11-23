@@ -166,3 +166,12 @@ export function Accuracy({items, suffix, bonusFn, defaultAcc}) {
         <div>{items[`accuracy${suffix}`] || defaultAcc}{ hasMultiplier(items, suffix) ? ` * (${bonusFn(multiplier)})` : null}%</div>
     );
 }
+
+const unitFactions = {
+    "-1": "User faction",
+    "0": "Player faction",
+    "1": "Enemy faction",
+    "2": "Civilian faction"
+};
+
+export const getUnitFaction = x => unitFactions[`${x}`];

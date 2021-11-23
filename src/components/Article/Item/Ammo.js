@@ -1,5 +1,5 @@
 import React from "react";
-import { ListHeader, ListValue, SimpleValue } from "../../ComponentUtils";
+import { ListHeader, ListValue, SimpleValue, getUnitFaction } from "../../ComponentUtils";
 import Damage from "./Damage";
 import DamageAlter from "./DamageAlter";
 
@@ -15,6 +15,8 @@ export default function Ammo({ ruleset, items, lc, linkFn, spriteFn }) {
                         </Damage>
                     )}
                 </SimpleValue>
+                <SimpleValue label="Spawned Unit" value={items.spawnUnit}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Spawned Unit Controller" value={items.spawnUnitFaction} showZero>{ getUnitFaction }</SimpleValue>
             </tbody>
             {items.damageAlter ? (
                 <React.Fragment>

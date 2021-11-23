@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/Table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { BooleanValue, ListHeader, SimpleValue, Percent, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import { BooleanValue, ListHeader, SimpleValue, Percent, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils";
 import Damage from "./Damage";
 import DamageAlter from "./DamageAlter";
 import Cost, { hasCost } from "./Cost";
@@ -73,6 +73,8 @@ export default function Grenade({ ruleset, items, lc, linkFn, spriteFn }) {
                 <SimpleValue label="Special Effect Chance" value={items.specialChance || 100}>{ Percent }</SimpleValue>
                 <BooleanValue label="Explodes in Inventory" value={items.isExplodingInHands}/>
                 <BooleanValue label="Hidden on Map" value={items.hiddenOnMinimap}/>
+                <SimpleValue label="Spawned Unit" value={items.spawnUnit}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Spawned Unit Controller" value={items.spawnUnitFaction} showZero>{ getUnitFaction }</SimpleValue>
             </tbody>
         </React.Fragment>
     );

@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils";
 import Damage from "./Damage";
 import DamageAlter from "./DamageAlter";
 import Cost, { hasCost } from "./Cost";
@@ -62,6 +62,8 @@ export default function PsiAmp({ ruleset, items, lc, linkFn, spriteFn }) {
                 <SimpleValue label="Dropoff" value={items.dropoff}/>
                 <SimpleValue label="Max Range" value={items.maxRange}/>
                 <BooleanValue label="LOS Required" value={items.LOSRequired}/>
+                <SimpleValue label="Spawned Unit" value={items.spawnUnit}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Spawned Unit Controller" value={items.spawnUnitFaction} showZero>{ getUnitFaction }</SimpleValue>
             </tbody>
         </React.Fragment>
     );

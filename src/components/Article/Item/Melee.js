@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
+import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils";
 import DamageAlter from "./DamageAlter";
 import Damage from "./Damage";
 import Cost, { hasCost } from "./Cost";
@@ -40,6 +40,11 @@ export default function Melee({ ruleset, items, lc, linkFn, spriteFn }) {
                     />
                 </tbody>
             </Actions>
+            <ListHeader label="Melee Properties"/>
+            <tbody>
+                <SimpleValue label="Spawned Unit" value={items.spawnUnit}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Spawned Unit Controller" value={items.spawnUnitFaction} showZero>{ getUnitFaction }</SimpleValue>
+            </tbody>
         </React.Fragment>
     );
 }

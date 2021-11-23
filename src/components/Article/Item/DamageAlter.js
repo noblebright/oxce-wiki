@@ -10,13 +10,16 @@ const randomType = [
     "Fire Damage",
     "No Damage",
     "(0 - 100%) + (0 - 100%)",
-    "50 - 200%"
+    "50 - 200%",
+    "0 - 200%",
+    "50 - 150%"
 ];
 
 const defaultProps = [
-    {}, //none
-    { IgnoreOverKill: true }, //ap
+    { RandomType: 5 }, //none
+    { RandomType: 8, IgnoreOverKill: true }, //ap
     { //fire
+        RandomType: 4, 
         FireBlastCalc: true,
         IgnoreOverKill: true,
         IgnoreSelfDestruct: true,
@@ -28,15 +31,17 @@ const defaultProps = [
         ToHealth: 1,
     },
     { //he
+        RandomType: 9, 
         IgnoreOverKill: true,
         IgnoreSelfDestruct: true,
         FixRadius: -1,
         RadiusEffectiveness: 0.05,
         ToItem: 1
     },
-    { IgnoreOverKill: true }, //laser
-    { IgnoreOverKill: true }, //plasma
+    { RandomType: 8, IgnoreOverKill: true }, //laser
+    { RandomType: 8, IgnoreOverKill: true }, //plasma
     { //stun
+        RandomType: 8, 
         IgnoreOverKill: true,
         IgnoreSelfDestruct: true,
         IgnoreDirection: true,
@@ -46,9 +51,10 @@ const defaultProps = [
         ToStun: 1,
         RandomStun: false
     }, 
-    { IgnoreOverKill: true, IgnoreSelfDestruct: true }, //melee
-    { IgnoreOverKill: true }, //acid
+    { RandomType: 8, IgnoreOverKill: true, IgnoreSelfDestruct: true }, //melee
+    { RandomType: 8, IgnoreOverKill: true }, //acid
     { //smoke
+        RandomType: 5, 
         IgnoreOverKill: true,
         IgnoreDirection: true,
         FixRadius: -1,
@@ -58,16 +64,16 @@ const defaultProps = [
         ToHealth: 0,
         ToStun: 1
     },
-    { IgnoreOverKill: true }, //10
-    { IgnoreOverKill: true }, //11
-    { IgnoreOverKill: true }, //12
-    { IgnoreOverKill: true }, //13
-    { IgnoreOverKill: true }, //14
-    { IgnoreOverKill: true }, //15
-    { IgnoreOverKill: true }, //16
-    { IgnoreOverKill: true }, //17
-    { IgnoreOverKill: true }, //18
-    { IgnoreOverKill: true }, //19
+    { RandomType: 8, IgnoreOverKill: true }, //10
+    { RandomType: 8, IgnoreOverKill: true }, //11
+    { RandomType: 8, IgnoreOverKill: true }, //12
+    { RandomType: 8, IgnoreOverKill: true }, //13
+    { RandomType: 8, IgnoreOverKill: true }, //14
+    { RandomType: 8, IgnoreOverKill: true }, //15
+    { RandomType: 8, IgnoreOverKill: true }, //16
+    { RandomType: 8, IgnoreOverKill: true }, //17
+    { RandomType: 8, IgnoreOverKill: true }, //18
+    { RandomType: 8, IgnoreOverKill: true }, //19
 ];
 
 function AlterEntry({ alter, suffix, label }) {
