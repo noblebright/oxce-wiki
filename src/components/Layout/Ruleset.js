@@ -14,6 +14,7 @@ import useRuleset from "../../hooks/useRuleset";
 import useMobileLayout from "../../hooks/useMobileLayout";
 import SideBar from "./Sidebar";
 import Article from "../Article";
+import GunSim from "../GunSim";
 import { possibleLanguages } from "../../model/utils";
 import { clearDB } from "../../model/RulesetDB";
 
@@ -125,7 +126,9 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                             <ErrorBoundary config={config}>
                               <Article ruleset={ruleset} lang={lang} />
                             </ErrorBoundary>
-                            
+                        </Route>
+                        <Route path={`${path}/gunSim`}>
+                            <GunSim ruleset={ruleset} lang={lang} />
                         </Route>
                         <Redirect to={`/${version}`}/>
                     </Switch>

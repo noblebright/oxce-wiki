@@ -271,7 +271,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
         backLink(ruleset.entries, key, [manufacture.spawnedPersonType], "soldiers", "manufacture");
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
-        backLink(ruleset.entries, key, units.units, "soldiers", "usableArmors");
+        backLink(ruleset.entries, key, armors.units, "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
         backLink(ruleset.entries, key, soldierTransformation.requires, "research", "$allowsTransform");
         backLink(ruleset.entries, key, soldierTransformation.allowedSoldierTypes, "soldiers", "$allowedTransform");
