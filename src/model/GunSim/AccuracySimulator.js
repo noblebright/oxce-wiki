@@ -1,19 +1,16 @@
 import intersects from "./Vector";
+import { generate } from "./utils";
 
 export const VOXEL_PER_TILE = 16;
-
-function generate(x) {
-	return Math.floor(Math.random() * (x + 1));
-}
 
 function deg2Rad(deg) {
 	return deg * Math.PI / 180;
 }
 
 const ShotType = {
-	Aimed: 1,
-	Snap: 2,
-	Auto: 3
+	Aimed: "Aimed",
+	Snap: "Snap",
+	Auto: "Auto"
 };
 
 function applyAccuracy(origin, target, accuracy, keepRange, extendLine, weapon, shotType) {
@@ -35,6 +32,7 @@ function applyAccuracy(origin, target, accuracy, keepRange, extendLine, weapon, 
 	case ShotType.Auto:
 			upperLimit = weapon.autoRange;
 		break;
+	default:
 	}
 
 	if(realDistance / VOXEL_PER_TILE < lowerLimit) {
@@ -101,7 +99,7 @@ function applyAccuracy(origin, target, accuracy, keepRange, extendLine, weapon, 
 
 const isBetween = (x, range , t) => t >= x && t <= x + range;
 
-class Target {
+export class Target {
 	constructor(x, y, z, width, height) {
 		this.x = x;
 		this.y = y;
@@ -117,9 +115,10 @@ class Target {
 
 function simulateAcc(source, target, w, acc, simulations, shots, type) {
 	let hit = 0;
+	console.time("simulateAcc");
 	for(let i = 0; i < simulations; i++) {
 		for(let s = 0; s < shots; s++) {
-			let p = { x: target.x + target.width/2, y: target.y, z: target.z + target.height/2 }
+			let p = { x: target.x + target.width/2, y: target.y, z: target.z + target.height/2 } // shooting at center mass
 
 			applyAccuracy(source, p, acc, true, false, w, type);
 
@@ -128,10 +127,11 @@ function simulateAcc(source, target, w, acc, simulations, shots, type) {
 			}
 		}
 	}
+	console.timeEnd("simulateAcc");
 	return hit;
 }
 
-class Weapon {
+export class Weapon {
 		constructor(aimRange, minRange, autoRange, snapRange, dropOff, dmg) {
 			this.aimRange = aimRange;
 			this.minRange = minRange;

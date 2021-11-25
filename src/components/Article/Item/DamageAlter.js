@@ -1,6 +1,7 @@
 import React from "react";
 
 import { SimpleValue, BooleanValue, Percent } from "../../ComponentUtils";
+import {defaultDTProps as defaultProps} from "../../../model/Constants";
 
 const randomType = [
     "Default",
@@ -13,67 +14,6 @@ const randomType = [
     "50 - 200%",
     "0 - 200%",
     "50 - 150%"
-];
-
-const defaultProps = [
-    { RandomType: 5 }, //none
-    { RandomType: 8, IgnoreOverKill: true }, //ap
-    { //fire
-        RandomType: 4, 
-        FireBlastCalc: true,
-        IgnoreOverKill: true,
-        IgnoreSelfDestruct: true,
-        IgnoreDirection: true,
-        FixRadius: -1,
-        RadiusEffectiveness: 0.03,
-        ArmorEffectiveness: 0,
-        FireThreshold: 0,
-        ToHealth: 1,
-    },
-    { //he
-        RandomType: 9, 
-        IgnoreOverKill: true,
-        IgnoreSelfDestruct: true,
-        FixRadius: -1,
-        RadiusEffectiveness: 0.05,
-        ToItem: 1
-    },
-    { RandomType: 8, IgnoreOverKill: true }, //laser
-    { RandomType: 8, IgnoreOverKill: true }, //plasma
-    { //stun
-        RandomType: 8, 
-        IgnoreOverKill: true,
-        IgnoreSelfDestruct: true,
-        IgnoreDirection: true,
-        FixRadius: -1,
-        RadiusEffectiveness: 0.05,
-        ToHealth: 0,
-        ToStun: 1,
-        RandomStun: false
-    }, 
-    { RandomType: 8, IgnoreOverKill: true, IgnoreSelfDestruct: true }, //melee
-    { RandomType: 8, IgnoreOverKill: true }, //acid
-    { //smoke
-        RandomType: 5, 
-        IgnoreOverKill: true,
-        IgnoreDirection: true,
-        FixRadius: -1,
-        RadiusEffectiveness: 0.05,
-        ArmorEffectiveness: 0,
-        SmokeThreshold: 0,
-        ToHealth: 0,
-        ToStun: 1
-    },
-    { RandomType: 8, IgnoreOverKill: true }, //10
-    { RandomType: 8, IgnoreOverKill: true }, //11
-    { RandomType: 8, IgnoreOverKill: true }, //12
-    { RandomType: 8, IgnoreOverKill: true }, //13
-    { RandomType: 8, IgnoreOverKill: true }, //14
-    { RandomType: 8, IgnoreOverKill: true }, //15
-    { RandomType: 8, IgnoreOverKill: true }, //16
-    { RandomType: 8, IgnoreOverKill: true }, //17
-    { RandomType: 8, IgnoreOverKill: true }, //18
-    { RandomType: 8, IgnoreOverKill: true }, //19
 ];
 
 function AlterEntry({ alter, suffix, label }) {

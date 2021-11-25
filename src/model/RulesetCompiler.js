@@ -204,7 +204,7 @@ function getKillCriteriaItems(ruleset, killCriteria) {
     return [...items];
 }
 
-const globalKeys = ["maxViewDistance"];
+const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange"];
 
 export default function compile(base, mod) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };

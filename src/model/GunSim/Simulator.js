@@ -1,9 +1,89 @@
-import { Weapon, VOXEL_PER_TILE } from "./AccuracySimulator";
+import { Weapon, Target, VOXEL_PER_TILE } from "./AccuracySimulator";
+import { getMultiplier } from "./Multipliers";
+import { mergeStats } from "./utils";
 
-export function computeInputs(entries, stat, soldier, armor, weapon, target, distance) {
-    const result = [];
-    const weaponEntry = entries[weapon].items;
+function getTarget(entries, source, targetEntry, distance) {
+    const targetHeight = targetEntry.standHeight;
+    const targetArmor = entries[targetEntry.armor].armors;
+    const targetWidth = 12 * (targetArmor.size ?? 1); //approximate width, since we don't want to bother with loftemps
+    return new Target(160, source.y + (distance * VOXEL_PER_TILE), 160, targetWidth, targetHeight);
+}
+
+function getWeapon(weaponEntry) {
+    return new Weapon(weaponEntry.aimRange ?? 200, 
+        weaponEntry.minRange ?? 0, 
+        weaponEntry.autoRange ?? 7, 
+        weaponEntry.snapRange ?? 15, 
+        weaponEntry.dropoff, 
+        0/* dmg never used*/ );
+}
+
+function getAccuracy(ruleset, stats, weapon, mode, kneeling, oneHanded) {
+    let acc = weapon[`accuracy${mode}`];
+    if(weapon.accuracyMultiplier) {
+        acc *= getMultiplier(weapon.accuracyMultiplier, stats) / 100;
+    } else {
+        acc *= stats.firing / 100;
+    }
+    if(kneeling) {
+        acc *= (weapon.kneelBonus ?? ruleset.globalVars.kneelBonusGlobal ?? 115) / 100;
+    }
+    if(oneHanded && weapon.twoHanded) {
+        acc *= (weapon.oneHandedPenalty ?? ruleset.globalVars.oneHandedPenaltyGlobal ?? 80) / 100;
+    }
+    return acc / 100;
+}
+
+function getShots(weapon, ammo, mode) {
+    let shots = 1;
+    if(mode === "Auto") {
+        if(weapon.autoShots && !weapon.confAuto) {
+            shots = weapon.autoShots;
+        } else if(weapon.confAuto) {
+            shots = weapon.confAuto.shots;
+        }
+    } else if(weapon[`conf${mode}`]) {
+        shots = weapon[`conf${mode}`].shots
+    }
+
+    let pellets = 1;
+    let shotgunSpread = 100;
+    if(weapon.shotgunPellets) {
+        pellets = weapon.shotgunPellets;
+        shotgunSpread = weapon.shotgunSpread;
+    }
+    if(ammo?.shotgunPellets) {
+        pellets = ammo.shotgunPellets;
+        shotgunSpread = ammo.shotgunSpread;
+    }
+
+    // FIXME: Handle shotgunBehavior and shotgunChoke
+    // We approximate pellets as the expected value of shotgunSpread in shots.
+    // According to: https://openxcom.org/forum/index.php/topic,4834.0.html
+    // shotgunSpread:  Defined on an ammunition type as a number between 0 and 100 with a default value of 100.  
+    // With shotgunBehavior: true, this is approximatley the percent of pellets after the first that will hit 
+    // the same tile/target as the first at the maximum accurate range."
+    return shots * Math.max(1, Math.ceil(pellets * shotgunSpread / 100));
+}
+
+// function simulateAcc(source, target, w, acc, simulations, shots, type) {
+
+export function computeAccuracyInputs(ruleset, {stat, soldier, armor, weapon, ammo, target, distance, kneeling, oneHanded}) {
+    const entries = ruleset.entries;
     const source = { x: 160, y: 160, z: 160 };
-    const targetObj = { x: 160, y: source.y + (distance * VOXEL_PER_TILE) , z: 160 };
-    //const w = new Weapon(weaponEntry.);
+    const weaponEntry = entries[weapon].items;
+    const targetEntry = entries[target].units;
+    const soldierEntry = entries[soldier].soldiers;
+    const armorEntry = entries[armor].armors;
+    const ammoEntry = entries[ammo]?.items;
+    const soldierStats = soldierEntry[stat];
+    const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
+    const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, "Snap", kneeling, oneHanded);
+    const shots = getShots(weaponEntry, ammoEntry, "Snap");
+    const simulations = Math.ceil(10000 / shots);
+
+    const targetObj = getTarget(entries, source, targetEntry, distance);
+    const weaponObj = getWeapon(weaponEntry);
+
+    return [source, targetObj, weaponObj, acc, simulations, shots, "Snap"];
 }

@@ -1,6 +1,19 @@
 .gunSim {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     height: 100%;
     overflow: hidden;
+}
+
+.GunSimSidebar {
+    width: 300px;
+    padding: 1rem;
+    flex-shrink: 0;
+}
+
+.GunSimContent {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 1px;
+    word-break: break-word;
 }
