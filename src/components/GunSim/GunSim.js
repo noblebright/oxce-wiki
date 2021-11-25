@@ -1,22 +1,54 @@
-import React, { useCallback, useMemo } from "react";
-import { Form } from "react-bootstrap";
+import React, { useCallback, useRef, useState, useMemo } from "react";
+import { Form, Modal, ProgressBar, Button } from "react-bootstrap";
 import useLocale from "../../hooks/useLocale";
 import useGunSim from "../../hooks/useGunSim";
-import { computeAccuracyInputs, simulateAcc, getAverageDamage } from "../../model/GunSim";
+import useRunningState from "../../hooks/useRunningState";
+import getChartData from "../../model/GunSim/ChartService";
+import ResultChart from "./ResultChart";
 
 import "./gunSim.css";
+
+function ProgressDialog({current, max, abort}) {     
+    return (
+      <Modal 
+        show={true} 
+        backdrop="static"
+        keyboard={false}
+        animation={false}
+        centered >
+        <Modal.Body>
+          <ProgressBar min={0} max={max} now={current} animated/>
+          <div><Button variant="primary" onClick={abort}>Abort</Button></div>
+        </Modal.Body>
+      </Modal>
+    );
+}
 
 export default function GunSim({ ruleset, lang }) {
     const lc = useLocale(lang, ruleset);
     const optionFn = useCallback(x => <option key={x} value={x}>{lc(x)}</option>, [lc]);
-    const [{ soldierList, armorList, weaponList, ammoList, targetList, stat, soldier, armor, weapon, ammo, target, direction, kneeling, oneHanded }, 
-        { setStat, setSoldier, setArmor, setWeapon, setAmmo, setTarget, setDirection, setKneeling, setOneHanded }] = useGunSim(ruleset.entries, lc);
+    const [state, { setStat, setSoldier, setArmor, setWeapon, setAmmo, setTarget, setDirection, setKneeling, setOneHanded }] = useGunSim(ruleset.entries, lc);
+    const { soldierList, armorList, weaponList, ammoList, targetList, stat, soldier, armor, weapon, ammo, target, direction, kneeling, oneHanded } = state;
     const soldierOptions = useMemo(() => soldierList.map(optionFn), [soldierList, optionFn]);
     const armorOptions = useMemo(() => armorList.map(optionFn), [armorList, optionFn]);
     const weaponOptions = useMemo(() => weaponList.map(optionFn), [weaponList, optionFn]);
     const ammoOptions = useMemo(() => ammoList.map(optionFn), [ammoList, optionFn]);
     const targetOptions = useMemo(() => targetList.map(optionFn), [targetList, optionFn]);
-    const accuracyInputs = computeAccuracyInputs(ruleset, {stat, soldier, armor, weapon, ammo, target, distance: 20, kneeling, oneHanded});
+
+    const [{running, current, max}, {abort, complete, setSteps, increment}] = useRunningState();
+    const [chartData, setChartData] = useState();
+    const [mode, setMode] = useState("HitRatio");
+    const abortFn = useRef();
+    const startRun = useCallback(() => {
+        setChartData(null);
+        const { p, abort: abortComputation } = getChartData(ruleset, state, increment, setSteps);
+        abortFn.current = () => { abortComputation() };
+        p.then(result => {
+            complete();
+            setChartData(result);
+        }, abort);
+    }, [ruleset, state, setSteps, increment, abortFn, complete, abort]);
+
     return (
         <main className="gunSim">
             <Form className="GunSimSidebar">
@@ -74,32 +106,18 @@ export default function GunSim({ ruleset, lang }) {
                         <option value="rear">Rear</option>
                     </Form.Control>
                 </Form.Group>
+                <Button variant="primary" onClick={startRun}>Submit</Button>
             </Form>
             <div className="GunSimContent">
-                <table>
-                    <tbody>
-                        <tr><td>Stat:</td><td>{stat}</td></tr>
-                        <tr><td>Soldier:</td><td>{soldier}</td></tr>
-                        <tr><td>Kneeling:</td><td>{`${kneeling}`}</td></tr>
-                        <tr><td>OneHanded:</td><td>{`${oneHanded}`}</td></tr>
-                        <tr><td>Armor:</td><td>{armor}</td></tr>
-                        <tr><td>Weapon:</td><td>{weapon}</td></tr>
-                        <tr><td>Ammo:</td><td>{ammo}</td></tr>
-                        <tr><td>Target:</td><td>{target}</td></tr>
-                        <tr><td>Facing:</td><td>{direction}</td></tr>
-                        <tr><td colSpan="2"><b>Output</b></td></tr>
-                        <tr><td>Source:</td><td>{JSON.stringify(accuracyInputs[0])}</td></tr>
-                        <tr><td>Target:</td><td>{JSON.stringify(accuracyInputs[1])}</td></tr>
-                        <tr><td>Weapon:</td><td>{JSON.stringify(accuracyInputs[2])}</td></tr>
-                        <tr><td>Accuracy:</td><td>{JSON.stringify(accuracyInputs[3])}</td></tr>
-                        <tr><td>Iterations:</td><td>{JSON.stringify(accuracyInputs[4])}</td></tr>
-                        <tr><td>Shots:</td><td>{JSON.stringify(accuracyInputs[5])}</td></tr>
-                        <tr><td>Type:</td><td>{JSON.stringify(accuracyInputs[6])}</td></tr>
-                        <tr><td colSpan="2"><b>Result</b></td></tr>
-                        <tr><td>Hits:</td><td>{simulateAcc(...accuracyInputs)}</td></tr>
-                        <tr><td>Damage:</td><td>{getAverageDamage(ruleset, 10000, {stat, soldier, armor, weapon, ammo, target, direction})}</td></tr>
-                    </tbody>
-                </table>
+                { running ? <ProgressDialog current={current} max={max} abort={abortFn.current}/> : null }
+                <Form.Group className="mb-3" controlId="weapon">
+                    <Form.Label>Mode</Form.Label>
+                    <Form.Control as="select" size="sm" custom value={mode} onChange={e => setMode(e.target.value)}>
+                        <option value="HitRatio">Hit Ratio</option>
+                        <option value="Damage">Damage</option>
+                    </Form.Control>
+                </Form.Group>
+                { chartData ? <ResultChart data={chartData} mode={mode}/> : null }
             </div>
         </main>
     );    

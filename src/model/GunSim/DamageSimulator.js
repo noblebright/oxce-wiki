@@ -42,9 +42,11 @@ const getDamageAlter = (key, defaultValue) => (weapon, ammo) => {
         case weapon.damageAlter?.[key] !== undefined && 
              weapon.damageAlter?.[key] !== 0:
             return weapon.damageAlter[key];
-        case ammo.damageType !== undefined: 
+        case ammo.damageType !== undefined && 
+            defaultDTProps[ammo.damageType][key] !== undefined: 
             return defaultDTProps[ammo.damageType][key];
-        case weapon.damageType !== undefined: 
+        case weapon.damageType !== undefined &&
+            defaultDTProps[weapon.damageType][key] !== undefined: 
             return defaultDTProps[weapon.damageType][key];
         default:
             return defaultValue;

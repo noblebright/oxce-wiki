@@ -1,17 +1,12 @@
 import intersects from "./Vector";
 import { generate } from "./utils";
+import { ShotType } from "../Constants";
 
 export const VOXEL_PER_TILE = 16;
 
 function deg2Rad(deg) {
 	return deg * Math.PI / 180;
 }
-
-const ShotType = {
-	Aimed: "Aimed",
-	Snap: "Snap",
-	Auto: "Auto"
-};
 
 function applyAccuracy(origin, target, accuracy, keepRange, extendLine, weapon, shotType) {
 	let xdiff = origin.x - target.x;
@@ -112,10 +107,12 @@ export class Target {
 		return isBetween(this.x, this.width, p.x) && isBetween(this.z, this.height, p.z);
 	}
 }
+function toPercent(shots, hits) {
+	return hits*100 / shots;
+}
 
 function simulateAcc(source, target, w, acc, simulations, shots, type) {
 	let hit = 0;
-	console.time("simulateAcc");
 	for(let i = 0; i < simulations; i++) {
 		for(let s = 0; s < shots; s++) {
 			let p = { x: target.x + target.width/2, y: target.y, z: target.z + target.height/2 } // shooting at center mass
@@ -127,8 +124,7 @@ function simulateAcc(source, target, w, acc, simulations, shots, type) {
 			}
 		}
 	}
-	console.timeEnd("simulateAcc");
-	return hit;
+	return toPercent(simulations, hit);
 }
 
 export class Weapon {
@@ -137,7 +133,7 @@ export class Weapon {
 			this.minRange = minRange;
 			this.autoRange = autoRange;
 			this.snapRange = snapRange;
-			this.dropOff = dropOff;
+			this.dropOff = dropOff ?? 2;
 			this.dmg = dmg;
 		}
 }

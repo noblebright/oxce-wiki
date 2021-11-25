@@ -62,3 +62,9 @@ export const defaultDTProps = [
     { ResistType: 18, RandomType: 8, IgnoreOverKill: true }, //18
     { ResistType: 19, RandomType: 8, IgnoreOverKill: true }, //19
 ];
+
+export const ShotType = {
+	Aimed: "Aimed",
+	Snap: "Snap",
+	Auto: "Auto"
+};

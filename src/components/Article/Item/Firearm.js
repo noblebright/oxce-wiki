@@ -6,8 +6,9 @@ import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, 
 import DamageAlter from "./DamageAlter";
 import Damage from "./Damage";
 import Cost, { hasCost } from "./Cost";
+import { ShotType } from "../../../model/Constants";
 
-const actionTypes = ["Aimed", "Snap", "Auto"];
+const actionTypes = Object.values(ShotType);
 const actionLabel = {
     "Aimed": "STR_AIMED_SHOT", 
     "Snap": "STR_SNAP_SHOT", 

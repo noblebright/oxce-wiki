@@ -41,6 +41,8 @@ function getShots(weapon, ammo, mode) {
             shots = weapon.autoShots;
         } else if(weapon.confAuto) {
             shots = weapon.confAuto.shots;
+        } else {
+            shots = 3;
         }
     } else if(weapon[`conf${mode}`]) {
         shots = weapon[`conf${mode}`].shots
@@ -68,7 +70,7 @@ function getShots(weapon, ammo, mode) {
 
 // function simulateAcc(source, target, w, acc, simulations, shots, type) {
 
-export function computeAccuracyInputs(ruleset, {stat, soldier, armor, weapon, ammo, target, distance, kneeling, oneHanded}) {
+export function computeAccuracyInputs(ruleset, shotType, iterations, distance, {stat, soldier, armor, weapon, ammo, target, kneeling, oneHanded}) {
     const entries = ruleset.entries;
     const source = { x: 160, y: 160, z: 160 };
     const weaponEntry = entries[weapon].items;
@@ -78,12 +80,12 @@ export function computeAccuracyInputs(ruleset, {stat, soldier, armor, weapon, am
     const ammoEntry = entries[ammo]?.items;
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
-    const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, "Snap", kneeling, oneHanded);
-    const shots = getShots(weaponEntry, ammoEntry, "Snap");
-    const simulations = Math.ceil(10000 / shots);
+    const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, shotType, kneeling, oneHanded);
+    const shots = getShots(weaponEntry, ammoEntry, shotType);
+    const simulations = Math.ceil(iterations / shots);
 
     const targetObj = getTarget(entries, source, targetEntry, distance);
     const weaponObj = getWeapon(weaponEntry);
 
-    return [source, targetObj, weaponObj, acc, simulations, shots, "Snap"];
+    return [source, targetObj, weaponObj, acc, simulations, shots, shotType];
 }
