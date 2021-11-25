@@ -4,7 +4,7 @@ import { computeAccuracyInputs } from "./Simulator";
 import simulateAcc from "./AccuracySimulator";
 import { mergeStats } from "./utils";
 
-const iterations = 10000;
+const iterations = 100000;
 
 export function hasCost(value, suffix) {
     const costObj = value[`cost${suffix}`];
@@ -19,7 +19,18 @@ function getShotTypes(weapon, ammo) {
     if(!ammo || !weapon.ammo) { // ie, vanilla-style compatibleAmmo
         return actionTypes.filter(type => hasCost(weapon, type));
     } else {
-        return actionTypes.filter((type, idx) => hasCost(weapon, type) && weapon.ammo[idx].compatibleAmmo?.includes(ammo.type));
+        const validAmmoSlots = new Set();
+        Object.entries(weapon.ammo).forEach(([key, value]) => {
+            if(value.compatibleAmmo.includes(ammo.type)) {
+                validAmmoSlots.add(key);
+            }
+        });
+        return actionTypes.filter((type, idx) => {
+            if(!hasCost(weapon, type)) {
+                return false;
+            }
+            return validAmmoSlots.has(`${weapon[`conf${type}`].ammoSlot}`);
+        });
     }
     
 }
@@ -37,11 +48,10 @@ function getShotsPerTurn(ruleset, {soldier, weapon, armor, stat}) {
     actionTypes.forEach(type => {
         if(weaponEntry[`cost${type}`]) {
             result[type] = weaponEntry.flatRate ? Math.floor(tu / weaponEntry[`cost${type}`].time) : Math.floor(100 / weaponEntry[`cost${type}`].time);
-        } else {
-            result[type] = weaponEntry.flatRate ? Math.floor(tu / weaponEntry[`tu${type}`]) : Math.floor(100 /weaponEntry[`tu${type}`]);
+        } else if(hasCost(weaponEntry, type)){
+            result[type] = weaponEntry.flatRate ? Math.floor(tu / weaponEntry[`tu${type}`]) : Math.floor(100 / weaponEntry[`tu${type}`]);
         }
     });
-    console.log("shots per turn", result);
     return result;
 }
 

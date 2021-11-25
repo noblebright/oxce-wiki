@@ -5,6 +5,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import NavItem from "react-bootstrap/NavItem";
 import NavLink from "react-bootstrap/NavLink";
@@ -104,7 +105,10 @@ export default function Ruleset({ lang, setLanguage, versions }) {
             <Row noGutters>
                 <Col>
                     <Navbar bg="dark" variant="dark">
-                        <Navbar.Brand className="mr-auto">{isMobile && <Hamburger onClick={() => setShowSidebar(!showSidebar)}/>}<Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
+                        <Navbar.Brand>{isMobile && <Hamburger onClick={() => setShowSidebar(!showSidebar)}/>}<Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
+                        <Nav className="mr-auto">
+                          {!isMobile && <Link to={`/${version}/gunSim`}>Gun Profiler</Link>}
+                        </Nav>
                         {!isMobile && <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
                             { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
                         </NavDropdown>}

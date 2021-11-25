@@ -1,5 +1,5 @@
 import React from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Legend, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const colors = {
     AimedHitRatio: "#003f5c",
@@ -11,9 +11,8 @@ const colors = {
 };
 
 export default function ResultChart({ data, mode }) {
-    console.log(data);
     return (
-        <ResponsiveContainer width="100%" height="90%">
+        <ResponsiveContainer width="80%" height="80%">
             <LineChart
                 width={500}
                 height={300}
@@ -25,6 +24,8 @@ export default function ResultChart({ data, mode }) {
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="distance"/>
                 <YAxis/>
+                <Tooltip />
+                <Legend />
                 { data[0].AimedHitRatio !== undefined && mode === "HitRatio" && <Line type="monoTone" dataKey="AimedHitRatio" stroke={colors.AimedHitRatio}/> }
                 { data[0].SnapHitRatio !== undefined && mode === "HitRatio" && <Line type="monoTone" dataKey="SnapHitRatio" stroke={colors.SnapHitRatio}/> }
                 { data[0].AutoHitRatio !== undefined && mode === "HitRatio" && <Line type="monoTone" dataKey="AutoHitRatio" stroke={colors.AutoHitRatio}/> }

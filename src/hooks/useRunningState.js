@@ -13,6 +13,8 @@ const reducer = (state, action) => {
             return { running: true, current: 0, max: action.payload };
         case "increment":
             return {...state, current: action.payload };
+        default:
+            return state;
     }
 };
 

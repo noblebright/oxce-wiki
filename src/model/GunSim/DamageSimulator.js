@@ -93,6 +93,7 @@ function getTargetStats(entries, damageType, targetEntry, direction, explosive) 
                 break;
             case "left":
                 armorRating = targetArmor.sideArmor + (targetArmor.leftArmorDiff ?? 0);
+                break;
             default:
         }    
     } else {
@@ -136,7 +137,6 @@ export function getAverageDamage(ruleset, iterations, {stat, soldier, armor, wea
     const isExplosive = getExplosive(weaponEntry, ammoEntry);
     const { armorRating, resist } = getTargetStats(entries, damageType, targetEntry, direction, isExplosive);
 
-    console.log({ power, armorPen, damageType, isExplosive, armorRating, resist, adjustedStats });
     let totalDamage = 0;
     for(let i = 0; i < iterations; i++) {
         totalDamage += getExpectedDamage(ruleset, randomType, power, multipliers, adjustedStats, armorRating, armorPen, resist)

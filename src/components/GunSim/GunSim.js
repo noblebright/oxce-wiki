@@ -41,10 +41,12 @@ export default function GunSim({ ruleset, lang }) {
     const abortFn = useRef();
     const startRun = useCallback(() => {
         setChartData(null);
+        console.time("chartGen");
         const { p, abort: abortComputation } = getChartData(ruleset, state, increment, setSteps);
         abortFn.current = () => { abortComputation() };
         p.then(result => {
             complete();
+            console.timeEnd("chartGen");
             setChartData(result);
         }, abort);
     }, [ruleset, state, setSteps, increment, abortFn, complete, abort]);
@@ -67,17 +69,16 @@ export default function GunSim({ ruleset, lang }) {
                     </Form.Control>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="soldierArmor">
-                    <Form.Label>Circumstantial Modifiers</Form.Label>
-                    <div>
-                        <Form.Check type="checkbox" id="kneeling" checked={kneeling} onChange={e => setKneeling(e.target.checked)} label="Kneeling" inline/>
-                        <Form.Check type="checkbox" id="oneHanded" checked={oneHanded} onChange={e => setOneHanded(e.target.checked)} label="One-handed" inline/>
-                    </div>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="soldierArmor">
                     <Form.Label>Armor Type</Form.Label>
                     <Form.Control as="select" size="sm" custom value={armor} onChange={e => setArmor(e.target.value)}>
                         { armorOptions }
                     </Form.Control>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="soldierArmor">
+                    <div>
+                        <Form.Check type="checkbox" id="kneeling" checked={kneeling} onChange={e => setKneeling(e.target.checked)} label="Kneeling" inline/>
+                        <Form.Check type="checkbox" id="oneHanded" checked={oneHanded} onChange={e => setOneHanded(e.target.checked)} label="One-handed" inline/>
+                    </div>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="weapon">
                     <Form.Label>Weapon</Form.Label>
@@ -110,13 +111,10 @@ export default function GunSim({ ruleset, lang }) {
             </Form>
             <div className="GunSimContent">
                 { running ? <ProgressDialog current={current} max={max} abort={abortFn.current}/> : null }
-                <Form.Group className="mb-3" controlId="weapon">
-                    <Form.Label>Mode</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={mode} onChange={e => setMode(e.target.value)}>
-                        <option value="HitRatio">Hit Ratio</option>
-                        <option value="Damage">Damage</option>
-                    </Form.Control>
-                </Form.Group>
+                <Form.Control as="select" size="sm" custom value={mode} onChange={e => setMode(e.target.value)}>
+                    <option value="HitRatio">Hit Ratio</option>
+                    <option value="Damage">Damage</option>
+                </Form.Control>
                 { chartData ? <ResultChart data={chartData} mode={mode}/> : null }
             </div>
         </main>
