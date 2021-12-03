@@ -18,7 +18,7 @@ function ProgressDialog({current, max, abort}) {
         centered >
         <Modal.Body>
           <ProgressBar min={0} max={max} now={current} animated/>
-          <div><Button variant="primary" onClick={abort}>Abort</Button></div>
+          {/*<!-- <div><Button variant="primary" onClick={abort}>Abort</Button></div> -->*/}
         </Modal.Body>
       </Modal>
     );

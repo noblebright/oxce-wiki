@@ -39,7 +39,9 @@ const init = lc => state => {
     state.armor = state.armorList[0];
     state.weaponList = Object.keys(state.entries).filter(x => {
         const item = state.entries[x].items;
-        return item?.battleType === 1 && item?.recover !== false
+        return item && item.battleType === 1 && 
+                !item.arcingShot &&  // FIXME: Handle more corner cases for arcing (confAimed et. al.)
+                item.recover !== false
     }).sort(sortFn);
     state.weapon = state.weaponList[0];
     state.ammoList = getAmmoList(state, state.weapon, lc);

@@ -75,10 +75,17 @@ function getMultipliers(weapon, ammo) {
 
 const getArmorPen = getDamageAlter("ArmorEffectiveness", 1);
 const getDamageType = getDamageAlter("ResistType", 1);
+const getToHealth = getDamageAlter("ToHealth", 1);
+const getRandomHealth = getDamageAlter("RandomHealth", false);
+const getRandomStun = getDamageAlter("RandomStun", true);
+const getToStun = getDamageAlter("ToHealth", 0.25);
+const getIgnorePainImmunity = getDamageAlter("IgnorePainImmunity", false);
+const getIgnoreDirection = getDamageAlter("IgnoreDirection", false);
 
 function getTargetStats(entries, damageType, targetEntry, direction, explosive) {
     const targetArmor = entries[targetEntry.armor].armors;
     const resist = targetArmor.damageModifier[damageType] ?? 1;
+    const painImmune = targetArmor.painImmune ?? targetArmor.size === 2;
     let armorRating;
     if(!explosive) {
         switch(direction) {
@@ -99,7 +106,7 @@ function getTargetStats(entries, damageType, targetEntry, direction, explosive) 
     } else {
         armorRating = targetArmor.underArmor;
     }
-    return { armorRating, resist };
+    return { armorRating, painImmune, resist };
 }
 
 const getFixRadius = getDamageAlter("FixRadius", undefined);
@@ -135,11 +142,22 @@ export function getAverageDamage(ruleset, iterations, {stat, soldier, armor, wea
     const armorPen = getArmorPen(weaponEntry, ammoEntry);
     const damageType = getDamageType(weaponEntry, ammoEntry);
     const isExplosive = getExplosive(weaponEntry, ammoEntry);
-    const { armorRating, resist } = getTargetStats(entries, damageType, targetEntry, direction, isExplosive);
+    const ignoreDirection = getIgnoreDirection(weaponEntry, ammoEntry);
+    const ignorePainImmunity = getIgnorePainImmunity(weaponEntry, ammoEntry);
+    const randomHealthFactor = getRandomHealth(weaponEntry, ammoEntry) ? .5 : 1; // RandomX is uniform 1-N distribution
+    const randomStunFactor = getRandomStun(weaponEntry, ammoEntry) ? .5 : 1;     // Average distribution is n / 2
+
+    if(ignoreDirection) {  // IgnoreDirection defaults to front armor
+        direction = "front";
+    }
+
+    const { armorRating, painImmune, resist } = getTargetStats(entries, damageType, targetEntry, direction, isExplosive);
+    const penetratingDamageMultiplier = getToHealth(weaponEntry, ammoEntry) * randomHealthFactor + 
+                                        getToStun(weaponEntry, ammoEntry) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
 
     let totalDamage = 0;
     for(let i = 0; i < iterations; i++) {
-        totalDamage += getExpectedDamage(ruleset, randomType, power, multipliers, adjustedStats, armorRating, armorPen, resist)
+        totalDamage += getExpectedDamage(ruleset, randomType, power, multipliers, adjustedStats, armorRating, armorPen, resist) * penetratingDamageMultiplier;
     }
     return Math.floor(totalDamage / iterations);
 }

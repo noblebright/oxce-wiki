@@ -13,6 +13,12 @@ export const defaultDTProps = [
         ArmorEffectiveness: 0,
         FireThreshold: 0,
         ToHealth: 1,
+        ToArmor: 0,
+        ToWound: 0,
+        ToItem: 0,
+        ToTile: 0,
+        ToStun: 2,
+        TileDamageMethod: 2
     },
     { //he
         ResistType: 3, 
@@ -21,7 +27,8 @@ export const defaultDTProps = [
         IgnoreSelfDestruct: true,
         FixRadius: -1,
         RadiusEffectiveness: 0.05,
-        ToItem: 1
+        ToItem: 1,
+        TileDamageMethod: 2
     },
     { ResistType: 4, RandomType: 8, IgnoreOverKill: true }, //laser
     { ResistType: 5, RandomType: 8, IgnoreOverKill: true }, //plasma
@@ -30,12 +37,17 @@ export const defaultDTProps = [
         RandomType: 8, 
         IgnoreOverKill: true,
         IgnoreSelfDestruct: true,
-        IgnoreDirection: true,
+        IgnorePainImmunity: true,
         FixRadius: -1,
         RadiusEffectiveness: 0.05,
         ToHealth: 0,
+        ToArmor: 0,
+        ToWound: 0,
+        ToItem: 0,
+        ToTile: 0,
         ToStun: 1,
-        RandomStun: false
+        RandomStun: false,
+        TileDamageMethod: 2
     }, 
     { ResistType: 7, RandomType: 8, IgnoreOverKill: true, IgnoreSelfDestruct: true }, //melee
     { ResistType: 8, RandomType: 8, IgnoreOverKill: true }, //acid
@@ -49,7 +61,12 @@ export const defaultDTProps = [
         ArmorEffectiveness: 0,
         SmokeThreshold: 0,
         ToHealth: 0,
-        ToStun: 1
+        ToArmor: 0,
+        ToWound: 0,
+        ToItem: 0,
+        ToTile: 0,
+        ToStun: 1,
+        TileDamageMethod: 2
     },
     { ResistType: 10, RandomType: 8, IgnoreOverKill: true }, //10
     { ResistType: 11, RandomType: 8, IgnoreOverKill: true }, //11

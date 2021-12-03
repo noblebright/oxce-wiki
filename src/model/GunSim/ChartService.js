@@ -46,10 +46,10 @@ function getShotsPerTurn(ruleset, {soldier, weapon, armor, stat}) {
     const result = {};
 
     actionTypes.forEach(type => {
-        if(weaponEntry[`cost${type}`]) {
-            result[type] = weaponEntry.flatRate ? Math.floor(tu / weaponEntry[`cost${type}`].time) : Math.floor(100 / weaponEntry[`cost${type}`].time);
-        } else if(hasCost(weaponEntry, type)){
-            result[type] = weaponEntry.flatRate ? Math.floor(tu / weaponEntry[`tu${type}`]) : Math.floor(100 / weaponEntry[`tu${type}`]);
+        const tuCost = hasCost(weaponEntry, type);
+        const flatCost = weaponEntry.flatRate || weaponEntry[`flat${type}`].time;
+        if(tuCost) {
+            result[type] = flatCost ? Math.floor(tu / tuCost) : Math.floor(100 / tuCost);
         }
     });
     return result;
@@ -83,6 +83,13 @@ function getCancellableDataset(data, fn) {
     return { p, abort: () => cancelled = true };
 }
 
+function simulateAccWrapper(...args) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(simulateAcc(...args));
+        }, 10);
+    });
+}
 export default function getChartData(ruleset, state, updateProgress, updateMaxProgress) {
     const avgDamage = getAverageDamage(ruleset, iterations, state);
     const weaponEntry = ruleset.entries[state.weapon].items;
@@ -91,7 +98,7 @@ export default function getChartData(ruleset, state, updateProgress, updateMaxPr
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
     const data = [];
 
-    updateMaxProgress(50 * shotTypes.length);
+    updateMaxProgress(50);
 
     for(let i = 1; i <= 50; i++) {
         data.push(i);
@@ -102,7 +109,7 @@ export default function getChartData(ruleset, state, updateProgress, updateMaxPr
         const dataPoint = { distance };
         for(let shotType of shotTypes) {
             const accuracyInputs = computeAccuracyInputs(ruleset, shotType, iterations, distance, state);
-            const hitRatio = await Promise.resolve(simulateAcc(...accuracyInputs));
+            const hitRatio = await simulateAccWrapper(...accuracyInputs);
             const shotsPerTurn = shotsPerTurnByType[shotType];
             dataPoint[`${shotType}HitRatio`] = hitRatio;
             dataPoint[`${shotType}Damage`] = avgDamage * hitRatio / 100 * shotsPerTurn;
