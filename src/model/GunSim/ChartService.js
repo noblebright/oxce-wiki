@@ -47,7 +47,7 @@ function getShotsPerTurn(ruleset, {soldier, weapon, armor, stat}) {
 
     actionTypes.forEach(type => {
         const tuCost = hasCost(weaponEntry, type);
-        const flatCost = weaponEntry.flatRate || weaponEntry[`flat${type}`].time;
+        const flatCost = weaponEntry.flatRate || weaponEntry[`flat${type}`]?.time;
         if(tuCost) {
             result[type] = flatCost ? Math.floor(tu / tuCost) : Math.floor(100 / tuCost);
         }
