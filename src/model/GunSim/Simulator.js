@@ -1,11 +1,12 @@
 import { Weapon, Target, VOXEL_PER_TILE } from "./AccuracySimulator";
 import { getMultiplier } from "./Multipliers";
 import { mergeStats } from "./utils";
+import { unitWidths } from "../Constants";
 
 function getTarget(entries, source, targetEntry, distance) {
     const targetHeight = targetEntry.standHeight;
     const targetArmor = entries[targetEntry.armor].armors;
-    const targetWidth = 12 * (targetArmor.size ?? 1); //approximate width, since we don't want to bother with loftemps
+    const targetWidth = unitWidths[targetArmor.loftempsSet[0]] ?? 7; //weird-shaped units we assume are 7 voxels wide (human)
     return new Target(160, source.y + (distance * VOXEL_PER_TILE), 160, targetWidth, targetHeight);
 }
 

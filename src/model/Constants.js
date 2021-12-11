@@ -85,3 +85,15 @@ export const ShotType = {
 	Snap: "Snap",
 	Auto: "Auto"
 };
+
+export const unitWidths = {  //Derived from LOFTEMPS.DAT
+	"1": 3,
+	"2": 5,
+	"3": 7,
+	"4": 9,
+	"5": 11,
+	"92": 32, //aggregated from [92, 89, 90, 91]
+	"105": 16, //aggregated from [105, 108, 99, 102]
+	"106": 8, //aggregated from [106, 109, 100, 103]
+	"104": 24 //aggregated from [104, 107, 98, 101]
+};
