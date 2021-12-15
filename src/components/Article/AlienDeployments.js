@@ -123,7 +123,7 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
     const availableRaces = useMemo(() => {
         const possibleRaces = new Set();
         if(!alienDeployments) return [null];
-        if(randomRace) possibleRaces.add(randomRace);
+        if(randomRace) randomRace.forEach(x => possibleRaces.add(x));
         if(alienRace) possibleRaces.add(alienRace);
         if(raceByDeployment[id]) {
             raceByDeployment[id].forEach(x => possibleRaces.add(x));

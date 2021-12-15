@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/table";
 
 import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, Percent, getUnitFaction } from "../../ComponentUtils";
+import { ListHeader, BooleanValue, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, Percent, getUnitFaction } from "../../ComponentUtils";
 import DamageAlter from "./DamageAlter";
 import Damage from "./Damage";
 import Cost, { hasCost } from "./Cost";
@@ -27,8 +27,13 @@ function getShots(item, suffix) {
     return confShots || autoShots || undefined;
 }
 
+function getArcing(item, suffix) {
+    const confArcing = item[`conf${suffix}`]?.arcing;
+    return confArcing || item.arcingShot || undefined;
+}
+
 const GunAction = ({suffix, item, lc, bonusFn}) => (
-    <ActionValue label={lc(getActionKey(item, suffix))} 
+    <ActionValue label={`${lc(getActionKey(item, suffix))} ${getArcing(item, suffix) ? "\u21B7" : ""}`} 
         show={hasCost(item, suffix)}
         cost={<Cost value={item} suffix={suffix} lc={lc} />}
         accuracy={<Accuracy items={item} suffix={suffix} bonusFn={bonusFn}/>}
@@ -154,6 +159,7 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
                 <SimpleValue label="CQC Accuracy" value={items.accuracyCloseQuarters}>{ Percent }</SimpleValue>
                 <SimpleValue label="Min Range" value={items.minRange}/>
                 <SimpleValue label="Dropoff" value={items.dropoff}/>
+                <BooleanValue label="Arcing?" value={items.arcingShot}/>
                 <SimpleValue label="Effective Range" value={items.powerRangeThreshold}/>
                 <SimpleValue label="Damage Dropoff" value={items.powerRangeReduction}/>
                 <SimpleValue label="Spawned Unit" value={items.spawnUnit}>{ linkFn }</SimpleValue>
