@@ -70,6 +70,7 @@ export default function Units(props) {
                 </tbody>
                 <UnitStats stats={units.stats} lc={lc}/>
                 { units.builtInWeaponSets && units.builtInWeaponSets.map((weaponSet, idx) => <ListValue key={idx} label={`Built-In Weapons Set ${idx + 1}`} values={weaponSet}>{ linkFn }</ListValue>) }
+                <ListValue label="Deployed In" values={units.$deployedIn}>{ linkFn }</ListValue>
             </Table>
             <Armors {...props} id={units.armor}/>
         </React.Fragment>

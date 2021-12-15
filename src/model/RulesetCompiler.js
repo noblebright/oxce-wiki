@@ -3,6 +3,7 @@ import { getSupportedLanguages } from "./utils";
 import { joinRaces, compileMissions } from "./MissionMapper";
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
+import { mapUnitSources } from "./UnitSourceMapper";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -12,7 +13,6 @@ import { mapEventScripts } from "./EventMapper";
 }
 */
 
-//const supportedSections = ["items", "events", "commendations", "soldierTransforms"];
 const supportedSections = [
     { section: "items", key: "type", filter: (x, rs, key) => x.recover !== false && (x.battleType !== 11 || x.recoverCorpse !== false)},
     { section: "manufacture", key: "name" },
@@ -20,14 +20,14 @@ const supportedSections = [
     { section: "facilities", key: "type" },
     { section: "crafts", key: "type" },
     { section: "craftWeapons", key: "type" },
-    { section: "ufos", key: "type" },
+    { section: "alienDeployments", key: "type"}, // deployments must be before ufos, because ufo are filtered based on deployment
+    { section: "ufos", key: "type", filter: (x, rs, key) => (rs[key].alienDeployments) }, // hide all the ufos that are used in site-based missions
     { section: "units", key: "type" },
     { section: "soldiers", key: "type" },
     { section: "soldierTransformation", key: "name"},
     { section: "commendations", key: "type"},
     { section: "events", key: "name"},
     { section: "armors", key: "type" },
-    { section: "alienDeployments", key: "type"},
     { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
     { section: "terrains", key: "name", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) },
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
@@ -47,10 +47,10 @@ function generateSection(ruleset, rules, metadata) {
         const name = entry[keyField];
 
         if(entry.delete) { //process delete
-            if(ruleset[entry.delete]){
+            if(ruleset[entry.delete]){ // delete the section
                 delete ruleset[entry.delete][sectionName];
             }
-            if(ruleset[entry.delete] && 
+            if(ruleset[entry.delete] && // if there are no sections left for this key, delete the key
                 !Object.keys(ruleset[entry.delete])
                     .filter(x => x !== "hide").length) {
                 delete ruleset[entry.delete];
@@ -316,6 +316,8 @@ export default function compile(base, mod) {
 
         //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
+
+    mapUnitSources(backLinkSet, ruleset);
 
     backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
         if(obj[key] instanceof Set) {

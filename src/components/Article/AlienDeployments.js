@@ -4,6 +4,7 @@ import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useInventory from "../../hooks/useInventory";
 import { BooleanValue, SectionHeader, ListHeader, ContainerValue, SimpleValue, SimpleSelect, ListValue, Percent } from "../ComponentUtils.js";
+import { getPossibleRaces } from "../../model/UnitSourceMapper";
 
 function getAliens(ruleset, race, deployment) {
     const rank = deployment.alienRank;
@@ -115,25 +116,12 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
     const inventoryFn = useInventory(linkFn);
     const entry = ruleset.entries[id];
     const alienDeployments = entry.alienDeployments;
-    const alienRace = alienDeployments?.race;
-    const randomRace = alienDeployments?.randomRace;
-    const prevStage = alienDeployments?.$prevStage;
-    const raceByDeployment = ruleset.lookups.raceByDeployment;
 
     const availableRaces = useMemo(() => {
-        const possibleRaces = new Set();
-        if(!alienDeployments) return [null];
-        if(randomRace) randomRace.forEach(x => possibleRaces.add(x));
-        if(alienRace) possibleRaces.add(alienRace);
-        if(raceByDeployment[id]) {
-            raceByDeployment[id].forEach(x => possibleRaces.add(x));
-        }
-        if(raceByDeployment[prevStage]) {
-            raceByDeployment[prevStage].forEach(x => possibleRaces.add(x)); //check previous stage if this is the second part of a two-parter.
-        }
+        const possibleRaces = getPossibleRaces(id, ruleset);
         console.log([...possibleRaces]);
         return [...possibleRaces];
-    }, [id, alienDeployments, alienRace, randomRace, prevStage, raceByDeployment]);
+    }, [id, ruleset]);
     const [race, setRace] = useState(availableRaces[0]);
 
     useEffect(() => {
