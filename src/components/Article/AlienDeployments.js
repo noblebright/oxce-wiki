@@ -119,7 +119,6 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
 
     const availableRaces = useMemo(() => {
         const possibleRaces = getPossibleRaces(id, ruleset);
-        console.log([...possibleRaces]);
         return [...possibleRaces];
     }, [id, ruleset]);
     const [race, setRace] = useState(availableRaces[0]);

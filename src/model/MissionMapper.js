@@ -112,14 +112,20 @@ function processMissionScripts(lookups, rules) {
     })
 }
 
-function getDeployments(mission) {
+function getDeployments(mission, lookups) {
     switch(mission.objective) {
         case 1: // infiltration
             return new Set(mission.siteType ? [mission.siteType] : []);
         case 2: // alien base
             return new Set(mission.siteType ? [mission.siteType] : ["STR_ALIEN_BASE_ASSAULT"]);
         case 3: // site-based missions
-            return new Set();
+            let objectiveTrajectory = mission.waves.filter(x => x.objective)[0].trajectory;
+            if(lookups.ufoTrajectories[objectiveTrajectory].groundTimer === 0) {
+                // instant spawn missions can't be shot down, so no UFO recovery deployments apply.
+                return new Set();
+            } else {
+                return new Set(mission.waves.map(x => x.ufo));
+            }
         default: 
             return new Set(mission.waves.map(x => x.ufo));
     }
@@ -136,7 +142,7 @@ function processMissions(lookups, rules) {
         
         const races = getWeightValues(mission.raceWeights);
         //ignore ufos for site-type missions.
-        const ufos = getDeployments(mission);
+        const ufos = getDeployments(mission, lookups);
         lookups.raceByMission[mission.type] = races;
         
         lookups.deploymentsByMission[mission.type] = lookups.deploymentsByMission[mission.type] || new Set();

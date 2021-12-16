@@ -35,7 +35,8 @@ const supportedSections = [
 
 const supportedLookups = [
     { section: "soldierBonuses", key: "name" },
-    { section: "eventScripts", key: "type" }
+    { section: "eventScripts", key: "type" },
+    { section: "ufoTrajectories", key: "id" }
 ];
 
 function generateSection(ruleset, rules, metadata) {
