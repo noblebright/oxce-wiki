@@ -14,7 +14,8 @@ import { mapUnitSources } from "./UnitSourceMapper";
 */
 
 const supportedSections = [
-    { section: "items", key: "type", filter: (x, rs, key) => x.recover !== false && (x.battleType !== 11 || x.recoverCorpse !== false)},
+    // skip unrecoverable items, corpses, and unrecoverable corpses.  liveAlien seems to override recover = false.
+    { section: "items", key: "type", filter: (x, rs, key) => (x.recover !== false || x.liveAlien === true) && (x.battleType !== 11 || x.recoverCorpse !== false)},
     { section: "manufacture", key: "name" },
     { section: "research", key: "name" },
     { section: "facilities", key: "type" },

@@ -150,6 +150,7 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                     <SimpleValue label="Despawn Penalty" value={alienDeployments.despawnPenalty}/>
                     <SimpleValue label="Abort Penalty" value={alienDeployments.abortPenalty}/>
                     <SimpleValue label="Turn Limit" value={alienDeployments.turnLimit}/>
+                    <SimpleValue label="Related Ufo" value={alienDeployments.$relatedUfo}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Alien Race" value={availableRaces}>
                         { availableRaces.length > 1 ? (x => <SimpleSelect options={x} value={race || ""} onChange={setRace}>{ x => `${lc(x)} [${x}]` }</SimpleSelect>) : x => lc(x[0])}
                     </SimpleValue>
@@ -158,6 +159,7 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 <ListValue label="Map Items" values={alienDeployments.terrainItems}>{ linkFn }</ListValue>
                 <ListValue label="Map Items (Random)" values={alienDeployments.terrainRandomItems}>{ linkFn }</ListValue>
                 <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>
+                <ListValue label="Spawned Units" values={alienDeployments.$spawnedUnits}>{ linkFn }</ListValue>
                 {alienDeployments.data.map((x, idx) => <Deployment key={idx} ruleset={ruleset} linkFn={linkFn} deployment={x} race={race} idx={idx}/>)}
             </Table>
             <Reinforcements ruleset={ruleset} linkFn={linkFn} race={race} reinforcements={alienDeployments.reinforcements}/>

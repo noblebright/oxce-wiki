@@ -45,7 +45,7 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     }
     if(terrainRandomItems && terrainRandomItems.size) {
         entry.alienDeployments.terrainRandomItems = [...terrainRandomItems];
-        backLinkSet(ruleset.entries, key, [...terrainItems], "items", "foundFrom");
+        backLinkSet(ruleset.entries, key, [...terrainRandomItems], "items", "foundFrom");
     }
 
     //Items from UFOs
