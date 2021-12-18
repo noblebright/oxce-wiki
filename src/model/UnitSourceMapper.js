@@ -12,9 +12,14 @@ export function getPossibleRaces(id, ruleset) {
     if(raceByDeployment[id]) {
         raceByDeployment[id].forEach(x => possibleRaces.add(x));
     }
-    if(raceByDeployment[prevStage]) {
-        raceByDeployment[prevStage].forEach(x => possibleRaces.add(x)); //check previous stage if this is the second part of a two-parter.
+    if(prevStage) {
+        prevStage.forEach(stage => {
+            if(raceByDeployment[stage]) {
+                raceByDeployment[stage].forEach(x => possibleRaces.add(x)); //check previous stage if this is the second part of a two-parter.
+            }
+        });
     }
+    
     return possibleRaces;
 }
 
@@ -46,7 +51,7 @@ function getRelatedUfos(key, ruleset) {
 }
 
 export function mapUnitSources(backLinkSet, ruleset) {
-    Object.keys(ruleset.entries).filter(x => x.alienDeployment).forEach(deploymentKey => {
+    Object.keys(ruleset.entries).filter(x => ruleset.entries[x].alienDeployments).forEach(deploymentKey => {
         const deploymentObj = ruleset.entries[deploymentKey]?.alienDeployments;
 
         if(!deploymentObj) {
@@ -67,9 +72,19 @@ export function mapUnitSources(backLinkSet, ruleset) {
             }
 
             const roster = raceObj.membersRandom ?? raceObj.members.map(x => [x]);
+            //normal deployments
             deploymentObj.data.forEach(loadout => {  // for each loadout
-                const potentialUnits = roster[loadout.alienRank];
+                const potentialUnits = loadout.customUnitType ? [loadout.customUnitType] : roster[loadout.alienRank];
                 backLinkSet(ruleset.entries, deploymentKey, potentialUnits, "units", "$deployedIn");
+            });
+
+            // look at reinforcements.
+            //eslint-disable-next-line no-unused-expressions
+            deploymentObj.reinforcements?.forEach(reinforcement => {
+                reinforcement.data.forEach(loadout => {  // for each loadout
+                    const potentialUnits = loadout.customUnitType ? [loadout.customUnitType] : roster[loadout.alienRank];
+                    backLinkSet(ruleset.entries, deploymentKey, potentialUnits, "units", "$deployedIn");
+                });
             });
         });
 

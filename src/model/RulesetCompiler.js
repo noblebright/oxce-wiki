@@ -39,6 +39,8 @@ const supportedLookups = [
     { section: "ufoTrajectories", key: "id" },
     { section: "terrains", key: "name" },
     { section: "mapScripts", key: "type" },
+    { section: "startingConditions", key: "type" },
+    { section: "enviroEffects", key: "type" }
 ];
 
 function generateSection(ruleset, rules, metadata) {
@@ -320,7 +322,7 @@ export default function compile(base, mod) {
 
         //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
-
+    
     mapUnitSources(backLinkSet, ruleset);
 
     backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
