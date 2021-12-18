@@ -14,9 +14,7 @@ export function getPossibleRaces(id, ruleset) {
     }
     if(prevStage) {
         prevStage.forEach(stage => {
-            if(raceByDeployment[stage]) {
-                raceByDeployment[stage].forEach(x => possibleRaces.add(x)); //check previous stage if this is the second part of a two-parter.
-            }
+            getPossibleRaces(stage, ruleset).forEach(x => possibleRaces.add(x));
         });
     }
     

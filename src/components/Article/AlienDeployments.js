@@ -110,13 +110,84 @@ function Reinforcements(props) {
     );
 }
 
+const factions = ["STR_FRIENDLY", "STR_NEUTRAL", "STR_HOSTILE"];
+const armorFacing = ["STR_RANDOMIZE", "STR_FRONT_ARMOR", "STR_LEFT_ARMOR", "STR_RIGHT_ARMOR", "STR_REAR_ARMOR", "STR_UNDER_ARMOR"];
+const bodyPart = ["STR_RANDOMIZE", "STR_HEAD", "STR_TORSO", "STR_RIGHT_ARM", "STR_LEFT_ARM", "STR_RIGHT_LEG", "STR_LEFT_LEG"];
+
+function EnviroCondition({ faction, value, lc, linkFn }) {
+    if(!value) return null;
+    // bodyPart and side + 1, since STR_RANDOMIZE value is -1
+    return(
+        <React.Fragment>
+            <SectionHeader label={`${lc(faction)} Condition`}/>
+            <tbody>
+                <SimpleValue label="% Chance This Combat" value={value.globalChance}/>
+                <SimpleValue label="% Chance Per Turn" value={value.chancePerTurn}/>
+                <SimpleValue label="First Turn" value={value.firstTurn}/>
+                <SimpleValue label="Last Turn" value={value.lastTurn}/>
+                <SimpleValue label="Message" value={value.message}>{ lc }</SimpleValue>
+                <SimpleValue label="Effect" value={value.weaponOrAmmo}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Facing" value={armorFacing[value.side + 1]}>{ lc }</SimpleValue>
+                <SimpleValue label="Body Part" value={bodyPart[value.bodyPart + 1]}>{ lc }</SimpleValue>
+            </tbody>
+        </React.Fragment>
+    );
+}
+
+function EnviroEffect({ value, lc, linkFn }) {
+    if(!value) return null;
+    return (
+        <React.Fragment>
+            {factions.map(x => (<EnviroCondition key={x} faction={x} value={value.environmentalConditions?.[x]} lc={lc} linkFn={linkFn} />))}
+            <ListValue label="Armor Transforms" values={Object.entries(value.armorTransformations ?? {})}>
+                { ([key, value]) => (
+                    <React.Fragment>
+                        {linkFn(key)} ➔ {linkFn(value)}
+                    </React.Fragment>
+                )}
+            </ListValue>
+        </React.Fragment>
+    )
+}
+
+function StartingConditions({ value, lc, linkFn, inventoryFn }) {
+    if(!value) return null;
+    return (
+        <React.Fragment>
+            <tbody>
+                <SimpleValue label="Destroy Required Items?" value={value.destroyRequiredItems}/>
+            </tbody>
+            <ListValue label="Required Items" values={value.requiredItems}>{ linkFn } </ListValue>
+            <SectionHeader label="Default Armors"/>
+            { Object.entries(value.defaultArmor).map(([soldier, armorTypes]) => (
+                <ListValue key={soldier} label={lc(soldier)} values={Object.entries(armorTypes)}>{inventoryFn}</ListValue>
+            ))}
+            <SectionHeader label="Allowed/Forbidden"/>
+            <ListValue label="Allowed Armors" values={value.allowedArmors}>{ linkFn }</ListValue>
+            <ListValue label="Forbidden Armors" values={value.forbiddenArmors}>{ linkFn }</ListValue>
+            <ListValue label="Allowed Soldier Types" values={value.allowedSoldierTypes}>{ linkFn }</ListValue>
+            <ListValue label="Forbidden Soldier Types" values={value.forbiddenSoldierTypes}>{ linkFn }</ListValue>
+            <ListValue label="Allowed Soldier Types" values={value.allowedSoldierTypes}>{ linkFn }</ListValue>
+            <ListValue label="Forbidden Soldier Types" values={value.forbiddenSoldierTypes}>{ linkFn }</ListValue>
+            <ListValue label="Allowed Vehicle Unit Types" values={value.allowedVehicles }>{ linkFn}</ListValue>
+            <ListValue label="Forbidden Vehicle Unit Types" values={value.forbiddenVehicles}>{ linkFn }</ListValue>
+            <ListValue label="Allowed Items" values={value.allowedItems}>{ linkFn }</ListValue>
+            <ListValue label="Forbidden Items" values={value.forbiddenItems}>{ linkFn }</ListValue>
+            <ListValue label="Allowed Item Categories" values={value.allowedItemCategories}>{ linkFn }</ListValue>
+            <ListValue label="Forbidden Item Categories" values={value.forbiddenItemCategories}>{ linkFn }</ListValue>
+            <ListValue label="Allowed Craft" values={value.allowedCraft}>{ linkFn }</ListValue>
+            <ListValue label="Forbidden Craft" values={value.forbiddenCraft}>{ linkFn }</ListValue>
+        </React.Fragment>
+    )
+}
+
 export default function AlienDeployments({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
     const inventoryFn = useInventory(linkFn);
     const entry = ruleset.entries[id];
     const alienDeployments = entry.alienDeployments;
-
+    
     const availableRaces = useMemo(() => {
         const possibleRaces = getPossibleRaces(id, ruleset);
         return [...possibleRaces];
@@ -129,6 +200,9 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
     }, [availableRaces]);
 
     if(!alienDeployments) return null;
+
+    const startingConditions = ruleset.lookups.startingConditions[alienDeployments.startingCondition];
+    const enviroEffects = ruleset.lookups.enviroEffects[alienDeployments.enviroEffects];
 
     return (
         <React.Fragment>
@@ -160,6 +234,8 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 <ListValue label="Map Items (Random)" values={alienDeployments.terrainRandomItems}>{ linkFn }</ListValue>
                 <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>
                 <ListValue label="Spawned Units" values={alienDeployments.$spawnedUnits}>{ linkFn }</ListValue>
+                <EnviroEffect value={enviroEffects} linkFn={linkFn} lc={lc}/>
+                <StartingConditions value={startingConditions} lc={lc} linkFn={linkFn} inventoryFn={inventoryFn}/>
                 {alienDeployments.data.map((x, idx) => <Deployment key={idx} ruleset={ruleset} linkFn={linkFn} deployment={x} race={race} idx={idx}/>)}
             </Table>
             <Reinforcements ruleset={ruleset} linkFn={linkFn} race={race} reinforcements={alienDeployments.reinforcements}/>

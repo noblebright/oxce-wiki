@@ -132,7 +132,7 @@ export default function Item({ruleset, lang, id, version}) {
             <SectionHeader label="Item"/>
             { BattleComponent && <BattleComponent ruleset={ruleset} items={items} lc={lc} linkFn={linkFn} spriteFn={spriteFn}/> }
             <MiscItem ruleset={ruleset} items={items} lc={lc} linkFn={linkFn}/>
-            <ListValue label="Categories" values={items.categories}>{ lc }</ListValue>
+            <ListValue label="Categories" values={items.categories}>{ linkFn }</ListValue>
             <ListValue label="Supported Inventory Sections" values={items.supportedInventorySections}>{ lc }</ListValue>
             <ListValue label="Associated Commendations" values={items.$givesCommendation}>{ linkFn }</ListValue>
             <ListValue label="Prison Type" values={ruleset.prisons[items.prisonType || (items.liveAlien ? 0 : null)]}>{ linkFn }</ListValue>

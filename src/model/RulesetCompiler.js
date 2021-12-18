@@ -209,6 +209,24 @@ function getKillCriteriaItems(ruleset, killCriteria) {
     return [...items];
 }
 
+function generateCategory(ruleset, key) {
+    const entry = ruleset.entries[key];
+    const items = entry.items;
+    
+    if(!items?.categories) return;
+    items.categories.forEach(category => {
+        if(!ruleset.entries[category]) {
+            ruleset.entries[category] = {};
+        }
+        if(!ruleset.entries[category].category) {
+            ruleset.entries[category].category = {
+                entries: []
+            };
+        }
+        ruleset.entries[category].category.entries.push(key);
+    });
+}
+
 const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange"];
 
 export default function compile(base, mod) {
@@ -264,6 +282,8 @@ export default function compile(base, mod) {
         const soldierTransformation = entry.soldierTransformation || {};
         const commendations = entry.commendations || {};
 
+        generateCategory(ruleset, key);
+        
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
         backLink(ruleset.entries, key, research.unlocks, "research", "unlockedBy");
         backLink(ruleset.entries, key, research.getOneFree, "research", "freeFrom");
