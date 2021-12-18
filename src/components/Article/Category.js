@@ -10,7 +10,7 @@ export default function Category({ruleset, lang, id, version}) {
     const category = ruleset.entries[id].category;
     const entries = category?.entries;
     const sortedEntries = useMemo(() => {
-        if(!category) return null;
+        if(!entries) return null;
         return [...entries].sort((a, b) => lc(a) > lc(b) ? 1 : -1);
     }, [lc, entries]);
 

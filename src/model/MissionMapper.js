@@ -1,4 +1,5 @@
-const LOOKUP_TABLES = ["deploymentsById", "deploymentsByRegion", "missionsByRegion", "regionsByDeployment", "raceByRegion", "raceByMission", "missionsByDeployment", "deploymentsByMission", "raceByDeployment"];
+const LOOKUP_TABLES = ["deploymentsById", "deploymentsByRegion", "missionsByRegion", "regionsByDeployment", "raceByRegion", "raceByMission", 
+                        "missionsByDeployment", "deploymentsByMission", "raceByDeployment", "triggersByDeployment"];
 
 function initializeLookups(lookups) {
     LOOKUP_TABLES.forEach(x => {
@@ -69,6 +70,21 @@ function getWeightValues(weightObj) {
     return values;
 }
 
+const triggerKeys = ["researchTriggers", "itemTriggers", "facilityTriggers", "xcomBaseInRegionTriggers", "xcomBaseInCountryTriggers"];
+
+function processTriggers(lookups, script, deployment, mission) {
+    const triggers = {};
+    triggerKeys.forEach(key => {
+        if(script[key]) {
+            triggers[key] = script[key];
+        }
+    });
+    if(Object.keys(triggers).length) {
+        lookups.triggersByDeployment[deployment] = lookups.triggersByDeployment[deployment] || {};
+        lookups.triggersByDeployment[deployment][mission] = triggers;
+    }
+}
+
 function processMissionScripts(lookups, rules) {
     //eslint-disable-next-line no-unused-expressions
     rules.missionScripts?.forEach?.(script => {
@@ -88,6 +104,7 @@ function processMissionScripts(lookups, rules) {
                     races.forEach(race => {
                         lookups.raceByDeployment[deployment].add(race);
                     });
+                    processTriggers(lookups, script, deployment, mission);
                 });
                 races.forEach(race => {
                     lookups.raceByMission[race] = lookups.raceByMission[race] || new Set();
@@ -104,6 +121,7 @@ function processMissionScripts(lookups, rules) {
                     deployments.forEach(deployment => {
                         lookups.missionsByDeployment[deployment] = lookups.missionsByDeployment[deployment] || new Set();
                         lookups.missionsByDeployment[deployment].add(mission);
+                        processTriggers(lookups, script, deployment, mission);
                     });
                 });
                 races.forEach(race => lookups.raceByRegion[region].add(race));
