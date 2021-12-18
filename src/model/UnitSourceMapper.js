@@ -28,8 +28,25 @@ function getSpawnedUnits(items, units, rs) {
     });
 }
 
+function getRelatedUfos(key, ruleset) {
+    const entry = ruleset.entries[key];
+    const deployment = entry.alienDeployments;
+    const ufo = entry.ufos;
+    const related = [];
+
+    if(deployment.customUfo) {
+        related.push(deployment.customUfo);
+    } else if(ufo) {
+        related.push(key);
+        const customRaceUfos = new Set();
+        Object.values(ufo.raceBonus ?? {}).forEach(({ craftCustomDeploy }) => { if(craftCustomDeploy) customRaceUfos.add(craftCustomDeploy) });
+        related.push(...customRaceUfos);
+    }
+    return related;
+}
+
 export function mapUnitSources(backLinkSet, ruleset) {
-    Object.keys(ruleset.lookups.raceByDeployment).forEach(deploymentKey => {
+    Object.keys(ruleset.entries).filter(x => x.alienDeployment).forEach(deploymentKey => {
         const deploymentObj = ruleset.entries[deploymentKey]?.alienDeployments;
 
         if(!deploymentObj) {
@@ -57,15 +74,17 @@ export function mapUnitSources(backLinkSet, ruleset) {
         });
 
         // Find units created via unit spawners
-        const relatedUfoKey = deploymentObj.customUfo || deploymentKey;
-        const relatedUfo = ruleset.entries[relatedUfoKey]?.ufos;
-        if(relatedUfo) {
-            const spawnedUnits = new Set();
+        const relatedUfoKeys = getRelatedUfos(deploymentKey, ruleset);
+        const relatedUfos = relatedUfoKeys.map(k => ruleset.entries[k]?.ufos);
+        ruleset.entries[deploymentKey].alienDeployments.$relatedUfos = relatedUfoKeys;
+
+        const spawnedUnits = new Set();
+        //not all relatedUfos are real, some are variants that are deployment only.
+        relatedUfos.filter(x => x).forEach(relatedUfo => {
             getSpawnedUnits(relatedUfo.ufoItems, spawnedUnits, ruleset);
             getSpawnedUnits(relatedUfo.ufoRandomItems, spawnedUnits, ruleset);
-            ruleset.entries[deploymentKey].alienDeployments.$relatedUfo = relatedUfoKey;
-            ruleset.entries[deploymentKey].alienDeployments.$spawnedUnits = [...spawnedUnits];
-            backLinkSet(ruleset.entries, deploymentKey, [...spawnedUnits], "units", "$deployedIn");
-        }
+        });
+        ruleset.entries[deploymentKey].alienDeployments.$spawnedUnits = [...spawnedUnits];
+        backLinkSet(ruleset.entries, deploymentKey, [...spawnedUnits], "units", "$deployedIn");
     });
 }

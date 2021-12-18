@@ -3,7 +3,7 @@ import { getSupportedLanguages } from "./utils";
 import { joinRaces, compileMissions } from "./MissionMapper";
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
-import { mapUnitSources } from "./UnitSourceMapper";
+import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -30,14 +30,15 @@ const supportedSections = [
     { section: "events", key: "name"},
     { section: "armors", key: "type" },
     { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
-    { section: "terrains", key: "name", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) },
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
 ];
 
 const supportedLookups = [
     { section: "soldierBonuses", key: "name" },
     { section: "eventScripts", key: "type" },
-    { section: "ufoTrajectories", key: "id" }
+    { section: "ufoTrajectories", key: "id" },
+    { section: "terrains", key: "name" },
+    { section: "mapScripts", key: "type" },
 ];
 
 function generateSection(ruleset, rules, metadata) {
@@ -278,9 +279,10 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, soldierTransformation.requires, "research", "$allowsTransform");
         backLink(ruleset.entries, key, soldierTransformation.allowedSoldierTypes, "soldiers", "$allowedTransform");
         backLink(ruleset.entries, key, getKillCriteriaItems(ruleset.entries, commendations.killCriteria), "items", "$givesCommendation");
+        backLink(ruleset.entries, key, [alienDeployments.unlockedResearch], "research", "$fromMission");
         backLinkSet(ruleset.entries, key, [alienDeployments.nextStage], "alienDeployments", "$prevStage");
-        backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "foundFrom");
-
+        backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "$foundFrom");
+        
         if(ufos.raceBonus) {
             Object.entries(ufos.raceBonus).forEach(([race, data]) => {
                 if(data.craftCustomDeploy) {
@@ -310,7 +312,7 @@ export default function compile(base, mod) {
             ruleset.prisons[entry.facilities.prisonType].push(key);
         }
         
-        if(entry.alienDeployments && !ruleset.lookups.raceByDeployment[key]?.size) {
+        if(entry.alienDeployments && !getPossibleRaces(key, ruleset).size) {
             entry.hide = true;
         }
 
