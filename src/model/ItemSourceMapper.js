@@ -63,6 +63,8 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     backLinkSet(ruleset.entries, key, unitItems && [...unitItems], "items", "$foundFrom");
 
     const [deploymentItems, deploymentRandomItems] = getDeploymentItems(alienDeployments, ruleset);
+    alienDeployments.$terrainItems = deploymentItems;
+    alienDeployments.$terrainRandomItems = deploymentRandomItems;
     backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, deploymentRandomItems && [...deploymentRandomItems], "items", "$foundFrom");
 }
@@ -100,7 +102,7 @@ function getDeploymentItems(alienDeployments, ruleset) {
     alienDeployments.data?.forEach(deployment => {
         deployment.itemSets.forEach(itemSet => {
             itemSet.forEach(item => {
-                items.add(item);
+                randomItems.add(item);
             });
         });
     });

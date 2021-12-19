@@ -59,8 +59,8 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                     </SimpleValue>
                 </tbody>
                 <ListValue label="Variant Of" values={alienDeployments.$variant}>{ linkFn }</ListValue>
-                <ListValue label="Map Items" values={alienDeployments.terrainItems}>{ linkFn }</ListValue>
-                <ListValue label="Map Items (Random)" values={alienDeployments.terrainRandomItems}>{ linkFn }</ListValue>
+                <ListValue label="Map Items" values={alienDeployments.$terrainItems}>{ linkFn }</ListValue>
+                <ListValue label="Map Items (Random)" values={alienDeployments.$terrainRandomItems}>{ linkFn }</ListValue>
                 <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>
                 <ListValue label="Spawned Units" values={alienDeployments.$spawnedUnits}>{ linkFn }</ListValue>
                 <EnviroEffect value={enviroEffects} linkFn={linkFn} lc={lc}/>

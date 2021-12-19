@@ -24,6 +24,10 @@ export function getPossibleRaces(id, ruleset) {
 function getSpawnedUnits(items, units, rs) {
     if(!items) return;
     items.forEach(k => {
+        if(!rs.entries[k]) { 
+            console.error(`Item Key ${k} not found when looking for spawned units`);
+            return;
+        }
         const item = rs.entries[k].items;
         if(item.spawnUnit) {
             units.add(item.spawnUnit);
@@ -86,12 +90,16 @@ export function mapUnitSources(backLinkSet, ruleset) {
             });
         });
 
+        const spawnedUnits = new Set();
+        // look at terrain items for spawners
+        getSpawnedUnits(deploymentObj.$terrainItems, spawnedUnits, ruleset);
+        getSpawnedUnits(deploymentObj.$terrainRandomItems, spawnedUnits, ruleset);
+
         // Find units created via unit spawners
         const relatedUfoKeys = getRelatedUfos(deploymentKey, ruleset);
         const relatedUfos = relatedUfoKeys.map(k => ruleset.entries[k]?.ufos);
         ruleset.entries[deploymentKey].alienDeployments.$relatedUfos = relatedUfoKeys;
 
-        const spawnedUnits = new Set();
         //not all relatedUfos are real, some are variants that are deployment only.
         relatedUfos.filter(x => x).forEach(relatedUfo => {
             getSpawnedUnits(relatedUfo.ufoItems, spawnedUnits, ruleset);
