@@ -10,7 +10,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import NavItem from "react-bootstrap/NavItem";
 import NavLink from "react-bootstrap/NavLink";
 import Dropdown from "react-bootstrap/Dropdown";
-
+import { Helmet } from "react-helmet-async";
 import useRuleset from "../../hooks/useRuleset";
 import useMobileLayout from "../../hooks/useMobileLayout";
 import SideBar from "./Sidebar";
@@ -101,7 +101,11 @@ export default function Ruleset({ lang, setLanguage, versions }) {
     const { config, supportedLanguages, ruleset } = result;
 
     return (
-        <>
+        <>   
+            <Helmet>
+                <title>{`${config.title} Mod Data Viewer`}</title>
+                <meta name="description" content={`${config.title} Mod Data Viewer`} />
+            </Helmet>
             <Row noGutters>
                 <Col>
                     <Navbar bg="dark" variant="dark">

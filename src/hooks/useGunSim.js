@@ -1,7 +1,10 @@
 import { useReducer, useCallback } from "react";
 
 const alphaSort = lc => (a, b) => lc(a) > lc(b) ? 1 : -1;
-const getArmorList = (state, soldier, lc) => state.entries[soldier].soldiers.usableArmors.sort(alphaSort(lc));
+const getArmorList = (state, soldier, lc) => {
+    const usableArmors = state.entries[soldier].soldiers?.usableArmors;
+    return usableArmors ? usableArmors.sort(alphaSort(lc)) : [state.entries[soldier].units.armor]; // no usable armors = vanilla HWP
+}
 const getAmmoList = (state, weapon, lc) => {
     const ammoList = state.entries[weapon].items.allCompatibleAmmo;
     return ammoList ? ammoList.sort(alphaSort(lc)) : [];
@@ -33,7 +36,9 @@ const init = lc => state => {
     const sortFn = alphaSort(lc);
     state.stat = "statCaps";
     state.direction = "front";
-    state.soldierList = Object.keys(state.entries).filter(x => state.entries[x].soldiers).sort(sortFn);
+    state.soldierList = Object.keys(state.entries).filter(x => state.entries[x].soldiers) // normal soldiers
+                        .concat(state.lookups.hwps) // vanilla-style hwps
+                        .sort(sortFn);
     state.soldier = state.soldierList[0];
     state.armorList = getArmorList(state, state.soldier, lc);
     state.armor = state.armorList[0];
@@ -53,9 +58,10 @@ const init = lc => state => {
     return state;
 }
 
-export default function useGunSim(entries, lc) {
+export default function useGunSim(ruleset, lc) {
     const actions = {};
-    const [state, dispatch] = useReducer(gunReducer, { entries }, init(lc));
+    const { entries, lookups } = ruleset;
+    const [state, dispatch] = useReducer(gunReducer, { entries, lookups }, init(lc));
 
     actions.setStat = useCallback(payload => dispatch({ type: "setStat", payload }), [dispatch]);
     actions.setSoldier = useCallback((payload, meta) => dispatch({ type: "setSoldier", payload, meta }), [dispatch]);

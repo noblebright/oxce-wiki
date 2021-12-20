@@ -268,6 +268,9 @@ export default function compile(base, mod) {
 
     mapEventScripts(ruleset.lookups);
 
+    const allSoldiers = Object.keys(ruleset.entries).filter(k => ruleset.entries[k].soldiers);
+
+    ruleset.lookups.hwps = [];
     //add backreferences
     for(let key in ruleset.entries) {
         const entry = ruleset.entries[key];
@@ -296,7 +299,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
         backLink(ruleset.entries, key, [manufacture.spawnedPersonType], "soldiers", "manufacture");
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
-        backLink(ruleset.entries, key, armors.units, "soldiers", "usableArmors");
+        backLink(ruleset.entries, key, armors.units || (entry.armors?.storeItem && allSoldiers), "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
         backLink(ruleset.entries, key, soldierTransformation.requires, "research", "$allowsTransform");
         backLink(ruleset.entries, key, soldierTransformation.allowedSoldierTypes, "soldiers", "$allowedTransform");
@@ -318,6 +321,11 @@ export default function compile(base, mod) {
                     backLinkSet(ruleset.entries, key, [data.missionCustomDeploy], "alienDeployments", "$variant");
                 }
             });
+        }
+
+        // Vanilla HWP style
+        if(entry.items?.fixedWeapon && units.type) {
+            ruleset.lookups.hwps.push(key);
         }
 
         if(entry.items) {

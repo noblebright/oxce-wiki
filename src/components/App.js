@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 
 import useMetadata from "../hooks/useMetadata";
 import Ruleset from "./Layout/Ruleset";
@@ -21,20 +22,22 @@ function App() {
   const { versions, config, setLanguage, clearDB } = useMetadata();
 
   return (
-    <Router>
-        {versions && config && <Switch>
-          <Route path="/" exact>
-            <Redirect to={`/${getDefaultVersion(versions)}`}/>
-          </Route>
-          <Route path="/admin/_clearDB" exact>
-            <ClearDB clear={clearDB}/>
-          </Route>
-          <Route path="/:version">
-            <Ruleset lang={config.currentLanguage} setLanguage={setLanguage} versions={versions}/>
-          </Route>
-        </Switch>
-        }
-    </Router>
+    <HelmetProvider>
+      <Router>
+          {versions && config && <Switch>
+            <Route path="/" exact>
+              <Redirect to={`/${getDefaultVersion(versions)}`}/>
+            </Route>
+            <Route path="/admin/_clearDB" exact>
+              <ClearDB clear={clearDB}/>
+            </Route>
+            <Route path="/:version">
+              <Ruleset lang={config.currentLanguage} setLanguage={setLanguage} versions={versions}/>
+            </Route>
+          </Switch>
+          }
+      </Router>
+    </HelmetProvider>
   )
 }
 export default App;

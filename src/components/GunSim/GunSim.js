@@ -27,7 +27,7 @@ function ProgressDialog({current, max, abort}) {
 export default function GunSim({ ruleset, lang }) {
     const lc = useLocale(lang, ruleset);
     const optionFn = useCallback(x => <option key={x} value={x}>{lc(x)}</option>, [lc]);
-    const [state, { setStat, setSoldier, setArmor, setWeapon, setAmmo, setTarget, setDirection, setKneeling, setOneHanded }] = useGunSim(ruleset.entries, lc);
+    const [state, { setStat, setSoldier, setArmor, setWeapon, setAmmo, setTarget, setDirection, setKneeling, setOneHanded }] = useGunSim(ruleset, lc);
     const { soldierList, armorList, weaponList, ammoList, targetList, stat, soldier, armor, weapon, ammo, target, direction, kneeling, oneHanded } = state;
     const soldierOptions = useMemo(() => soldierList.map(optionFn), [soldierList, optionFn]);
     const armorOptions = useMemo(() => armorList.map(optionFn), [armorList, optionFn]);
