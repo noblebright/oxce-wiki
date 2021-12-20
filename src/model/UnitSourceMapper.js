@@ -96,9 +96,10 @@ export function mapUnitSources(backLinkSet, ruleset) {
         getSpawnedUnits(deploymentObj.$terrainRandomItems, spawnedUnits, ruleset);
 
         // Find units created via unit spawners
-        const relatedUfoKeys = getRelatedUfos(deploymentKey, ruleset);
-        const relatedUfos = relatedUfoKeys.map(k => ruleset.entries[k]?.ufos);
+        const relatedUfoKeys = getRelatedUfos(deploymentKey, ruleset).concat(deploymentObj.$customCrafts || []);
+        const relatedUfos = relatedUfoKeys.map(k => ruleset.entries[k]?.ufos || ruleset.entries[k]?.crafts);
         ruleset.entries[deploymentKey].alienDeployments.$relatedUfos = relatedUfoKeys;
+
 
         //not all relatedUfos are real, some are variants that are deployment only.
         relatedUfos.filter(x => x).forEach(relatedUfo => {

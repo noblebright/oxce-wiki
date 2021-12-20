@@ -31,20 +31,23 @@ function getMapBlockItems(block, items, randomItems) {
     }
 }
 
+function handleBattlescapeTerrain(battlescapeTerrainData) {
+    return battlescapeTerrainData?.mapBlocks?.reduce((acc, block) => {
+        const [items, randomItems] = acc;
+        getMapBlockItems(block, items, randomItems);
+        return acc;
+    }, [new Set(), new Set()]);
+}
+
 export function mapItemSources(backLinkSet, ruleset, key) {
     const entry = ruleset.entries[key];
     const alienDeployments = entry.alienDeployments || {};
     const ufos = entry.ufos || {};
     const units = entry.units || {};
+    const crafts = entry.crafts || {};
 
     //Items from UFOs
-    const ufoResults = ufos.battlescapeTerrainData?.mapBlocks?.reduce((acc, block) => {
-        const [items, randomItems] = acc;
-        getMapBlockItems(block, items, randomItems);
-        return acc;
-    }, [new Set(), new Set()]);
-
-    const [ufoItems, ufoRandomItems] = ufoResults || [];
+    const [ufoItems, ufoRandomItems] = handleBattlescapeTerrain(ufos.battlescapeTerrainData) || [];
 
     if(ufoItems && ufoItems.size) {
         entry.ufos.ufoItems = [...ufoItems];
@@ -55,6 +58,18 @@ export function mapItemSources(backLinkSet, ruleset, key) {
         backLinkSet(ruleset.entries, key, [...ufoRandomItems], "items", "$foundFrom");
     }
 
+    //Items from Crafts
+    const [craftItems, craftRandomItems] = handleBattlescapeTerrain(crafts.battlescapeTerrainData) || [];
+
+    if(craftItems && craftItems.size) {
+        entry.crafts.ufoItems = [...craftItems];
+        backLinkSet(ruleset.entries, key, [...craftItems], "items", "$foundFrom");
+    }
+    if(craftRandomItems && craftRandomItems.size) {
+        entry.crafts.ufoRandomItems = [...craftRandomItems];
+        backLinkSet(ruleset.entries, key, [...craftRandomItems], "items", "$foundFrom");
+    }
+    
     //Items from Units
     const unitItems = units.builtInWeaponSets?.reduce((acc, weaponSet) => {
         weaponSet.forEach(item => acc.add(item));
@@ -62,11 +77,14 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     }, new Set());
     backLinkSet(ruleset.entries, key, unitItems && [...unitItems], "items", "$foundFrom");
 
-    const [deploymentItems, deploymentRandomItems] = getDeploymentItems(alienDeployments, ruleset);
-    alienDeployments.$terrainItems = deploymentItems;
-    alienDeployments.$terrainRandomItems = deploymentRandomItems;
+    //Items from deployment terrains and subterrains
+    const [deploymentItems, deploymentRandomItems, customCrafts] = getDeploymentItems(alienDeployments, ruleset);
+    alienDeployments.$terrainItems = [...deploymentItems];
+    alienDeployments.$terrainRandomItems = [...deploymentRandomItems];
+    alienDeployments.$customCrafts = [...customCrafts];
     backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, deploymentRandomItems && [...deploymentRandomItems], "items", "$foundFrom");
+    backLinkSet(ruleset.entries, key, customCrafts && [...customCrafts], "items", "$deployedIn");
 }
 
 function handleCommand(command, terrainKey, ruleset, items, randomItems) {
@@ -96,6 +114,7 @@ function handleCommand(command, terrainKey, ruleset, items, randomItems) {
 function getDeploymentItems(alienDeployments, ruleset) {
     const items = new Set();
     const randomItems = new Set();
+    const customCrafts = new Set();
 
     //Items from alienDeployments
     //eslint-disable-next-line no-unused-expressions
@@ -113,9 +132,12 @@ function getDeploymentItems(alienDeployments, ruleset) {
         const scriptKey = alienDeployments.script ?? baseTerrain.script ?? "DEFAULT";
         const script = ruleset.lookups.mapScripts[scriptKey];
         
-        script.commands.filter(x => x.type === "addBlock").forEach(command => { //for each command
+        script.commands.filter(x => x.type === "addBlock" || (x.type === "addCraft" && x.craftName)).forEach(command => { //for each command
             const commandTerrains = new Set(command.randomTerrain || [command.terrain || terrainKey]);
-            
+            if(command.type === "addCraft") {
+                customCrafts.add(command.craftName);
+                return;
+            }
             commandTerrains.forEach(commandTerrainKey => { //for each possible terrain for this command
                 if(command.verticalLevels !== undefined) { //towers and shit
                     command.verticalLevels.forEach(levelCommand => { //for each level
@@ -130,5 +152,5 @@ function getDeploymentItems(alienDeployments, ruleset) {
             })
         });
     });
-    return [items, randomItems];
+    return [items, randomItems, customCrafts];
 }

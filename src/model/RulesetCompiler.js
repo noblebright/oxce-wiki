@@ -299,6 +299,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
         backLink(ruleset.entries, key, [manufacture.spawnedPersonType], "soldiers", "manufacture");
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
+        // if there's no units field, and it has a storeItem (ie, can be stored in base), it's usable by all soldiers
         backLink(ruleset.entries, key, armors.units || (entry.armors?.storeItem && allSoldiers), "soldiers", "usableArmors");
         backLink(ruleset.entries, key, [armors.storeItem], "items", "wearableArmors");
         backLink(ruleset.entries, key, soldierTransformation.requires, "research", "$allowsTransform");
