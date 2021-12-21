@@ -35,9 +35,10 @@ function getShotTypes(weapon, ammo) {
     
 }
 
-function getShotsPerTurn(ruleset, {soldier, weapon, armor, stat}) {
+function getShotsPerTurn(ruleset, state, key = "weapon") {
+    const {soldier, armor, stat} = state;
     const entries = ruleset.entries;
-    const weaponEntry = entries[weapon].items;
+    const weaponEntry = entries[state[key]].items;
     const soldierEntry = entries[soldier].soldiers;
     const armorEntry = entries[armor].armors;
     const soldierStats = soldierEntry[stat];
@@ -92,27 +93,52 @@ function simulateAccWrapper(...args) {
 }
 export default function getChartData(ruleset, state, updateProgress, updateMaxProgress) {
     const avgDamage = getAverageDamage(ruleset, iterations, state);
+    let compareAvgDamage;
+    if(state.compare) {
+        compareAvgDamage = getAverageDamage(ruleset, iterations, state, "compareWeapon", "compareAmmo");
+    } 
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo].items;
+    const compareWeaponEntry = ruleset.entries[state.compareWeapon].items;
+    const compareAmmoEntry = ruleset.entries[state.compareAmmo].items;
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
+    const compareShotTypes = getShotTypes(compareWeaponEntry, compareAmmoEntry);
+    const mergedShotTypes = [... new Set(shotTypes.concat(state.compare ? compareShotTypes : []))]; // union
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
+    const compareShotsPerTurnByType = getShotsPerTurn(ruleset, state, "compareWeapon");
     const data = [];
 
-    updateMaxProgress(50);
+    updateMaxProgress(state.compare ? 100 : 50);
 
     for(let i = 1; i <= 50; i++) {
         data.push(i);
     }
 
     return getCancellableDataset(data, async distance => {
-        updateProgress(distance);
+        updateProgress(state.compare ? (2 * distance) : distance);
         const dataPoint = { distance };
-        for(let shotType of shotTypes) {
+        for(let shotType of mergedShotTypes) {
+            if(!shotTypes.includes(shotType)) {
+                continue;
+            }
             const accuracyInputs = computeAccuracyInputs(ruleset, shotType, iterations, distance, state);
             const hitRatio = await simulateAccWrapper(...accuracyInputs);
             const shotsPerTurn = shotsPerTurnByType[shotType];
             dataPoint[`${shotType}HitRatio`] = hitRatio;
             dataPoint[`${shotType}Damage`] = avgDamage * hitRatio / 100 * shotsPerTurn;
+        }
+        if(state.compare) {
+            updateProgress(2 * distance + 1);
+            for(let shotType of mergedShotTypes) {
+                if(!compareShotTypes.includes(shotType)) {
+                    continue;
+                }
+                const accuracyInputs = computeAccuracyInputs(ruleset, shotType, iterations, distance, state, "compareWeapon", "compareAmmo");
+                const hitRatio = await simulateAccWrapper(...accuracyInputs);
+                const shotsPerTurn = compareShotsPerTurnByType[shotType];
+                dataPoint[`Compare${shotType}HitRatio`] = hitRatio;
+                dataPoint[`Compare${shotType}Damage`] = compareAvgDamage * hitRatio / 100 * shotsPerTurn;
+            }
         }
         return dataPoint;
     });

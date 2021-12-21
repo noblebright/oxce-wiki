@@ -125,14 +125,14 @@ function getExplosive(weapon, ammo) {
     }
 }
 
-export function getAverageDamage(ruleset, iterations, {stat, soldier, armor, weapon, ammo, target, direction}) {
+export function getAverageDamage(ruleset, iterations, state, weaponKey = "weapon", ammoKey = "ammo") {
     const entries = ruleset.entries;
-
-    const weaponEntry = entries[weapon].items;  
+    const {stat, soldier, armor, target, direction} = state;
+    const weaponEntry = entries[state[weaponKey]].items;  
     const targetEntry = entries[target].units;  //needed for armor info
     const soldierEntry = entries[soldier].soldiers;  //needed for stats
     const armorEntry = entries[armor].armors; //needed for stats
-    const ammoEntry = entries[ammo]?.items;
+    const ammoEntry = entries[state[ammoKey]]?.items;
 
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);

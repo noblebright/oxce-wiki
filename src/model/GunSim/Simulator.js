@@ -71,14 +71,15 @@ function getShots(weapon, ammo, mode) {
 
 // function simulateAcc(source, target, w, acc, simulations, shots, type) {
 
-export function computeAccuracyInputs(ruleset, shotType, iterations, distance, {stat, soldier, armor, weapon, ammo, target, kneeling, oneHanded}) {
+export function computeAccuracyInputs(ruleset, shotType, iterations, distance, state, weaponKey = "weapon", ammoKey = "ammo") {
+    const {stat, soldier, armor, target, kneeling, oneHanded} = state;
     const entries = ruleset.entries;
     const source = { x: 160, y: 160, z: 160 };
-    const weaponEntry = entries[weapon].items;
+    const weaponEntry = entries[state[weaponKey]].items;
     const targetEntry = entries[target].units;
     const soldierEntry = entries[soldier].soldiers;
     const armorEntry = entries[armor].armors;
-    const ammoEntry = entries[ammo]?.items;
+    const ammoEntry = entries[state[ammoKey]]?.items;
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
     const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, shotType, kneeling, oneHanded);

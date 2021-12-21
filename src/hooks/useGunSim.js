@@ -17,11 +17,17 @@ const reductions = {
         return { ...state, soldier: action.payload, armorList, armor: armorList[0] };
     },
     setArmor: (state, action) => ({ ...state, armor: action.payload }),
+    setCompare: (state, action) => ({ ...state, compare: action.payload }),
     setWeapon: (state, action) => {
         const ammoList = getAmmoList(state, action.payload, action.meta);
         return { ...state, weapon: action.payload, ammoList, ammo: ammoList[0] };
     },
+    setCompareWeapon: (state, action) => {
+        const compareAmmoList = getAmmoList(state, action.payload, action.meta);
+        return { ...state, compareWeapon: action.payload, compareAmmoList, compareAmmo: compareAmmoList[0] };
+    },
     setAmmo: (state, action) => ({ ...state, ammo: action.payload }),
+    setCompareAmmo: (state, action) => ({ ...state, compareAmmo: action.payload }),
     setTarget: (state, action) => ({ ...state, target: action.payload }),
     setKneeling: (state, action) => ({ ...state, kneeling: action.payload }),
     setOneHanded: (state, action) => ({ ...state, oneHanded: action.payload }),
@@ -48,9 +54,13 @@ const init = lc => state => {
                 !item.arcingShot &&  // FIXME: Handle more corner cases for arcing (confAimed et. al.)
                 item.recover !== false
     }).sort(sortFn);
+    state.compare = false;
     state.weapon = state.weaponList[0];
     state.ammoList = getAmmoList(state, state.weapon, lc);
+    state.compareWeapon = state.weaponList.filter(x => x !== state.weapon)[0];
+    state.compareAmmoList = getAmmoList(state, state.compareWeapon, lc);
     state.ammo = state.ammoList[0];
+    state.compareAmmo = state.compareAmmoList[0];
     state.targetList = Object.keys(state.entries).filter(x => state.entries[x].units).sort(sortFn);
     state.target = state.targetList[0];
     state.kneeling = false;
@@ -72,5 +82,8 @@ export default function useGunSim(ruleset, lc) {
     actions.setKneeling = useCallback(payload => dispatch({ type: "setKneeling", payload }), [dispatch]);
     actions.setOneHanded = useCallback(payload => dispatch({ type: "setOneHanded", payload }), [dispatch]);
     actions.setDirection = useCallback(payload => dispatch({ type: "setDirection", payload }), [dispatch]);
+    actions.setCompare = useCallback(payload => dispatch({ type: "setCompare", payload }), [dispatch]);
+    actions.setCompareWeapon = useCallback((payload, meta) => dispatch({ type: "setCompareWeapon", payload, meta }), [dispatch]);
+    actions.setCompareAmmo = useCallback(payload => dispatch({ type: "setCompareAmmo", payload }), [dispatch]);
     return [state, actions];
 }

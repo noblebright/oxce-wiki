@@ -27,17 +27,19 @@ function ProgressDialog({current, max, abort}) {
 export default function GunSim({ ruleset, lang }) {
     const lc = useLocale(lang, ruleset);
     const optionFn = useCallback(x => <option key={x} value={x}>{lc(x)}</option>, [lc]);
-    const [state, { setStat, setSoldier, setArmor, setWeapon, setAmmo, setTarget, setDirection, setKneeling, setOneHanded }] = useGunSim(ruleset, lc);
-    const { soldierList, armorList, weaponList, ammoList, targetList, stat, soldier, armor, weapon, ammo, target, direction, kneeling, oneHanded } = state;
+    const [state, { setStat, setSoldier, setArmor, setWeapon, setAmmo, setCompareWeapon, setCompareAmmo, setCompare, setTarget, setDirection, setKneeling, setOneHanded }] = useGunSim(ruleset, lc);
+    const { soldierList, armorList, weaponList, ammoList, compareAmmoList, targetList, stat, soldier, armor, compare, weapon, compareWeapon, ammo, compareAmmo, target, direction, kneeling, oneHanded } = state;
     const soldierOptions = useMemo(() => soldierList.map(optionFn), [soldierList, optionFn]);
     const armorOptions = useMemo(() => armorList.map(optionFn), [armorList, optionFn]);
     const weaponOptions = useMemo(() => weaponList.map(optionFn), [weaponList, optionFn]);
+    const compareWeaponOptions = useMemo(() => weaponList.filter(x => x !== weapon).map(optionFn), [weaponList, weapon, optionFn]);
     const ammoOptions = useMemo(() => ammoList.map(optionFn), [ammoList, optionFn]);
+    const compareAmmoOptions = useMemo(() => compareAmmoList.map(optionFn), [compareAmmoList, optionFn]);
     const targetOptions = useMemo(() => targetList.map(optionFn), [targetList, optionFn]);
 
     const [{running, current, max}, {abort, complete, setSteps, increment}] = useRunningState();
     const [chartData, setChartData] = useState();
-    const [mode, setMode] = useState("HitRatio");
+    const [mode, setMode] = useState("Damage");
     const abortFn = useRef();
     const startRun = useCallback(() => {
         setChartData(null);
@@ -74,14 +76,14 @@ export default function GunSim({ ruleset, lang }) {
                         { armorOptions }
                     </Form.Control>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="soldierArmor">
+                <Form.Group className="mb-3" controlId="conditional">
                     <div>
                         <Form.Check type="checkbox" id="kneeling" checked={kneeling} onChange={e => setKneeling(e.target.checked)} label="Kneeling" inline/>
                         <Form.Check type="checkbox" id="oneHanded" checked={oneHanded} onChange={e => setOneHanded(e.target.checked)} label="One-handed" inline/>
                     </div>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="weapon">
-                    <Form.Label>Weapon</Form.Label>
+                    <Form.Label>Weapon 1</Form.Label>
                     <Form.Control as="select" size="sm" custom value={weapon} onChange={e => setWeapon(e.target.value, lc)}>
                         { weaponOptions }
                     </Form.Control>
@@ -92,6 +94,22 @@ export default function GunSim({ ruleset, lang }) {
                         { ammoOptions }
                     </Form.Control>
                 </Form.Group>
+                <Form.Group className="mb-3" controlId="compare">
+                    <Form.Check type="checkbox" id="compare" checked={compare} onChange={e => setCompare(e.target.checked)} label="Compare"/>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="compareWeapon">
+                    <Form.Label>Weapon 2</Form.Label>
+                    <Form.Control as="select" size="sm" custom value={compareWeapon} onChange={e => setCompareWeapon(e.target.value, lc)} disabled={!compare}>
+                        { compareWeaponOptions }
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="compareAmmo">
+                    <Form.Label>Ammo 2</Form.Label>
+                    <Form.Control as="select" size="sm" custom value={compareAmmo} onChange={e => setCompareAmmo(e.target.value)} disabled={!compare}>
+                        { compareAmmoOptions }
+                    </Form.Control>
+                </Form.Group>
+
                 <Form.Group className="mb-3" controlId="target" value={target} onChange={e => setTarget(e.target.value)}>
                     <Form.Label>Target</Form.Label>
                     <Form.Control as="select" size="sm" custom>
