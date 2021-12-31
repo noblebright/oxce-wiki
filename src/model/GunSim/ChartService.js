@@ -103,7 +103,7 @@ export default function getChartData(ruleset, state, updateProgress, updateMaxPr
     const compareAmmoEntry = ruleset.entries[state.compareAmmo].items;
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
     const compareShotTypes = getShotTypes(compareWeaponEntry, compareAmmoEntry);
-    const mergedShotTypes = [... new Set(shotTypes.concat(state.compare ? compareShotTypes : []))]; // union
+    const mergedShotTypes = [...new Set(shotTypes.concat(state.compare ? compareShotTypes : []))]; // union
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
     const compareShotsPerTurnByType = getShotsPerTurn(ruleset, state, "compareWeapon");
     const data = [];

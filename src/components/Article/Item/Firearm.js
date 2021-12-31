@@ -62,6 +62,8 @@ const GunAmmo = ({lc, linkFn, item, integral, melee}) => (
     </tr>
 );
 
+const hasAmmo = item => item.compatibleAmmo || item.ammo;
+
 function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     let result;
 
@@ -93,7 +95,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
         </tr>
     ] : [];
 
-    if(!item.compatibleAmmo && !item.ammo) {
+    if(!hasAmmo(item)) {
         //this item does not use external ammo (no ammo or integral ammo like throwing knives)
         result = getAction(actionTypes);
         return result;
@@ -112,6 +114,29 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     });
     result = result.concat(melee);
     return result;
+}
+
+function ReloadTimes({ items, lc }) {
+    let customReloading = false;
+    if(items.ammo) {
+        customReloading = Object.values(items.ammo).reduce((acc, ammo) => { 
+            return acc || !!ammo.tuLoad || !!ammo.tuUnload
+        }, false);
+    }
+    if(!hasAmmo(items)) {
+        return null;
+    }
+    const ammoReloadValues = [];
+    actionTypes.filter(x => items[`conf${x}`]?.ammoSlot !== undefined).forEach(type => {
+        const slot = items[`conf${type}`]?.ammoSlot;
+        ammoReloadValues.push(<SimpleValue key={`${type}reload`} label={`Reload: ${lc(getActionKey(items, type))}`} value={items.ammo[slot].tuLoad}/>);
+        ammoReloadValues.push(<SimpleValue key={`${type}unload`}  label={`Unload: ${lc(getActionKey(items, type))}`} value={items.ammo[slot].tuUnload}/>)
+    });
+    return (
+        <React.Fragment>
+            { customReloading ? ammoReloadValues : null }
+        </React.Fragment>
+    );
 }
 
 export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
@@ -158,6 +183,7 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
                 {hasCost(items, "Auto") && <SimpleValue label="Auto Range" value={items.autoRange || 7}/>}
                 <SimpleValue label="CQC Accuracy" value={items.accuracyCloseQuarters}>{ Percent }</SimpleValue>
                 <SimpleValue label="Min Range" value={items.minRange}/>
+                <ReloadTimes items={items} lc={lc} />
                 <SimpleValue label="Dropoff" value={items.dropoff}/>
                 <BooleanValue label="Arcing?" value={items.arcingShot}/>
                 <SimpleValue label="Effective Range" value={items.powerRangeThreshold}/>
