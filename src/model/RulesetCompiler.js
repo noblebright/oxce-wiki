@@ -1,6 +1,6 @@
 import deepmerge from "deepmerge";
 import { getSupportedLanguages } from "./utils";
-import { joinRaces, compileMissions } from "./MissionMapper";
+import { initializeLookups, processGlobe, compileMissions } from "./MissionMapper";
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
@@ -40,7 +40,10 @@ const supportedLookups = [
     { section: "terrains", key: "name" },
     { section: "mapScripts", key: "type" },
     { section: "startingConditions", key: "type" },
-    { section: "enviroEffects", key: "type" }
+    { section: "enviroEffects", key: "type" },
+    { section: "missionScripts", key: "type" },
+    { section: "alienMissions", key: "type" },
+    { section: "regions", key: "type" },
 ];
 
 function generateSection(ruleset, rules, metadata) {
@@ -233,26 +236,33 @@ export default function compile(base, mod) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };
     
     //add languages
+    console.time("l10n");
     const supportedLanguages = getSupportedLanguages(base, mod);
     supportedLanguages.forEach(key => {
         ruleset.languages[key] = mod[key] ? deepmerge(base[key], mod[key]) : base[key];
     });
+    console.timeEnd("l10n");
 
     //add globalVars
     globalKeys.forEach(key => ruleset.globalVars[key] = base[key] || mod[key]);
     
     //add entries
+    console.time("entries");
     supportedSections.forEach(metadata => {
         generateSection(ruleset.entries, base, metadata);
         generateSection(ruleset.entries, mod, metadata);
     });
+    console.timeEnd("entries");
 
     //add lookups
+    console.time("lookups");
     supportedLookups.forEach(metadata => {
         generateLookup(ruleset.lookups, base, metadata);
         generateLookup(ruleset.lookups, mod, metadata);
     });
+    console.timeEnd("lookups")
 
+    console.time("assets");
     //add sprites
     generateAssets(ruleset.sprites, base.extraSprites);
     generateAssets(ruleset.sprites, mod.extraSprites);
@@ -260,11 +270,15 @@ export default function compile(base, mod) {
     //add sounds
     generateAssets(ruleset.sounds, base.extraSounds);
     generateAssets(ruleset.sounds, mod.extraSounds);
+    console.timeEnd("assets");
 
     //handle globe/region/mission/missionscript/deployment relationships
-    compileMissions(ruleset.lookups, base);
-    compileMissions(ruleset.lookups, mod);
-    joinRaces(ruleset.lookups);
+    console.time("missionMapping");
+    initializeLookups(ruleset.lookups);
+    processGlobe(ruleset.lookups, base);
+    processGlobe(ruleset.lookups, mod);
+    compileMissions(ruleset);
+    console.timeEnd("missionMapping");
 
     mapEventScripts(ruleset.lookups);
 
@@ -272,6 +286,7 @@ export default function compile(base, mod) {
 
     ruleset.lookups.hwps = [];
     //add backreferences
+    console.time("backrefs");
     for(let key in ruleset.entries) {
         const entry = ruleset.entries[key];
         const research = entry.research || {};
@@ -312,13 +327,9 @@ export default function compile(base, mod) {
         if(ufos.raceBonus) {
             Object.entries(ufos.raceBonus).forEach(([race, data]) => {
                 if(data.craftCustomDeploy) {
-                    ruleset.lookups.raceByDeployment[data.craftCustomDeploy] = ruleset.lookups.raceByDeployment[data.craftCustomDeploy] || new Set();
-                    ruleset.lookups.raceByDeployment[data.craftCustomDeploy].add(race);
                     backLinkSet(ruleset.entries, key, [data.craftCustomDeploy], "alienDeployments", "$variant");
                 }
                 if(data.missionCustomDeploy) {
-                    ruleset.lookups.raceByDeployment[data.missionCustomDeploy] = ruleset.lookups.raceByDeployment[data.missionCustomDeploy] || new Set();
-                    ruleset.lookups.raceByDeployment[data.missionCustomDeploy].add(race);
                     backLinkSet(ruleset.entries, key, [data.missionCustomDeploy], "alienDeployments", "$variant");
                 }
             });
@@ -351,8 +362,11 @@ export default function compile(base, mod) {
 
         //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
-    
+    console.timeEnd("backrefs");
+
+    console.time("unitSources");
     mapUnitSources(backLinkSet, ruleset);
+    console.timeEnd("unitSources");
 
     backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
         if(obj[key] instanceof Set) {

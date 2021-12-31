@@ -1,59 +1,9 @@
-const LOOKUP_TABLES = ["deploymentsById", "deploymentsByRegion", "missionsByRegion", "regionsByDeployment", "raceByRegion", "raceByMission", 
-                        "missionsByDeployment", "deploymentsByMission", "raceByDeployment", "triggersByDeployment"];
+const LOOKUP_TABLES = ["deploymentsByGlobeTexture", "deploymentData"];
 
-function initializeLookups(lookups) {
+export function initializeLookups(lookups) {
     LOOKUP_TABLES.forEach(x => {
         if(!lookups[x]) {
             lookups[x] = {};
-        }
-    });
-}
-
-function processDeployments(lookups, rules) {
-    //eslint-disable-next-line no-unused-expressions
-    rules.globe?.textures?.forEach?.(texture => {
-        if(!texture.deployments) return; //normal terrain, e.g. desert
-        lookups.deploymentsById[texture.id] = Object.keys(texture.deployments);
-    });
-}
-
-function deleteRelation(lookups, src, dest, srcKey) {
-    const destKeys = lookups[src][srcKey] || new Set();
-    destKeys.forEach(x => {
-        lookups[dest][x].delete(srcKey);
-    });
-    delete lookups[src][srcKey];
-}
-
-function processRegions(lookups, rules) {
-    //eslint-disable-next-line no-unused-expressions
-    rules.regions?.forEach?.(region => {
-        const {type, missionZones} = region;
-        const missionIds = new Set();
-        if(region.delete) {
-            deleteRelation(lookups, "deploymentsByRegion", "regionsByDeployment", region.delete);
-            delete lookups.missionsByRegion[region.delete];
-            delete lookups.raceByRegion[region.delete];
-            return;
-        }
-        //eslint-disable-next-line no-unused-expressions
-        missionZones?.forEach(missionZoneList => {
-            missionZoneList.forEach(missionZone => {
-                if(missionZone.length <= 4) return; //A normal, non-deployment zone
-                missionIds.add(missionZone[4]); //Add associated mission to list
-            });
-        });
-        if(missionIds.size) {
-            const deploymentsByRegion = [...missionIds].reduce((acc, x) => {
-                if(!lookups.deploymentsById[x]) console.warn(`no deployment corresponding to region: ${x}`);
-                lookups.deploymentsById[x].forEach(deployment => acc.add(deployment));
-                return acc;
-            }, new Set());
-            lookups.deploymentsByRegion[type] = deploymentsByRegion;
-            deploymentsByRegion.forEach(deployment => {
-                lookups.regionsByDeployment[deployment] = lookups.regionsByDeployment[deployment] || new Set();
-                lookups.regionsByDeployment[deployment].add(type);
-            });
         }
     });
 }
@@ -70,130 +20,159 @@ function getWeightValues(weightObj) {
     return values;
 }
 
-const triggerKeys = ["researchTriggers", "itemTriggers", "facilityTriggers", "xcomBaseInRegionTriggers", "xcomBaseInCountryTriggers"];
-
-function processTriggers(lookups, script, deployment, mission) {
-    const triggers = {};
-    triggerKeys.forEach(key => {
-        if(script[key]) {
-            triggers[key] = script[key];
-        }
+export function processGlobe(lookups, rules) {
+    //eslint-disable-next-line no-unused-expressions
+    rules.globe?.textures?.forEach?.(texture => {
+        if(!texture.deployments) return; //normal terrain, e.g. desert
+        lookups.deploymentsByGlobeTexture[texture.id] = Object.keys(texture.deployments);
     });
-    if(Object.keys(triggers).length) {
-        lookups.triggersByDeployment[deployment] = lookups.triggersByDeployment[deployment] || {};
-        lookups.triggersByDeployment[deployment][mission] = triggers;
-    }
 }
 
-function processMissionScripts(lookups, rules) {
-    //eslint-disable-next-line no-unused-expressions
-    rules.missionScripts?.forEach?.(script => {
-        const regions = getWeightValues(script.regionWeights);
-        const missions = getWeightValues(script.missionWeights);
-        const races = getWeightValues(script.raceWeights);
-
-        if(!regions.size) { // ufo-based missions
-            missions.forEach(mission => {
-                const deployments = lookups.deploymentsByMission[mission] || new Set();
-                deployments.forEach(deployment => {
-                    lookups.missionsByDeployment[deployment] = lookups.missionsByDeployment[deployment] || new Set();
-                    lookups.missionsByDeployment[deployment].add(mission);
-                    lookups.deploymentsByMission[mission] = lookups.deploymentsByMission[mission] || new Set();
-                    lookups.deploymentsByMission[mission].add(deployment);
-                    lookups.raceByDeployment[deployment] = lookups.raceByDeployment[deployment] || new Set();
-                    races.forEach(race => {
-                        lookups.raceByDeployment[deployment].add(race);
-                    });
-                    processTriggers(lookups, script, deployment, mission);
-                });
-                races.forEach(race => {
-                    lookups.raceByMission[race] = lookups.raceByMission[race] || new Set();
-                    lookups.raceByMission[race].add(mission);
-                });
-            });
-        } else { // site-based missions
-            regions.forEach(region => {
-                lookups.missionsByRegion[region] = lookups.missionsByRegion[region] || new Set();
-                lookups.raceByRegion[region] = lookups.raceByRegion[region] || new Set();
-                missions.forEach(mission => {
-                    lookups.missionsByRegion[region].add(mission);
-                    const deployments = lookups.deploymentsByRegion[region] || new Set();
-                    deployments.forEach(deployment => {
-                        lookups.missionsByDeployment[deployment] = lookups.missionsByDeployment[deployment] || new Set();
-                        lookups.missionsByDeployment[deployment].add(mission);
-                        processTriggers(lookups, script, deployment, mission);
-                    });
-                });
-                races.forEach(race => lookups.raceByRegion[region].add(race));
-            });
-        }
-    })
-}
-
-function getDeployments(mission, lookups) {
-    switch(mission.objective) {
-        case 1: // infiltration
-            return new Set(mission.siteType ? [mission.siteType] : []);
-        case 2: // alien base
-            return new Set(mission.siteType ? [mission.siteType] : ["STR_ALIEN_BASE_ASSAULT"]);
-        case 3: // site-based missions
-            let objectiveTrajectory = mission.waves.filter(x => x.objective)[0].trajectory;
-            if(lookups.ufoTrajectories[objectiveTrajectory].groundTimer === 0) {
-                // instant spawn missions can't be shot down, so no UFO recovery deployments apply.
-                return new Set();
-            } else {
-                return new Set(mission.waves.map(x => x.ufo));
-            }
-        default: 
-            return new Set(mission.waves.map(x => x.ufo));
-    }
-}
-
-function processMissions(lookups, rules) {
-    //eslint-disable-next-line no-unused-expressions
-    rules.alienMissions?.forEach?.(mission => {
-        if(mission.delete) {
-            delete lookups.raceByMission[mission.delete];
-            deleteRelation(lookups, "deploymentsByMission", "missionsByDeployment", mission.delete);
+function getGlobeTextures(regions, ruleset, scriptObj, spawnZone = -1) {
+    const textureDeploys = new Set();
+    regions.forEach(region => {
+        const regionObj = ruleset.lookups.regions[region];
+        if(!regionObj) {
+            console.error(`Region ${region} not found, referenced by ${scriptObj.type}`);
             return;
         }
         
-        const races = getWeightValues(mission.raceWeights);
-        //ignore ufos for site-type missions.
-        const ufos = getDeployments(mission, lookups);
-        lookups.raceByMission[mission.type] = races;
-        
-        lookups.deploymentsByMission[mission.type] = lookups.deploymentsByMission[mission.type] || new Set();
-        ufos.forEach(deployment => { //ufos are also deployments for purposes of missions
-            lookups.deploymentsByMission[mission.type].add(deployment);
-            lookups.missionsByDeployment[deployment] = lookups.missionsByDeployment[deployment] || new Set();
-            lookups.missionsByDeployment[deployment].add(mission.type);
-        });
-    })
-}
-
-export function joinRaces(lookups) {
-    Object.entries(lookups.regionsByDeployment).forEach(([key, regions]) => {
-        lookups.raceByDeployment[key] = lookups.raceByDeployment[key] || new Set();
-        regions.forEach(region => {
-            const races = lookups.raceByRegion[region] ?? new Set();
-            races.forEach(x => lookups.raceByDeployment[key].add(x));
-        });
+        //TODO: Verify this behavior when spawnZone is invalid.
+        if(spawnZone !== -1 && regionObj.missionZones.length > spawnZone) { 
+            const zone = regionObj.missionZones[spawnZone];
+            zone.forEach(([lat, lng, width, height, id]) => {
+                if(id) textureDeploys.add(id);
+            });
+        } else {
+            regionObj.missionZones.forEach(zone => {
+                zone.forEach(([lat, lng, width, height, id]) => {
+                    if(id) textureDeploys.add(id);
+                });
+            })
+        }
     });
-    Object.entries(lookups.missionsByDeployment).forEach(([key, missions]) => {
-        lookups.raceByDeployment[key] = lookups.raceByDeployment[key] || new Set();
-        missions.forEach(mission => {
-            const races = lookups.raceByMission[mission] ?? new Set();
-            races.forEach(x => lookups.raceByDeployment[key].add(x));
-        });
-    })
+    return [...textureDeploys].map(id => ruleset.lookups.deploymentsByGlobeTexture[id]).flat();
 }
 
-export function compileMissions(lookups, rules) {
-    initializeLookups(lookups);
+function addDeploymentEntry(ruleset, deployment, script, race, craft) {
+    if(!ruleset.lookups.deploymentData[deployment]) {
+        ruleset.lookups.deploymentData[deployment] = { races: new Set(), crafts: new Set(), scripts: new Set() };
+    }
+    const data = ruleset.lookups.deploymentData[deployment];
+    data.races.add(race);
+    if(craft) data.crafts.add(craft);
+    data.scripts.add(script);
+}
 
-    processDeployments(lookups, rules);
-    processRegions(lookups, rules);
-    processMissionScripts(lookups, rules);
-    processMissions(lookups, rules);
+function addDeploymentData(ruleset, script, race, craft, deployment, objective) {
+    if(craft) {  // craft-based overrides
+        if(!ruleset.entries[craft]) {
+            console.log(craft);
+        }
+        const craftObj = ruleset.entries[craft].ufos;
+        if(craftObj.raceBonus?.[race]) {
+            if(!objective) {
+                deployment = craftObj.raceBonus[race].craftCustomDeploy || deployment;
+            } else {
+                deployment = craftObj.raceBonus[race].missionCustomDeploy || deployment;
+            }
+        } else {
+            if(!objective) {
+                deployment = craftObj.craftCustomDeploy || deployment;
+            } else {
+                deployment = craftObj.missionCustomDeploy || deployment;
+            }
+        }
+    }
+    const deploymentObj = ruleset.entries[deployment].alienDeployments;
+    if(!deploymentObj) {
+        console.error(`Unable to find alienDeployment for key: ${deployment}`);
+    } else {
+        addDeploymentEntry(ruleset, deployment, script, race, craft);
+        if(deploymentObj.nextStage) {
+            addDeploymentEntry(ruleset, deploymentObj.nextStage, script, race, craft);
+        }
+    }
+}
+
+function handleTextureDeployment(ruleset, scriptObj, missionObj, regions, race, craft = null) {
+    if(missionObj.siteType) { // Option B
+        addDeploymentData(ruleset, scriptObj.type, race, craft, missionObj.siteType);
+    } else { // Option A
+        const globeDeployments = getGlobeTextures(regions, ruleset, scriptObj, missionObj.spawnZone);
+        globeDeployments.forEach(deploymentId => {
+            addDeploymentData(ruleset, scriptObj.type, race, craft, deploymentId, true);
+        });   
+    }
+}
+
+// Comments below from: https://openxcom.org/forum/index.php/topic,6557.msg104669.html#msg104669
+function compileSite(ruleset, scriptObj, missionObj, regions, race) {
+    if(missionObj.waves.length === 1 && !ruleset.entries[missionObj.waves[0].ufo]?.ufos) { // insta-pop site missions
+        const ufo = missionObj.waves[0].ufo;
+
+        if(ruleset.entries[ufo]?.alienDeployments) {
+            // Type 1:
+            // - no UFOs involved
+            // - only 1 wave
+            // - the wave specifies the alien deployment directly (e.g. `ufo: STR_ARTIFACT_SITE_P1 # spawn this site directly`)
+            // - example (1): STR_ALIEN_ARTIFACT (TFTD)
+            // Support for non-point areas: yes, without any additional ruleset changes required
+            addDeploymentData(ruleset, scriptObj.type, race, null, ufo);
+        } else {
+            // Type 2:
+            // - no UFOs involved
+            // - only 1 wave
+            // - the wave does NOT specify the alien deployment directly (e.g. `ufo: dummy #don't spawn a ufo, we only want the site`)
+            //   -> option A: alien deployment is chosen randomly = from the area's texture definition
+            //   -> option B: alien deployment is specified by the mission's `siteType` (overrides option A if both are defined)
+            // - example (2A): STR_ALIEN_SHIP_ATTACK (TFTD)
+            // - example (2B): none in vanilla, only mods
+            handleTextureDeployment(ruleset, scriptObj, missionObj, regions, race);
+        }
+    } else { 
+        // Alien Terror-style mission, with ufos deploying into a site mission, can be shot down on the way in.
+        // Type 3:
+        // - with UFOs waves
+        // - only 1 wave with `objective: true`
+        // - the wave does NOT specify the alien deployment (because it already specifies the UFO type)
+        //   -> option A: alien deployment is chosen randomly = from the area's texture definition
+        //   -> option B: alien deployment is specified by the mission's `siteType` (overrides option A if both are defined)
+        // - example (3A): STR_ALIEN_SURFACE_ATTACK (TFTD)
+        // - example (3B): none in vanilla, only mods
+        // Support for non-point areas: yes, but it is recommended to use one more wave attribute: `objectiveOnTheLandingSite: true`
+        //   -> false: UFO always lands in the top-left corner of the area; site spawns randomly inside the area
+        //   ->  true: UFO lands randomly inside the area; site spawns exactly on the UFO landing site
+        missionObj.waves.forEach(wave => {
+            addDeploymentData(ruleset, scriptObj.type, race, wave.ufo, wave.ufo);
+            if(wave.objective) {
+                handleTextureDeployment(ruleset, scriptObj, missionObj, regions, race, wave.ufo);
+            }
+        });
+        
+    }
+}
+
+export function compileMissions(ruleset) {
+    Object.values(ruleset.lookups.missionScripts).forEach(script => {
+        const missions = getWeightValues(script.missionWeights);
+        const regions = getWeightValues(script.regionWeights);
+        const scriptRaces = getWeightValues(script.raceWeights);
+        missions.forEach(mission => {
+            const missionObj = ruleset.lookups.alienMissions[mission];
+            const missionRaces = getWeightValues(missionObj.raceWeights);
+            const possibleRaces = scriptRaces.size ? scriptRaces: missionRaces;
+            possibleRaces.forEach(race => {
+                switch(missionObj.objective) {
+                    case 3: // site-based missions
+                        compileSite(ruleset, script, missionObj, regions, race);
+                        break;
+                    default:
+                        missionObj.waves.forEach(wave => {
+                            addDeploymentData(ruleset, script.type, race, wave.ufo, wave.ufo);
+                        });
+                }
+            })
+        })
+    });
 }

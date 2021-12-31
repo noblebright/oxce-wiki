@@ -5,12 +5,12 @@ export function getPossibleRaces(id, ruleset) {
     const alienRace = alienDeployments?.race;
     const randomRace = alienDeployments?.randomRace;
     const prevStage = alienDeployments?.$prevStage;
-    const raceByDeployment = ruleset.lookups.raceByDeployment;
+    const deploymentData = ruleset.lookups.deploymentData;
 
     if(randomRace) randomRace.forEach(x => possibleRaces.add(x));
     if(alienRace) possibleRaces.add(alienRace);
-    if(raceByDeployment[id]) {
-        raceByDeployment[id].forEach(x => possibleRaces.add(x));
+    if(deploymentData[id]) {
+        deploymentData[id].races.forEach(x => possibleRaces.add(x));
     }
     if(prevStage) {
         prevStage.forEach(stage => {
@@ -64,7 +64,7 @@ export function mapUnitSources(backLinkSet, ruleset) {
         const races = getPossibleRaces(deploymentKey, ruleset);
 
         if(!races.size) {
-            console.error(`No races found for deployment ${deploymentKey}!`)
+            console.warn(`No races found for deployment ${deploymentKey}!`)
         }
         races.forEach(raceId => { //for each possible race
             const raceObj = ruleset.entries[raceId].alienRaces;

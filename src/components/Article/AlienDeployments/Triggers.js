@@ -15,8 +15,33 @@ function Trigger({ mission, value, lc, inventoryFn }) {
         </React.Fragment>
     )
 }
+const triggerKeys = ["researchTriggers", "itemTriggers", "facilityTriggers", "xcomBaseInRegionTriggers", "xcomBaseInCountryTriggers"];
+
+function getTriggers(lookups, id) {
+    const triggers = {};
+    const deploymentData = lookups.deploymentData[id];
+    let hasTriggers = false;
+    deploymentData.scripts.forEach(script => {
+        const scriptObj = lookups.missionScripts[script];
+        const triggerConditions = {};
+        let hasConditions = false;
+        triggerKeys.forEach(key => {
+            if(scriptObj[key]) {
+                triggerConditions[key] = scriptObj[key];
+                hasConditions = true;
+            }
+        });
+        if(hasConditions) {
+            hasTriggers = true;
+            triggers[script] = triggerConditions;
+        }
+    });
+    console.log(triggers);
+    return hasTriggers ? triggers : null;
+}
+
 export default function Triggers({ ruleset, lc, inventoryFn, id }) {
-    const triggers = ruleset.lookups.triggersByDeployment[id];
+    const triggers = getTriggers(ruleset.lookups, id);
     if(!triggers) return null;
 
     return (
