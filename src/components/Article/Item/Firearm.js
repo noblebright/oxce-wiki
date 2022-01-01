@@ -154,7 +154,7 @@ export default function Firearm({ ruleset, items, lc, linkFn, spriteFn }) {
                             { x.damageAlter ? <Table>
                                 <ListHeader label="Damage Properties"/>
                                 <tbody>
-                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius}/>
+                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} ruleset={ruleset}/>
                                 </tbody>
                             </Table> : null}
                         </Damage>

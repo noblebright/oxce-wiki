@@ -24,7 +24,7 @@ export default function PsiAmp({ ruleset, items, lc, linkFn, spriteFn }) {
                             { x.damageAlter ? <Table>
                                 <ListHeader label="Damage Properties"/>
                                 <tbody>
-                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc}/>
+                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} ruleset={ruleset}/>
                                 </tbody>
                             </Table> : null}
                         </Damage>
