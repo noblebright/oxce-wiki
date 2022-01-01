@@ -20,11 +20,12 @@ function getAccuracy(ruleset, stats, weapon, shotType, kneeling, oneHanded, dist
 		break;
 	default:
 	}
-
+    
+    const dropoff = weapon.dropoff ?? 2;
 	if(distance < lowerLimit) {
-		modifier = (weapon.dropoff * (lowerLimit - distance));
+		modifier = (dropoff * (lowerLimit - distance));
 	} else if (upperLimit < distance) {
-		modifier = (weapon.dropoff * (distance - upperLimit));
+		modifier = (dropoff * (distance - upperLimit));
 	}
 
 	acc = Math.max(0, acc - modifier);
@@ -41,7 +42,8 @@ function getAccuracy(ruleset, stats, weapon, shotType, kneeling, oneHanded, dist
         acc *= (weapon.oneHandedPenalty ?? ruleset.globalVars.oneHandedPenaltyGlobal ?? 80) / 100;
     }
 
-    return Math.floor(acc);
+    //cap accuracy at 110 since that's the max the game supports
+    return Math.min(Math.floor(acc), 110);
 }
 
 function getShots(weapon, ammo, mode) {
@@ -78,10 +80,9 @@ function getShots(weapon, ammo, mode) {
     return shots * Math.max(1, Math.ceil(pellets * shotgunSpread / 100));
 }
 
-export function computeAccuracyInputs(ruleset, shotType, iterations, distance, state, weaponKey = "weapon", ammoKey = "ammo") {
+export function computeAccuracyInputs(ruleset, shotType, distance, state, weaponKey = "weapon", ammoKey = "ammo") {
     const {stat, soldier, armor, target, kneeling, oneHanded} = state;
     const entries = ruleset.entries;
-    const source = { x: 160, y: 160, z: 160 };
     const weaponEntry = entries[state[weaponKey]].items;
     const targetEntry = entries[target].units;
     const soldierEntry = entries[soldier].soldiers;

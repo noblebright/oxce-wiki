@@ -81,7 +81,7 @@ export function getChartData(ruleset, state) {
     let compareAvgDamage;
     if(state.compare) {
         compareAvgDamage = getAverageDamage(ruleset, iterations, state, "compareWeapon", "compareAmmo");
-    } 
+    }
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo].items;
     const compareWeaponEntry = ruleset.entries[state.compareWeapon].items;
