@@ -111,6 +111,10 @@ function handleCommand(command, terrainKey, ruleset, items, randomItems) {
     });
 }
 
+const isRelevantCommand = x => x.type === "addBlock" || 
+                                (x.type === "addCraft" && x.craftName) ||
+                                (x.type === "addUFO" && x.UFOName);
+                                
 function getDeploymentItems(alienDeployments, ruleset) {
     const items = new Set();
     const randomItems = new Set();
@@ -132,10 +136,14 @@ function getDeploymentItems(alienDeployments, ruleset) {
         const scriptKey = alienDeployments.script ?? baseTerrain.script ?? "DEFAULT";
         const script = ruleset.lookups.mapScripts[scriptKey];
         
-        script.commands.filter(x => x.type === "addBlock" || (x.type === "addCraft" && x.craftName)).forEach(command => { //for each command
+        script.commands.filter(isRelevantCommand).forEach(command => { //for each command
             const commandTerrains = new Set(command.randomTerrain || [command.terrain || terrainKey]);
             if(command.type === "addCraft") {
                 customCrafts.add(command.craftName);
+                return;
+            }
+            if(command.type === "addUFO") {
+                customCrafts.add(command.UFOName);
                 return;
             }
             commandTerrains.forEach(commandTerrainKey => { //for each possible terrain for this command
