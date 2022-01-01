@@ -18,7 +18,7 @@ export default function Melee({ ruleset, items, lc, linkFn, spriteFn }) {
                             { x.damageAlter ? <Table>
                                 <ListHeader label="Damage Properties"/>
                                 <tbody>
-                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} melee/>
+                                    <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} ruleset={ruleset} melee/>
                                 </tbody>
                             </Table> : null}
                         </Damage>

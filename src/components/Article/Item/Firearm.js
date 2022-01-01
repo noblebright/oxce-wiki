@@ -41,7 +41,7 @@ const GunAction = ({suffix, item, lc, bonusFn}) => (
     />
 );
 
-const GunAmmo = ({lc, linkFn, item, integral, melee}) => (
+const GunAmmo = ({lc, linkFn, item, integral, melee, ruleset}) => (
     <tr>
         <td>{integral ? "-" : linkFn(item.type)}</td>
         <td>
@@ -51,6 +51,7 @@ const GunAmmo = ({lc, linkFn, item, integral, melee}) => (
                     <tbody>
                         <DamageAlter type={melee ? item.meleeType : item.damageType} 
                                      alter={melee ? item.meleeAlter : item.damageAlter} 
+                                     ruleset={ruleset}
                                      blastRadius={item.blastRadius} lc={lc}/>
                     </tbody>
                 </Table>
@@ -74,7 +75,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
             <td colSpan="2">
                 <Table>
                     <tbody>
-                        {ammoList.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items}/>)}
+                        {ammoList.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items} ruleset={ruleset}/>)}
                     </tbody>      
                 </Table>
             </td>

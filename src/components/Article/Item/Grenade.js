@@ -31,7 +31,7 @@ export default function Grenade({ ruleset, items, lc, linkFn, spriteFn }) {
                         { x.damageAlter ? <Table>
                             <ListHeader label="Damage Properties"/>
                             <tbody>
-                                <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} blastRadius={x.blastRadius} />
+                                <DamageAlter type={x.damageType} alter={x.damageAlter} lc={lc} ruleset={ruleset} blastRadius={x.blastRadius} />
                             </tbody>
                         </Table> : null}
                     </Damage>}

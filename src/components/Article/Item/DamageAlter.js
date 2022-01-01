@@ -3,19 +3,21 @@ import React from "react";
 import { SimpleValue, BooleanValue, Percent } from "../../ComponentUtils";
 import {defaultDTProps as defaultProps} from "../../../model/Constants";
 
-const randomType = [
-    "Default",
-    "0 - 200%",
-    "50 - 150%",
-    "Flat Damage",
-    "Fire Damage",
-    "No Damage",
-    "(0 - 100%) + (0 - 100%)",
-    "50 - 200%",
-    "0 - 200%",
-    "50 - 150%"
-];
-
+function getRandomType(ruleset, randomType) {
+    switch(randomType) {
+        case 0: return "Default";
+        case 1: return "0 - 200%";
+        case 2: return "50 - 150%";
+        case 3: return "Flat Damage";
+        case 4: return `${ruleset.globalVars.fireDamageRange?.[0] ?? 5} - ${ruleset.globalVars.fireDamageRange?.[1] ?? 10}`;
+        case 5: return "No Damage";
+        case 6: return "(0 - 100%) + (0 - 100%)";
+        case 7: return "50 - 200%";
+        case 8: return `${100 - (ruleset.globalVars.damageRange ?? 100)} - ${100 + (ruleset.globalVars.damageRange ?? 100)}`;
+        case 9: return `${100 - (ruleset.globalVars.explosiveDamageRange ?? 50)} - ${100 + (ruleset.globalVars.explosiveDamageRange ?? 50)}`;
+        default: return "Unknown randomType!";
+    }
+}
 function AlterEntry({ alter, suffix, label }) {
     return (
         <React.Fragment>
@@ -25,7 +27,7 @@ function AlterEntry({ alter, suffix, label }) {
     );
 }
 
-export default function DamageAlter({type, alter, lc, blastRadius, melee}) {
+export default function DamageAlter({type, alter, lc, blastRadius, melee, ruleset}) {
     let blastRadiusObj = {};
     if(!alter?.FixRadius) {
         if(blastRadius !== undefined){
@@ -40,7 +42,7 @@ export default function DamageAlter({type, alter, lc, blastRadius, melee}) {
     return mergedAlter ? (
         <React.Fragment>
             <SimpleValue label="Random Type" value={mergedAlter.RandomType}>
-                { x => randomType[x]}
+                { x => getRandomType(ruleset, x) }
             </SimpleValue>
             {!melee && <SimpleValue label="Blast Radius" value={mergedAlter.FixRadius}>
                 { x => x === -1 ? "Dynamic" : `${x} Tiles` }
