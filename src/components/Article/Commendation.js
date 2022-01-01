@@ -80,6 +80,8 @@ function getKillString(killCriteria, lc) {
 export default function Commendation({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const commendations = ruleset.entries[id].commendations;
+    const normalCriteria = commendations?.criteria;
+
     const killCriteria = commendations?.killCriteria;
     const killCriteriaString = useMemo(() => getKillString(killCriteria, lc), [killCriteria, lc]);
 
@@ -98,6 +100,22 @@ export default function Commendation({ruleset, lang, id, version}) {
                         <td><Table>
                             <SoldierBonus bonus={ruleset.lookups.soldierBonuses[bonus]} showHeader={false} lc={lc}/>
                         </Table></td>
+                    </tr>
+                ))
+            }
+            {
+                Object.entries(normalCriteria ?? {}).map(([key,values]) => (
+                    <tr key={key}>
+                        <td>{key}</td>
+                        <td>
+                            <Table>
+                                <tbody>
+                                    <tr>
+                                        { values.map((x, idx) => (<td key={idx}>{x}</td>))}
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </td>
                     </tr>
                 ))
             }

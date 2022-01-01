@@ -150,3 +150,16 @@ div.facilitySprite img:nth-child(4) {
     min-width: 40px;
     padding-left: 10px; 
 }
+
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    .Category {
+        columns: auto 2;
+    }
+}
+
+@media screen and (min-width: 992px){
+    .Category {
+        columns: auto 4;
+    }
+}

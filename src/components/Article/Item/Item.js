@@ -132,7 +132,7 @@ export default function Item({ruleset, lang, id, version}) {
             <SectionHeader label="Item"/>
             { BattleComponent && <BattleComponent ruleset={ruleset} items={items} lc={lc} linkFn={linkFn} spriteFn={spriteFn}/> }
             <MiscItem ruleset={ruleset} items={items} lc={lc} linkFn={linkFn}/>
-            <ListValue label="Categories" values={items.categories}>{ lc }</ListValue>
+            <ListValue label="Categories" values={items.categories}>{ linkFn }</ListValue>
             <ListValue label="Supported Inventory Sections" values={items.supportedInventorySections}>{ lc }</ListValue>
             <ListValue label="Associated Commendations" values={items.$givesCommendation}>{ linkFn }</ListValue>
             <ListValue label="Prison Type" values={ruleset.prisons[items.prisonType || (items.liveAlien ? 0 : null)]}>{ linkFn }</ListValue>
@@ -144,7 +144,7 @@ export default function Item({ruleset, lang, id, version}) {
             <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>
             <ListValue label="Craft Ammo For" values={items.craftAmmo}>{ linkFn }</ListValue>
             <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
-            <ListValue label="Sources" values={items.foundFrom}>{ linkFn }</ListValue>
+            <ListValue label="Sources" values={items.$foundFrom}>{ linkFn }</ListValue>
             <ListValue label="Script Tags" values={Object.entries(items.tags || {})}/>
         </Table>
     )

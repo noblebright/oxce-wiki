@@ -33,9 +33,10 @@ function getShotTypes(weapon, ammo) {
     }    
 }
 
-function getShotsPerTurn(ruleset, {soldier, weapon, armor, stat}) {
+function getShotsPerTurn(ruleset, state, key = "weapon") {
+    const {soldier, armor, stat} = state;
     const entries = ruleset.entries;
-    const weaponEntry = entries[weapon].items;
+    const weaponEntry = entries[state[key]].items;
     const soldierEntry = entries[soldier].soldiers;
     const armorEntry = entries[armor].armors;
     const soldierStats = soldierEntry[stat];
@@ -77,10 +78,18 @@ function lookupAcc(accuracyData, targetWidth, targetHeight, acc, distance, shots
 
 export function getChartData(ruleset, state) {
     const avgDamage = getAverageDamage(ruleset, iterations, state);
+    let compareAvgDamage;
+    if(state.compare) {
+        compareAvgDamage = getAverageDamage(ruleset, iterations, state, "compareWeapon", "compareAmmo");
+    } 
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo].items;
+    const compareWeaponEntry = ruleset.entries[state.compareWeapon].items;
+    const compareAmmoEntry = ruleset.entries[state.compareAmmo].items;
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
+    const compareShotTypes = getShotTypes(compareWeaponEntry, compareAmmoEntry);
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
+    const compareShotsPerTurnByType = getShotsPerTurn(ruleset, state, "compareWeapon");
     const data = [];
 
     for(let distance = 1; distance <= 50; distance++) {
@@ -91,6 +100,15 @@ export function getChartData(ruleset, state) {
             const shotsPerTurn = shotsPerTurnByType[shotType];
             dataPoint[`${shotType}HitRatio`] = hitRatio;
             dataPoint[`${shotType}Damage`] = avgDamage * hitRatio / 100 * shotsPerTurn;
+        }
+        if(state.compare) {
+            for(let shotType of compareShotTypes) {
+                const accuracyInputs = computeAccuracyInputs(ruleset, shotType, distance, state, "compareWeapon", "compareAmmo");
+                const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
+                const shotsPerTurn = compareShotsPerTurnByType[shotType];
+                dataPoint[`Compare${shotType}HitRatio`] = hitRatio;
+                dataPoint[`Compare${shotType}Damage`] = compareAvgDamage * hitRatio / 100 * shotsPerTurn;
+            }
         }
         data.push(dataPoint);
     }

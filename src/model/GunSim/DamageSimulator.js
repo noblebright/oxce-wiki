@@ -125,14 +125,14 @@ function getExplosive(weapon, ammo) {
     }
 }
 
-export function getAverageDamage(ruleset, iterations, {stat, soldier, armor, weapon, ammo, target, direction}) {
+export function getAverageDamage(ruleset, iterations, state, weaponKey = "weapon", ammoKey = "ammo") {
     const entries = ruleset.entries;
-
-    const weaponEntry = entries[weapon].items;  
+    const {stat, soldier, armor, target, direction} = state;
+    const weaponEntry = entries[state[weaponKey]].items;  
     const targetEntry = entries[target].units;  //needed for armor info
     const soldierEntry = entries[soldier].soldiers;  //needed for stats
     const armorEntry = entries[armor].armors; //needed for stats
-    const ammoEntry = entries[ammo]?.items;
+    const ammoEntry = entries[state[ammoKey]]?.items;
 
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
@@ -147,11 +147,8 @@ export function getAverageDamage(ruleset, iterations, {stat, soldier, armor, wea
     const randomHealthFactor = getRandomHealth(weaponEntry, ammoEntry) ? .5 : 1; // RandomX is uniform 1-N distribution
     const randomStunFactor = getRandomStun(weaponEntry, ammoEntry) ? .5 : 1;     // Average distribution is n / 2
 
-    if(ignoreDirection) {  // IgnoreDirection defaults to front armor
-        direction = "front";
-    }
-
-    const { armorRating, painImmune, resist } = getTargetStats(entries, damageType, targetEntry, direction, isExplosive);
+    // IgnoreDirection defaults to front armor
+    const { armorRating, painImmune, resist } = getTargetStats(entries, damageType, targetEntry, ignoreDirection ? "front" : direction, isExplosive);
     const penetratingDamageMultiplier = getToHealth(weaponEntry, ammoEntry) * randomHealthFactor + 
                                         getToStun(weaponEntry, ammoEntry) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
 
