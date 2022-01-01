@@ -131,7 +131,7 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
         if(raceByDeployment[prevStage]) {
             raceByDeployment[prevStage].forEach(x => possibleRaces.add(x)); //check previous stage if this is the second part of a two-parter.
         }
-        console.log([...possibleRaces]);
+
         return [...possibleRaces];
     }, [id, alienDeployments, alienRace, randomRace, prevStage, raceByDeployment]);
     const [race, setRace] = useState(availableRaces[0]);
