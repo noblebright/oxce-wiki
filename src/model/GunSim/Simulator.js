@@ -1,26 +1,35 @@
-import { Weapon, Target, VOXEL_PER_TILE } from "./AccuracySimulator";
 import { getMultiplier } from "./Multipliers";
 import { mergeStats } from "./utils";
-import { unitWidths } from "../Constants";
+import { unitWidths, ShotType } from "../Constants";
 
-function getTarget(entries, source, targetEntry, distance) {
-    const targetHeight = targetEntry.standHeight;
-    const targetArmor = entries[targetEntry.armor].armors;
-    const targetWidth = unitWidths[targetArmor.loftempsSet[0]] ?? 7; //weird-shaped units we assume are 7 voxels wide (human)
-    return new Target(160, source.y + (distance * VOXEL_PER_TILE), 160, targetWidth, targetHeight);
-}
+function getAccuracy(ruleset, stats, weapon, shotType, kneeling, oneHanded, distance) {
+    let acc = weapon[`accuracy${shotType}`];
+    let modifier = 0.0;
+    let upperLimit;
+	let lowerLimit = weapon.minRange ?? 0;
 
-function getWeapon(weaponEntry) {
-    return new Weapon(weaponEntry.aimRange ?? 200, 
-        weaponEntry.minRange ?? 0, 
-        weaponEntry.autoRange ?? 7, 
-        weaponEntry.snapRange ?? 15, 
-        weaponEntry.dropoff, 
-        0/* dmg never used*/ );
-}
+	switch(shotType) {
+	case ShotType.Aimed:
+		upperLimit = weapon.aimRange ?? 200;
+		break;
+	case ShotType.Snap:
+		upperLimit = weapon.snapRange ?? 15;
+		break;
+	case ShotType.Auto:
+			upperLimit = weapon.autoRange ?? 7;
+		break;
+	default:
+	}
+    
+    const dropoff = weapon.dropoff ?? 2;
+	if(distance < lowerLimit) {
+		modifier = (dropoff * (lowerLimit - distance));
+	} else if (upperLimit < distance) {
+		modifier = (dropoff * (distance - upperLimit));
+	}
 
-function getAccuracy(ruleset, stats, weapon, mode, kneeling, oneHanded) {
-    let acc = weapon[`accuracy${mode}`];
+	acc = Math.max(0, acc - modifier);
+
     if(weapon.accuracyMultiplier) {
         acc *= getMultiplier(weapon.accuracyMultiplier, stats) / 100;
     } else {
@@ -32,7 +41,9 @@ function getAccuracy(ruleset, stats, weapon, mode, kneeling, oneHanded) {
     if(oneHanded && weapon.twoHanded) {
         acc *= (weapon.oneHandedPenalty ?? ruleset.globalVars.oneHandedPenaltyGlobal ?? 80) / 100;
     }
-    return acc / 100;
+
+    //cap accuracy at 110 since that's the max the game supports
+    return Math.min(Math.floor(acc), 110);
 }
 
 function getShots(weapon, ammo, mode) {
@@ -69,12 +80,9 @@ function getShots(weapon, ammo, mode) {
     return shots * Math.max(1, Math.ceil(pellets * shotgunSpread / 100));
 }
 
-// function simulateAcc(source, target, w, acc, simulations, shots, type) {
-
-export function computeAccuracyInputs(ruleset, shotType, iterations, distance, state, weaponKey = "weapon", ammoKey = "ammo") {
+export function computeAccuracyInputs(ruleset, shotType, distance, state, weaponKey = "weapon", ammoKey = "ammo") {
     const {stat, soldier, armor, target, kneeling, oneHanded} = state;
     const entries = ruleset.entries;
-    const source = { x: 160, y: 160, z: 160 };
     const weaponEntry = entries[state[weaponKey]].items;
     const targetEntry = entries[target].units;
     const soldierEntry = entries[soldier].soldiers;
@@ -82,12 +90,12 @@ export function computeAccuracyInputs(ruleset, shotType, iterations, distance, s
     const ammoEntry = entries[state[ammoKey]]?.items;
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
-    const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, shotType, kneeling, oneHanded);
+    const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, shotType, kneeling, oneHanded, distance);
     const shots = getShots(weaponEntry, ammoEntry, shotType);
-    const simulations = Math.ceil(iterations / shots);
+    
+    const targetArmor = entries[targetEntry.armor].armors;
+    const targetHeight = targetEntry.standHeight;
+    const targetWidth = unitWidths[targetArmor.loftempsSet[0]] ?? 7; //weird-shaped units we assume are 7 voxels wide (human)
 
-    const targetObj = getTarget(entries, source, targetEntry, distance);
-    const weaponObj = getWeapon(weaponEntry);
-
-    return [source, targetObj, weaponObj, acc, simulations, shots, shotType];
+    return [targetWidth, targetHeight, acc, distance, shots];
 }

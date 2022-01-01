@@ -1,28 +1,11 @@
-import React, { useCallback, useRef, useState, useMemo } from "react";
-import { Form, Modal, ProgressBar, Button } from "react-bootstrap";
+import React, { useCallback, useState, useMemo, useEffect } from "react";
+import { Form, Button } from "react-bootstrap";
 import useLocale from "../../hooks/useLocale";
 import useGunSim from "../../hooks/useGunSim";
-import useRunningState from "../../hooks/useRunningState";
-import getChartData from "../../model/GunSim/ChartService";
+import { getChartData, loadAccuracyData } from "../../model/GunSim/ChartService";
 import ResultChart from "./ResultChart";
 
 import "./gunSim.css";
-
-function ProgressDialog({current, max, abort}) {     
-    return (
-      <Modal 
-        show={true} 
-        backdrop="static"
-        keyboard={false}
-        animation={false}
-        centered >
-        <Modal.Body>
-          <ProgressBar min={0} max={max} now={current} animated/>
-          {/*<!-- <div><Button variant="primary" onClick={abort}>Abort</Button></div> -->*/}
-        </Modal.Body>
-      </Modal>
-    );
-}
 
 export default function GunSim({ ruleset, lang }) {
     const lc = useLocale(lang, ruleset);
@@ -36,22 +19,23 @@ export default function GunSim({ ruleset, lang }) {
     const ammoOptions = useMemo(() => ammoList.map(optionFn), [ammoList, optionFn]);
     const compareAmmoOptions = useMemo(() => compareAmmoList.map(optionFn), [compareAmmoList, optionFn]);
     const targetOptions = useMemo(() => targetList.map(optionFn), [targetList, optionFn]);
-
-    const [{running, current, max}, {abort, complete, setSteps, increment}] = useRunningState();
+    
     const [chartData, setChartData] = useState();
     const [mode, setMode] = useState("Damage");
-    const abortFn = useRef();
+    const [accuracyDataLoaded, setAccuracyDataLoaded] = useState(false);
+    
+    useEffect(() => {
+        loadAccuracyData().then(() => setAccuracyDataLoaded(true));
+    }, []);
+
     const startRun = useCallback(() => {
         setChartData(null);
         console.time("chartGen");
-        const { p, abort: abortComputation } = getChartData(ruleset, state, increment, setSteps);
-        abortFn.current = () => { abortComputation() };
-        p.then(result => {
-            complete();
+        getChartData(ruleset, state).then(result => {
             console.timeEnd("chartGen");
             setChartData(result);
-        }, abort);
-    }, [ruleset, state, setSteps, increment, abortFn, complete, abort]);
+        });
+    }, [ruleset, state]);
 
     return (
         <main className="gunSim">
@@ -125,10 +109,9 @@ export default function GunSim({ ruleset, lang }) {
                         <option value="rear">Rear</option>
                     </Form.Control>
                 </Form.Group>
-                <Button variant="primary" onClick={startRun}>Submit</Button>
+                <Button variant="primary" onClick={startRun} disabled={!accuracyDataLoaded}>Submit</Button>
             </Form>
             <div className="GunSimContent">
-                { running ? <ProgressDialog current={current} max={max} abort={abortFn.current}/> : null }
                 <Form.Control as="select" size="sm" custom value={mode} onChange={e => setMode(e.target.value)}>
                     <option value="HitRatio">Hit Ratio</option>
                     <option value="Damage">Damage</option>

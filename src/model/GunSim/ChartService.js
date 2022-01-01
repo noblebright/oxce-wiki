@@ -1,12 +1,11 @@
 import { getAverageDamage } from "./DamageSimulator";
-import { ShotType } from "../Constants";
+import { unitWidths, ShotType } from "../Constants";
 import { computeAccuracyInputs } from "./Simulator";
-import simulateAcc from "./AccuracySimulator";
 import { mergeStats } from "./utils";
 
 const iterations = 100000;
 
-export function hasCost(value, suffix) {
+function hasCost(value, suffix) {
     const costObj = value[`cost${suffix}`];
     const tu = value[`tu${suffix}`];
 
@@ -31,8 +30,7 @@ function getShotTypes(weapon, ammo) {
             }
             return validAmmoSlots.has(`${weapon[`conf${type}`].ammoSlot}`);
         });
-    }
-    
+    }    
 }
 
 function getShotsPerTurn(ruleset, state, key = "weapon") {
@@ -56,90 +54,63 @@ function getShotsPerTurn(ruleset, state, key = "weapon") {
     return result;
 }
 
-function getCancellableDataset(data, fn) {
-    let cancelled = false;
-    let res, rej;
-    let current = 0;
-    const p = new Promise((resolve, reject) => {
-        res = resolve;
-        rej = reject;
-    });
-    const result = [];
-    function iterate() {
-        if(cancelled) {
-            rej();
-            return;
-        }
-        fn(data[current]).then(val => {
-            result.push(val);
-            current++;
-            if(current >= data.length) {
-                res(result);
-            } else {
-                iterate();
-            }
-        });
-    }
-    iterate();
-    return { p, abort: () => cancelled = true };
+let accuracyData;
+
+export function loadAccuracyData() {
+    return fetch("/accuracyLookup.dat")
+            .then(response => response.arrayBuffer())
+            .then(buffer => { accuracyData = new Uint16Array(buffer)});
 }
 
-function simulateAccWrapper(...args) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(simulateAcc(...args));
-        }, 10);
-    });
+const widthOffsets = Object.values(unitWidths).reduce((acc, width, idx) => {
+    acc[width] = idx;
+    return acc;
+}, {});
+
+function lookupAcc(accuracyData, targetWidth, targetHeight, acc, distance, shots) {
+    const offset =  widthOffsets[targetWidth] * 132000 +
+                    (targetHeight - 1) * 5500 +
+                    acc * 50 +
+                    (distance - 1);
+
+    return accuracyData[offset] * shots  * 100 /  65535;
 }
-export default function getChartData(ruleset, state, updateProgress, updateMaxProgress) {
+
+export function getChartData(ruleset, state) {
     const avgDamage = getAverageDamage(ruleset, iterations, state);
     let compareAvgDamage;
     if(state.compare) {
         compareAvgDamage = getAverageDamage(ruleset, iterations, state, "compareWeapon", "compareAmmo");
-    } 
+    }
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo].items;
     const compareWeaponEntry = ruleset.entries[state.compareWeapon].items;
     const compareAmmoEntry = ruleset.entries[state.compareAmmo].items;
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
     const compareShotTypes = getShotTypes(compareWeaponEntry, compareAmmoEntry);
-    const mergedShotTypes = [...new Set(shotTypes.concat(state.compare ? compareShotTypes : []))]; // union
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
     const compareShotsPerTurnByType = getShotsPerTurn(ruleset, state, "compareWeapon");
     const data = [];
 
-    updateMaxProgress(state.compare ? 100 : 50);
-
-    for(let i = 1; i <= 50; i++) {
-        data.push(i);
-    }
-
-    return getCancellableDataset(data, async distance => {
-        updateProgress(state.compare ? (2 * distance) : distance);
+    for(let distance = 1; distance <= 50; distance++) {
         const dataPoint = { distance };
-        for(let shotType of mergedShotTypes) {
-            if(!shotTypes.includes(shotType)) {
-                continue;
-            }
-            const accuracyInputs = computeAccuracyInputs(ruleset, shotType, iterations, distance, state);
-            const hitRatio = await simulateAccWrapper(...accuracyInputs);
+        for(let shotType of shotTypes) {
+            const accuracyInputs = computeAccuracyInputs(ruleset, shotType, distance, state);
+            const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
             const shotsPerTurn = shotsPerTurnByType[shotType];
             dataPoint[`${shotType}HitRatio`] = hitRatio;
             dataPoint[`${shotType}Damage`] = avgDamage * hitRatio / 100 * shotsPerTurn;
         }
         if(state.compare) {
-            updateProgress(2 * distance + 1);
-            for(let shotType of mergedShotTypes) {
-                if(!compareShotTypes.includes(shotType)) {
-                    continue;
-                }
-                const accuracyInputs = computeAccuracyInputs(ruleset, shotType, iterations, distance, state, "compareWeapon", "compareAmmo");
-                const hitRatio = await simulateAccWrapper(...accuracyInputs);
+            for(let shotType of compareShotTypes) {
+                const accuracyInputs = computeAccuracyInputs(ruleset, shotType, distance, state, "compareWeapon", "compareAmmo");
+                const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
                 const shotsPerTurn = compareShotsPerTurnByType[shotType];
                 dataPoint[`Compare${shotType}HitRatio`] = hitRatio;
                 dataPoint[`Compare${shotType}Damage`] = compareAvgDamage * hitRatio / 100 * shotsPerTurn;
             }
         }
-        return dataPoint;
-    });
+        data.push(dataPoint);
+    }
+    return Promise.resolve(data);
 }
