@@ -103,8 +103,8 @@ export function mapUnitSources(backLinkSet, ruleset) {
 
         //not all relatedUfos are real, some are variants that are deployment only.
         relatedUfos.filter(x => x).forEach(relatedUfo => {
-            getSpawnedUnits(relatedUfo.ufoItems, spawnedUnits, ruleset);
-            getSpawnedUnits(relatedUfo.ufoRandomItems, spawnedUnits, ruleset);
+            getSpawnedUnits(relatedUfo.$ufoItems, spawnedUnits, ruleset);
+            getSpawnedUnits(relatedUfo.$ufoRandomItems, spawnedUnits, ruleset);
         });
         ruleset.entries[deploymentKey].alienDeployments.$spawnedUnits = [...spawnedUnits];
         backLinkSet(ruleset.entries, deploymentKey, [...spawnedUnits], "units", "$deployedIn");

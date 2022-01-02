@@ -327,11 +327,15 @@ export default function compile(base, mod) {
         if(ufos.raceBonus) {
             Object.entries(ufos.raceBonus).forEach(([race, data]) => {
                 if(data.craftCustomDeploy) {
-                    backLinkSet(ruleset.entries, key, [data.craftCustomDeploy], "alienDeployments", "$variant");
+                    if(!ufos.$hasVariants) {
+                        ufos.$hasVariants = [];
+                    }
+                    ufos.$hasVariants.push([race, data.craftCustomDeploy]);
+                    backLinkSet(ruleset.entries, key, [data.craftCustomDeploy], "alienDeployments", "$variantOf");
                 }
-                if(data.missionCustomDeploy) {
-                    backLinkSet(ruleset.entries, key, [data.missionCustomDeploy], "alienDeployments", "$variant");
-                }
+                // if(data.missionCustomDeploy) {
+                //     backLinkSet(ruleset.entries, key, [data.missionCustomDeploy], "alienDeployments", "$variant");
+                // }
             });
         }
 

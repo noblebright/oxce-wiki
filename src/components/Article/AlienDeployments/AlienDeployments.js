@@ -58,7 +58,8 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                         { availableRaces.length > 1 ? (x => <SimpleSelect options={x} value={race || ""} onChange={setRace}>{ x => `${lc(x)} [${x}]` }</SimpleSelect>) : x => lc(x[0])}
                     </SimpleValue>
                 </tbody>
-                <ListValue label="Variant Of" values={alienDeployments.$variant}>{ linkFn }</ListValue>
+                <ListValue label="Variant Of" values={alienDeployments.$variantOf}>{ linkFn }</ListValue>
+                <ListValue label="Previous Stage" values={alienDeployments.$prevStage}>{ linkFn }</ListValue>
                 <ListValue label="Map Items" values={alienDeployments.$terrainItems}>{ linkFn }</ListValue>
                 <ListValue label="Map Items (Random)" values={alienDeployments.$terrainRandomItems}>{ linkFn }</ListValue>
                 <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>

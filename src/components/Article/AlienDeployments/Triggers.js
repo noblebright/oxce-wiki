@@ -21,7 +21,9 @@ function getTriggers(lookups, id) {
     const triggers = {};
     const deploymentData = lookups.deploymentData[id];
     let hasTriggers = false;
-    deploymentData.scripts.forEach(script => {
+    
+    //eslint-disable-next-line no-unused-expressions
+    deploymentData?.scripts.forEach(script => {
         const scriptObj = lookups.missionScripts[script];
         const triggerConditions = {};
         let hasConditions = false;
@@ -36,7 +38,6 @@ function getTriggers(lookups, id) {
             triggers[script] = triggerConditions;
         }
     });
-    console.log(triggers);
     return hasTriggers ? triggers : null;
 }
 

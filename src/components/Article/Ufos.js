@@ -64,15 +64,14 @@ export default function Ufos({ruleset, lang, id, version}) {
                 <SimpleValue label="Dodge Bonus" value={ufos.avoidBonus}>{ Percent }</SimpleValue>
                 <SimpleValue label="Armor" value={ufos.armor}/>
             </tbody>
-            <ListValue label="Requires Service" values={ufos.requiresBaseFunc}>{ lc }</ListValue>
-            <ListValue label="Get as a Result of " values={ufos.seeAlso}>{ linkFn }</ListValue>
-            <ListValue label="Dependencies" values={ufos.dependencies}>{ linkFn }</ListValue>
-            <ListValue label="Leads To" values={ufos.leadsTo}>{ linkFn }</ListValue>
-            <ListValue label="Unlocked By" values={ufos.unlockedBy}>{linkFn}</ListValue>
-            <ListValue label="Unlocks" values={ufos.unlocks}>{ linkFn }</ListValue>
-            <ListValue label="Manufacturing Process" values={ufos.manufacture}>{ linkFn }</ListValue>
-            <ListValue label="Contains Items" values={ufos.ufoItems}>{ linkFn }</ListValue>
-            <ListValue label="Contains Items (Random)" values={ufos.ufoRandomItems}>{ linkFn }</ListValue>
+            <ListValue label="Variants" values={ufos.$hasVariants}>{([race, ship]) => (
+                <div style={{ display: "flex"}}>
+                    <span style={{flexGrow: "1", paddingRight: "5px"}}>{linkFn(race)}</span>
+                    {linkFn(ship)}
+                </div>
+            )}</ListValue>
+            <ListValue label="Contains Items" values={ufos.$ufoItems}>{ linkFn }</ListValue>
+            <ListValue label="Contains Items (Random)" values={ufos.$ufoRandomItems}>{ linkFn }</ListValue>
         </Table>
     )
 }

@@ -50,11 +50,11 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     const [ufoItems, ufoRandomItems] = handleBattlescapeTerrain(ufos.battlescapeTerrainData) || [];
 
     if(ufoItems && ufoItems.size) {
-        entry.ufos.ufoItems = [...ufoItems];
+        entry.ufos.$ufoItems = [...ufoItems];
         backLinkSet(ruleset.entries, key, [...ufoItems], "items", "$foundFrom");
     }
     if(ufoRandomItems && ufoRandomItems.size) {
-        entry.ufos.ufoRandomItems = [...ufoRandomItems];
+        entry.ufos.$ufoRandomItems = [...ufoRandomItems];
         backLinkSet(ruleset.entries, key, [...ufoRandomItems], "items", "$foundFrom");
     }
 
@@ -62,11 +62,11 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     const [craftItems, craftRandomItems] = handleBattlescapeTerrain(crafts.battlescapeTerrainData) || [];
 
     if(craftItems && craftItems.size) {
-        entry.crafts.ufoItems = [...craftItems];
+        entry.crafts.$ufoItems = [...craftItems];
         backLinkSet(ruleset.entries, key, [...craftItems], "items", "$foundFrom");
     }
     if(craftRandomItems && craftRandomItems.size) {
-        entry.crafts.ufoRandomItems = [...craftRandomItems];
+        entry.crafts.$ufoRandomItems = [...craftRandomItems];
         backLinkSet(ruleset.entries, key, [...craftRandomItems], "items", "$foundFrom");
     }
     
