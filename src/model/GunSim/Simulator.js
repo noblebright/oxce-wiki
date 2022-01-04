@@ -42,8 +42,8 @@ function getAccuracy(ruleset, stats, weapon, shotType, kneeling, oneHanded, dist
         acc *= (weapon.oneHandedPenalty ?? ruleset.globalVars.oneHandedPenaltyGlobal ?? 80) / 100;
     }
 
-    //cap accuracy at 110 since that's the max the game supports
-    return Math.min(Math.floor(acc), 110);
+    //cap accuracy at 109 since that's the max the game supports
+    return Math.min(Math.floor(acc), 109);
 }
 
 function getShots(weapon, ammo, mode) {

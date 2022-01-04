@@ -13,8 +13,8 @@ function getRandomType(ruleset, randomType) {
         case 5: return "No Damage";
         case 6: return "(0 - 100%) + (0 - 100%)";
         case 7: return "50 - 200%";
-        case 8: return `${100 - (ruleset.globalVars.damageRange ?? 100)} - ${100 + (ruleset.globalVars.damageRange ?? 100)}`;
-        case 9: return `${100 - (ruleset.globalVars.explosiveDamageRange ?? 50)} - ${100 + (ruleset.globalVars.explosiveDamageRange ?? 50)}`;
+        case 8: return `${100 - (ruleset.globalVars.damageRange ?? 100)} - ${100 + (ruleset.globalVars.damageRange ?? 100)}%`;
+        case 9: return `${100 - (ruleset.globalVars.explosiveDamageRange ?? 50)} - ${100 + (ruleset.globalVars.explosiveDamageRange ?? 50)}%`;
         default: return "Unknown randomType!";
     }
 }
