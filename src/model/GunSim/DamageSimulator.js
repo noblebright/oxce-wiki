@@ -132,7 +132,7 @@ export function getAverageDamage(ruleset, iterations, state, weaponKey = "weapon
     const targetEntry = entries[target].units;  //needed for armor info
     const soldierEntry = entries[soldier].soldiers;  //needed for stats
     const armorEntry = entries[armor].armors; //needed for stats
-    const ammoEntry = entries[state[ammoKey]]?.items;
+    const ammoEntry = entries[state[ammoKey]]?.items ?? {};
 
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
