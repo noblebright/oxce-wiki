@@ -9,7 +9,7 @@ function getRandomType(ruleset, randomType) {
         case 1: return "0 - 200%";
         case 2: return "50 - 150%";
         case 3: return "Flat Damage";
-        case 4: return `${ruleset.globalVars.fireDamageRange?.[0] ?? 5} - ${ruleset.globalVars.fireDamageRange?.[1] ?? 10} (fire)`;
+        case 4: return `${ruleset.globalVars.fireDamageRange?.[0] ?? 5} - ${ruleset.globalVars.fireDamageRange?.[1] ?? 10} \uD83D\uDD25`;
         case 5: return "No Damage";
         case 6: return "(0 - 100%) + (0 - 100%)";
         case 7: return "50 - 200%";

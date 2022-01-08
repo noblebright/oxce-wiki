@@ -89,7 +89,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
             <td colSpan="2">
                 <Table>
                     <tbody>
-                        <GunAmmo lc={lc} linkFn={linkFn} item={item} integral melee/>
+                        <GunAmmo lc={lc} linkFn={linkFn} item={item} integral ruleset={ruleset} melee/>
                     </tbody>
                 </Table>
             </td>
