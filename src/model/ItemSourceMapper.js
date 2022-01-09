@@ -133,6 +133,10 @@ function getDeploymentItems(alienDeployments, ruleset) {
     //eslint-disable-next-line no-unused-expressions
     alienDeployments.terrains?.forEach(terrainKey => {
         const baseTerrain = ruleset.lookups.terrains[terrainKey];
+        if(!baseTerrain) {
+            console.error(`Unable to find baseTerrain "${terrainKey}" for deployment "${alienDeployments.type}"`);
+            return;
+        }
         const scriptKey = alienDeployments.script ?? baseTerrain.script ?? "DEFAULT";
         const script = ruleset.lookups.mapScripts[scriptKey];
         

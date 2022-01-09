@@ -160,6 +160,10 @@ export function compileMissions(ruleset) {
         const scriptRaces = getWeightValues(script.raceWeights);
         missions.forEach(mission => {
             const missionObj = ruleset.lookups.alienMissions[mission];
+            if(!missionObj) {
+                console.error(`Unable to find mission object ${mission} for script ${script.type}`);
+                return;
+            }
             const missionRaces = getWeightValues(missionObj.raceWeights);
             const possibleRaces = scriptRaces.size ? scriptRaces: missionRaces;
             possibleRaces.forEach(race => {
