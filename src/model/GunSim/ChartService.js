@@ -85,7 +85,7 @@ export function getChartData(ruleset, state) {
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo]?.items;
     const compareWeaponEntry = ruleset.entries[state.compareWeapon].items;
-    const compareAmmoEntry = ruleset.entries[state.compareAmmo].items;
+    const compareAmmoEntry = ruleset.entries[state.compareAmmo]?.items;
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
     const compareShotTypes = getShotTypes(compareWeaponEntry, compareAmmoEntry);
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
