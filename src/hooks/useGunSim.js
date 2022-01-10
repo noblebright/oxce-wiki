@@ -13,8 +13,10 @@ const getAmmoList = (state, weapon, lc) => {
 const reductions = {
     setStat: (state, action) => ({ ...state, stat: action.payload }),
     setSoldier: (state, action) => {
-        const armorList = getArmorList(state, action.payload, action.meta);
-        return { ...state, soldier: action.payload, armorList, armor: armorList[0] };
+        const soldier = action.payload;
+        const armorList = getArmorList(state, soldier, action.meta);
+        const armor = state.entries[soldier]?.soldiers?.armor ?? armorList[0];
+        return { ...state, soldier, armorList, armor };
     },
     setArmor: (state, action) => ({ ...state, armor: action.payload }),
     setCompare: (state, action) => ({ ...state, compare: action.payload }),
@@ -47,7 +49,7 @@ const init = lc => state => {
                         .sort(sortFn);
     state.soldier = state.soldierList[0];
     state.armorList = getArmorList(state, state.soldier, lc);
-    state.armor = state.armorList[0];
+    state.armor = state.entries[state.soldier]?.soldiers?.armor ?? state.armorList[0];
     state.weaponList = Object.keys(state.entries).filter(x => {
         const item = state.entries[x].items;
         return item && item.battleType === 1 && 

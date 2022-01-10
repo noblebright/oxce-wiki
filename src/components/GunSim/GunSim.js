@@ -116,7 +116,7 @@ export default function GunSim({ ruleset, lang }) {
                     <option value="HitRatio">Hit Ratio</option>
                     <option value="Damage">Damage</option>
                 </Form.Control>
-                { chartData ? <ResultChart data={chartData} mode={mode}/> : null }
+                { chartData ? <ResultChart data={chartData} mode={mode} lc={lc} weapon={weapon} compareWeapon={compareWeapon}/> : null }
             </div>
         </main>
     );    
