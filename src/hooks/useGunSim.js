@@ -59,7 +59,7 @@ const init = lc => state => {
     state.compare = false;
     state.weapon = state.weaponList[0];
     state.ammoList = getAmmoList(state, state.weapon, lc);
-    state.compareWeapon = state.weaponList.filter(x => x !== state.weapon)[0];
+    state.compareWeapon = state.weaponList[0];
     state.compareAmmoList = getAmmoList(state, state.compareWeapon, lc);
     state.ammo = state.ammoList[0];
     state.compareAmmo = state.compareAmmoList[0];

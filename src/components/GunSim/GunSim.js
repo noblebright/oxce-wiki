@@ -15,7 +15,6 @@ export default function GunSim({ ruleset, lang }) {
     const soldierOptions = useMemo(() => soldierList.map(optionFn), [soldierList, optionFn]);
     const armorOptions = useMemo(() => armorList.map(optionFn), [armorList, optionFn]);
     const weaponOptions = useMemo(() => weaponList.map(optionFn), [weaponList, optionFn]);
-    const compareWeaponOptions = useMemo(() => weaponList.filter(x => x !== weapon).map(optionFn), [weaponList, weapon, optionFn]);
     const ammoOptions = useMemo(() => ammoList.map(optionFn), [ammoList, optionFn]);
     const compareAmmoOptions = useMemo(() => compareAmmoList.map(optionFn), [compareAmmoList, optionFn]);
     const targetOptions = useMemo(() => targetList.map(optionFn), [targetList, optionFn]);
@@ -29,12 +28,11 @@ export default function GunSim({ ruleset, lang }) {
     }, []);
 
     const startRun = useCallback(() => {
-        setChartData(null);
+        //setChartData(null);
         console.time("chartGen");
-        getChartData(ruleset, state).then(result => {
-            console.timeEnd("chartGen");
-            setChartData(result);
-        });
+        const result = getChartData(ruleset, state);
+        console.timeEnd("chartGen");
+        setChartData(result);
     }, [ruleset, state]);
 
     return (
@@ -84,7 +82,7 @@ export default function GunSim({ ruleset, lang }) {
                 <Form.Group className="mb-3" controlId="compareWeapon">
                     <Form.Label>Weapon 2</Form.Label>
                     <Form.Control as="select" size="sm" custom value={compareWeapon} onChange={e => setCompareWeapon(e.target.value, lc)} disabled={!compare}>
-                        { compareWeaponOptions }
+                        { weaponOptions }
                     </Form.Control>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="compareAmmo">

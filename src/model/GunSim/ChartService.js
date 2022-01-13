@@ -84,12 +84,14 @@ export function getChartData(ruleset, state) {
     }
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo]?.items;
-    const compareWeaponEntry = ruleset.entries[state.compareWeapon].items;
-    const compareAmmoEntry = ruleset.entries[state.compareAmmo]?.items;
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
-    const compareShotTypes = getShotTypes(compareWeaponEntry, compareAmmoEntry);
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
-    const compareShotsPerTurnByType = getShotsPerTurn(ruleset, state, "compareWeapon");
+    
+    const compareWeaponEntry = state.compare && ruleset.entries[state.compareWeapon]?.items;
+    const compareAmmoEntry = state.compare && ruleset.entries[state.compareAmmo]?.items;
+    const compareShotTypes = state.compare && getShotTypes(compareWeaponEntry, compareAmmoEntry);
+    const compareShotsPerTurnByType = state.compare && getShotsPerTurn(ruleset, state, "compareWeapon");
+    
     const data = [];
 
     for(let distance = 1; distance <= 50; distance++) {
@@ -112,5 +114,22 @@ export function getChartData(ruleset, state) {
         }
         data.push(dataPoint);
     }
-    return Promise.resolve(data);
+    return data;
+}
+
+window.getChartData = (statMode, direction, soldier, armor, weapon, ammo, target, kneeling = false, oneHanded = false) => {
+    const result = getChartData(window.db.ruleset, { stat: statMode, direction, soldier, armor, weapon, ammo, compare: false, compareWeapon: {}, compareAmmo: {}, target, kneeling, oneHanded });
+    const rows = {};
+    result.forEach(col => {
+        Object.keys(col).forEach(k => {
+            if(k === "distance") { // skip distance
+                return;
+            }
+            if(!rows[k]) {
+                rows[k] = [];
+            }
+            rows[k].push(col[k]);
+        });
+    });
+    return Object.entries(rows).map(([k, v]) => [`${weapon}|${ammo}|${k}`, ...v].join(",")).join("\n");
 }

@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 
 import useLocale from "../../hooks/useLocale";
 import SoldierBonus from "./SoldierBonus";
-import { SectionHeader } from "../ComponentUtils.js";
+import { ListHeader, ListValue, SectionHeader } from "../ComponentUtils.js";
 
 function getCriteria(data, idx) {
     return Object.keys(data).reduce((acc, key) => {
@@ -92,6 +92,9 @@ export default function Commendation({ruleset, lang, id, version}) {
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Commendation"/>
+            <ListValue label="Counted Mission Marker Types" values={commendations.missionMarkerFilter}>{lc}</ListValue>
+            <ListValue label="Counted Mission Types" values={commendations.missionTypeFilter}>{lc}</ListValue>
+            <ListHeader label="Commendation Bonuses"/>
             <tbody>
             {
                 tierList.map(([criteria, bonus], idx) => (
@@ -104,7 +107,7 @@ export default function Commendation({ruleset, lang, id, version}) {
                 ))
             }
             {
-                Object.entries(normalCriteria ?? {}).map(([key,values]) => (
+                !tierList.length && Object.entries(normalCriteria ?? {}).map(([key,values]) => (
                     <tr key={key}>
                         <td>{key}</td>
                         <td>

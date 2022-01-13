@@ -35,12 +35,12 @@ export default function PsiAmp({ ruleset, items, lc, linkFn, spriteFn }) {
                 <ActionHeader label="Actions"/>
                 <tbody>
                     <ActionValue label={lc("STR_PANIC_UNIT")} 
-                                show={hasCost(items, "Panic")}
-                                cost={<Cost value={items} suffix="Panic" lc={lc} />}
+                                show={hasCost(items, "Panic") ?? hasCost(items, "Use")}
+                                cost={hasCost(items, "Panic") ? <Cost value={items} suffix="Panic" lc={lc} /> : <Cost value={items} suffix="Use" lc={lc}/>}
                     />
                     <ActionValue label={lc("STR_MIND_CONTROL")} 
-                                show={hasCost(items, "MindControl")}
-                                cost={<Cost value={items} suffix="MindControl" lc={lc} />}
+                                show={hasCost(items, "MindControl") ?? hasCost(items, "Use")}
+                                cost={hasCost(items, "MindControl") ? <Cost value={items} suffix="MindControl" lc={lc} /> : <Cost value={items} suffix="Use" lc={lc}/>}
                     />
                     <ActionValue label={lc(items.psiAttackName)} 
                                 show={hasCost(items, "Use") && items.damageType}
