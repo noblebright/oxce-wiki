@@ -117,7 +117,22 @@ export function getChartData(ruleset, state) {
     return data;
 }
 
-window.getChartData = (statMode, direction, soldier, armor, weapon, ammo, target, kneeling = false, oneHanded = false) => {
+window.getChartData = function (statMode, direction, soldier, armor, weapon, ammo, target, kneeling = false, oneHanded = false) {
+    if(!arguments.length) {
+        console.log([
+            "usage: getChartData(statMode, direction, soldier, armor, weapon, ammo, target, kneeling = false, oneHanded = false)",
+            "   statMode: one of 'minStats', 'maxStats', 'statCaps', 'trainingStatCaps'",
+            "   direction: one of 'front', 'left', 'right', 'rear'",
+            "   soldier: String key of ruleset entry with soldiers section",
+            "   armor: String key of ruleset entry with armor section",
+            "   weapon: String key of ruleset entry with items section and battleType: 1",
+            "   ammo: String key of ruleset entry with items section and battleType: 2",
+            "   target: String key of ruleset entry with unit section",
+            "   kneeling: boolean",
+            "   oneHanded: boolean"
+        ].join("\n"));
+        return;
+    }
     const result = getChartData(window.db.ruleset, { stat: statMode, direction, soldier, armor, weapon, ammo, compare: false, compareWeapon: {}, compareAmmo: {}, target, kneeling, oneHanded });
     const rows = {};
     result.forEach(col => {

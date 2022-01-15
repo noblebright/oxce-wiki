@@ -53,7 +53,9 @@ export default function Research({ruleset, lang, id, version}) {
             <ListValue label="Unlocks" values={research.unlocks}>{ linkFn }</ListValue>
             <ListValue label="Bonus Topics" values={research.getOneFree}>{ linkFn }</ListValue>
             <ProtectedTopics topics={research.getOneFreeProtected} linkFn={linkFn}/>
+            <ListValue label="Deployment Triggers" values={research.$deploymentTrigger}>{ linkFn }</ListValue>
             <ListValue label="Free From" values={research.freeFrom}>{ linkFn }</ListValue>
+            <ListValue label="Allows Purchase" values={research.$allowsPurchase}>{ linkFn }</ListValue>
             <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>
             <ListValue label="Allows Transformation" values={research.$allowsTransform}>{ linkFn }</ListValue>
         </Table>

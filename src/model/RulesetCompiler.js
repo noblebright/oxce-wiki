@@ -296,6 +296,7 @@ export default function compile(base, mod) {
         const armors = entry.armors || {};
         const ufos = entry.ufos || {};
         const units = entry.units || {};
+        const items = entry.items || {};
         const alienDeployments = entry.alienDeployments || {};
         const soldierTransformation = entry.soldierTransformation || {};
         const commendations = entry.commendations || {};
@@ -303,6 +304,7 @@ export default function compile(base, mod) {
         generateCategory(ruleset, key);
         
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
+        backLink(ruleset.entries, key, items.requiresBuy, "research", "$allowsPurchase");
         backLink(ruleset.entries, key, research.unlocks, "research", "unlockedBy");
         backLink(ruleset.entries, key, research.getOneFree, "research", "freeFrom");
         backLink(ruleset.entries, key, [research.lookup], "research", "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.

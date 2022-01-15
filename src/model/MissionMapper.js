@@ -54,11 +54,34 @@ function getGlobeTextures(regions, ruleset, scriptObj, spawnZone = -1) {
     return [...textureDeploys].map(id => ruleset.lookups.deploymentsByGlobeTexture[id]).flat();
 }
 
+const backlinkSets = [];
+
+function backlinkTriggers(ruleset, scriptObj, triggerSection, section, deployment) {
+    Object.keys(scriptObj[triggerSection]).forEach(key => {
+        if(!ruleset.entries[key][section]) {
+            console.warn(`Unknown ${section} "${key}" found in missionScript ${scriptObj.type}`);
+            return;
+        }
+        if(!ruleset.entries[key][section].$deploymentTrigger) {
+            ruleset.entries[key][section].$deploymentTrigger = new Set();
+            backlinkSets.push([key, section]);
+        }
+        ruleset.entries[key][section].$deploymentTrigger.add(deployment);
+    });
+}
+const backLinkSections = [["researchTriggers", "research"], ["itemTriggers", "items"], ["facilityTriggers", "facilities"]];
+
 function addDeploymentEntry(ruleset, deployment, script, race, craft) {
     if(!ruleset.lookups.deploymentData[deployment]) {
         ruleset.lookups.deploymentData[deployment] = { races: new Set(), crafts: new Set(), scripts: new Set() };
     }
     const data = ruleset.lookups.deploymentData[deployment];
+    const scriptObj = ruleset.lookups.missionScripts[script];
+    backLinkSections.forEach(([triggerSection, section]) => {
+        if(scriptObj[triggerSection]) {
+            backlinkTriggers(ruleset, scriptObj, triggerSection, section, deployment);
+        }
+    })
     data.races.add(race);
     if(craft) data.crafts.add(craft);
     data.scripts.add(script);
@@ -66,9 +89,6 @@ function addDeploymentEntry(ruleset, deployment, script, race, craft) {
 
 function addDeploymentData(ruleset, script, race, craft, deployment, objective) {
     if(craft) {  // craft-based overrides
-        if(!ruleset.entries[craft]) {
-            console.log(craft);
-        }
         const craftObj = ruleset.entries[craft].ufos;
         if(craftObj.raceBonus?.[race]) {
             if(!objective) {
@@ -179,4 +199,9 @@ export function compileMissions(ruleset) {
             })
         })
     });
+    // cleanup sets
+    backlinkSets.forEach(([key, section]) => {
+        ruleset.entries[key][section].$deploymentTrigger = [...ruleset.entries[key][section].$deploymentTrigger];
+    });
+    backlinkSets.length = 0;
 }

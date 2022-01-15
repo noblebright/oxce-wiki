@@ -121,6 +121,9 @@ function getDeploymentItems(alienDeployments, ruleset) {
     const customCrafts = new Set();
 
     //Items from alienDeployments
+    if(alienDeployments.missionBountyItem) {
+        items.add(alienDeployments.missionBountyItem);
+    }
     //eslint-disable-next-line no-unused-expressions
     alienDeployments.data?.forEach(deployment => {
         deployment.itemSets.forEach(itemSet => {
