@@ -89,22 +89,26 @@ function addDeploymentEntry(ruleset, deployment, script, race, craft) {
 
 function addDeploymentData(ruleset, script, race, craft, deployment, objective) {
     if(craft) {  // craft-based overrides
-        const craftObj = ruleset.entries[craft].ufos;
-        if(craftObj.raceBonus?.[race]) {
-            if(!objective) {
-                deployment = craftObj.raceBonus[race].craftCustomDeploy || deployment;
-            } else {
-                deployment = craftObj.raceBonus[race].missionCustomDeploy || deployment;
-            }
+        const craftObj = ruleset.entries[craft]?.ufos;
+        if(!craftObj) {
+            console.error(`Unable to find entry for ufo ${craft}, referenced from script ${script}`);
         } else {
-            if(!objective) {
-                deployment = craftObj.craftCustomDeploy || deployment;
+            if(craftObj.raceBonus?.[race]) {
+                if(!objective) {
+                    deployment = craftObj.raceBonus[race].craftCustomDeploy || deployment;
+                } else {
+                    deployment = craftObj.raceBonus[race].missionCustomDeploy || deployment;
+                }
             } else {
-                deployment = craftObj.missionCustomDeploy || deployment;
+                if(!objective) {
+                    deployment = craftObj.craftCustomDeploy || deployment;
+                } else {
+                    deployment = craftObj.missionCustomDeploy || deployment;
+                }
             }
         }
     }
-    const deploymentObj = ruleset.entries[deployment].alienDeployments;
+    const deploymentObj = ruleset.entries[deployment]?.alienDeployments;
     if(!deploymentObj) {
         console.error(`Unable to find alienDeployment for key: ${deployment}`);
     } else {
@@ -188,6 +192,7 @@ export function compileMissions(ruleset) {
             const possibleRaces = scriptRaces.size ? scriptRaces: missionRaces;
             possibleRaces.forEach(race => {
                 switch(missionObj.objective) {
+                    case 2: // base-based missions
                     case 3: // site-based missions
                         compileSite(ruleset, script, missionObj, regions, race);
                         break;
