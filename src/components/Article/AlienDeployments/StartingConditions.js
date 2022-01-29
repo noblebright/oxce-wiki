@@ -9,8 +9,8 @@ export default function StartingConditions({ value, lc, linkFn, inventoryFn }) {
                 <SimpleValue label="Destroy Required Items?" value={value.destroyRequiredItems}/>
             </tbody>
             <ListValue label="Required Items" values={value.requiredItems}>{ linkFn } </ListValue>
-            <SectionHeader label="Default Armors"/>
-            { Object.entries(value.defaultArmor).map(([soldier, armorTypes]) => (
+            { value.defaultArmor && <SectionHeader label="Default Armors"/> }
+            { Object.entries(value.defaultArmor || {}).map(([soldier, armorTypes]) => (
                 <ListValue key={soldier} label={lc(soldier)} values={Object.entries(armorTypes)}>{inventoryFn}</ListValue>
             ))}
             <SectionHeader label="Allowed/Forbidden"/>
