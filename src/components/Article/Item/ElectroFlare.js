@@ -4,6 +4,8 @@ import Table from "react-bootstrap/Table";
 import useBonusString from "../../../hooks/useBonusString";
 import { BooleanValue, ListHeader, SimpleValue, Percent, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
 import Cost, { hasCost } from "./Cost";
+import Damage from "./Damage";
+import DamageAlter from "./DamageAlter";
 
 function FuseTrigger({triggers}) {
     return triggers ? (
@@ -18,24 +20,50 @@ function FuseTrigger({triggers}) {
         </Table>
     ) : null;
 }
-function Power({label, power}) {
+
+function FlareMelee({ ruleset, lc, items, bonusFn }) {
     return (
         <React.Fragment>
-            <div>{label}</div>
-            <div>{power}</div>
+            <ActionValue label={lc("STR_HIT_MELEE")} 
+                        show={hasCost(items, "Melee")}
+                        cost={<Cost value={items} suffix="Melee" lc={lc} />}
+                        accuracy={<Accuracy items={items} suffix="Melee" bonusFn={bonusFn} defaultAcc={100}/>}
+            />
+            <tr key="MeleeDamage">
+                <td></td>
+                <td colSpan="2">
+                    <Table>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <DamageAlter type={items.meleeType} 
+                                            alter={items.meleeAlter} 
+                                            ruleset={ruleset}
+                                            blastRadius={items.blastRadius} lc={lc}/>
+                            </td>
+                            <td>
+                                <Damage items={items} lc={lc} melee={true}/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </Table>
+                </td>
+            </tr>
         </React.Fragment>
-    )
+    );
 }
+
 export default function ElectroFlare({ ruleset, items, lc, linkFn, spriteFn }) {
     const bonusFn = useBonusString(lc);
     return (
         <React.Fragment>
             <tbody>
-                <SimpleValue label={spriteFn(items.bigSprite)} value={<Power power={items.power} label={lc("STR_WEAPON_POWER")}/>}/>
+                <SimpleValue label={spriteFn(items.bigSprite)} value={items.power}/>
             </tbody>
             <Actions>
                 <ActionHeader label="Actions"/>
                 <tbody>
+                    { hasCost(items, "Melee") && <FlareMelee ruleset={ruleset} lc={lc} items={items} bonusFn={bonusFn} /> }
                     <ActionValue label={lc(items.primeActionName || "STR_PRIME_GRENADE")}
                                 show={items.fuseType !== -3}
                                 cost={<Cost value={items} suffix="Prime" lc={lc} defaultTu={50}/>}
