@@ -56,7 +56,7 @@ export function Deployment({ ruleset, deployment, race, linkFn, idx }) {
             </tbody>
             <ListValue label="Alien Types" values={alienList}>{ linkFn }</ListValue>
             <NumberAppearing deployment={deployment}/>
-            { deployment.itemSets.map((x, idx) => <ListValue key={idx} label={`Item Set ${idx}`} values={x}>{ linkFn }</ListValue>)}
+            { deployment.itemSets?.map((x, idx) => <ListValue key={idx} label={`Item Set ${idx}`} values={x}>{ linkFn }</ListValue>)}
         </React.Fragment>
     )
     
