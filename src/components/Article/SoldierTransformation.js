@@ -2,7 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/Table";
 
 import SoldierBonus from "./SoldierBonus";
-import { BooleanValue, Money, Hours, UnitStats, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
+import { BooleanValue, Money, Days, Hours, UnitStats, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
 import useLocale from "../../hooks/useLocale";
 import useInventory from "../../hooks/useInventory";
 import useLink from "../../hooks/useLink";
@@ -29,7 +29,7 @@ export default function SoldierTransformation({ruleset, lang, id, version}) {
             <tbody>
                 <SimpleValue label="Cost" value={transform.cost}>{ Money }</SimpleValue>
                 <SimpleValue label="Transfer Time" value={transform.transferTime}>{ Hours }</SimpleValue>
-                <SimpleValue label="Recovery Time" value={transform.recoveryTime}>{ Hours }</SimpleValue>
+                <SimpleValue label="Recovery Time" value={transform.recoveryTime}>{ Days }</SimpleValue>
                 <SimpleValue label="Produced Item" value={transform.producedItem}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Produced Soldier Type" value={transform.producedSoldierType}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Produced Soldier Armor" value={transform.producedSoldierArmor}>{ linkFn }</SimpleValue>
@@ -56,7 +56,6 @@ export default function SoldierTransformation({ruleset, lang, id, version}) {
             <ListValue label="Required Transformations" values={transform.requiredPreviousTransformations}>{ linkFn }</ListValue>
             <ListValue label="Forbidden Transformations" values={transform.forbiddenPreviousTransformations}>{ linkFn }</ListValue>
             <ListValue label="Requires Items" values={Object.entries(transform.requiredItems || {})}>{ inventoryFn }</ListValue>
-            <ListValue label="Required Items" values={transform.requiredItems}>{ linkFn }</ListValue>
             <ListValue label="Required Commendations" values={transform.requiredCommendations}>{ lc }</ListValue>
             <UnitStats showZero={false} label="Required Stats" stats={transform.requiredMinStats} lc={lc} />
             <UnitStats showZero={false} label="Flat Stats Change" stats={transform.flatOverallStatChange} lc={lc} />

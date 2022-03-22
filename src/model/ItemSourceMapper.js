@@ -126,7 +126,8 @@ function getDeploymentItems(alienDeployments, ruleset) {
     }
     //eslint-disable-next-line no-unused-expressions
     alienDeployments.data?.forEach(deployment => {
-        deployment.itemSets.forEach(itemSet => {
+        //eslint-disable-next-line no-unused-expressions
+        deployment.itemSets?.forEach(itemSet => {
             itemSet.forEach(item => {
                 randomItems.add(item);
             });
