@@ -132,6 +132,10 @@ function handleTextureDeployment(ruleset, scriptObj, missionObj, regions, race, 
 
 // Comments below from: https://openxcom.org/forum/index.php/topic,6557.msg104669.html#msg104669
 function compileSite(ruleset, scriptObj, missionObj, regions, race) {
+    if(missionObj.objective === 2 && !missionObj.waves) {
+        addDeploymentData(ruleset, scriptObj.siteType ?? scriptObj.type, race);
+        return;
+    }
     if(missionObj.waves.length === 1 && !ruleset.entries[missionObj.waves[0].ufo]?.ufos) { // insta-pop site missions
         const ufo = missionObj.waves[0].ufo;
 
