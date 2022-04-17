@@ -107,11 +107,11 @@ function ClassicInventory({ruleset, id, imageFn}) {
 
 //FIXME: OXCE falls back LayeredDoll -> ClassicInventory -> SingleImage instead of SingleImage -> LayeredDoll -> ClassicInventory.
 function PaperDoll({ruleset, armors, imageFn}) {
-    const spriteId = armors.spriteInv;
-    const sprite = ruleset.sprites[spriteId];
+    const spriteId = armors.spriteInv; 
+    const sprite = ruleset.sprites[spriteId] ?? ruleset.sprites[`${armors.spriteInv}.SPK`]; // Try defaulting to .SPK if the raw id doesn't work.
     
     if(sprite && (sprite.typeSingle || sprite.singleImage)) { //found a single image sprite
-        return <SingleImage imageFn={imageFn} id={spriteId}/>;
+        return <SingleImage imageFn={imageFn} id={sprite.type}/>; //do this instead of spriteId, so we can catch both normal and appended cases
     }
 
     //no single image, look for paperdoll
