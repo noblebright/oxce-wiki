@@ -18,8 +18,6 @@ export default function StartingConditions({ value, lc, linkFn, inventoryFn }) {
             <ListValue label="Forbidden Armors" values={value.forbiddenArmors}>{ linkFn }</ListValue>
             <ListValue label="Allowed Soldier Types" values={value.allowedSoldierTypes}>{ linkFn }</ListValue>
             <ListValue label="Forbidden Soldier Types" values={value.forbiddenSoldierTypes}>{ linkFn }</ListValue>
-            <ListValue label="Allowed Soldier Types" values={value.allowedSoldierTypes}>{ linkFn }</ListValue>
-            <ListValue label="Forbidden Soldier Types" values={value.forbiddenSoldierTypes}>{ linkFn }</ListValue>
             <ListValue label="Allowed Vehicle Unit Types" values={value.allowedVehicles }>{ linkFn}</ListValue>
             <ListValue label="Forbidden Vehicle Unit Types" values={value.forbiddenVehicles}>{ linkFn }</ListValue>
             <ListValue label="Allowed Items" values={value.allowedItems}>{ linkFn }</ListValue>

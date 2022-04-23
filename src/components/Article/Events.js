@@ -96,11 +96,12 @@ export default function Events({ruleset, lang, id, version}) {
                 <SimpleValue label="Timer" value={events.timer} />
                 <SimpleValue label="timerRandom" value={events.timerRandom}/>
             </tbody>
+            <ListValue label="Triggered by Research" values={events.$fromResearch}>{ linkFn }</ListValue>
             <ListValue label="Grants One Research" values={events.researchList}>{ linkFn }</ListValue>
             <ListValue label="Get Random Item" values={events.randomItemList}>{ linkFn }</ListValue>
             <ListValue label="Guaranteed Items" values={Object.entries(getGuaranteedItems(events))}>{ inventoryFn }</ListValue>
             <RandomItems label="Weighted Items" {...weightedItems}>{ linkFn }</RandomItems>
-            { ([...ruleset.lookups.eventScriptsByEvent[events.name]] || []).map((triggerId, idx) => <EventScript key={idx} data={ruleset.lookups.eventScripts[triggerId]} linkFn={linkFn}/>) }
+            { (ruleset.lookups.eventScriptsByEvent[events.name] || []).map((triggerId, idx) => <EventScript key={idx} data={ruleset.lookups.eventScripts[triggerId]} linkFn={linkFn}/>) }
         </Table>
     );
 }

@@ -42,6 +42,7 @@ export default function Research({ruleset, lang, id, version}) {
                 <BooleanValue label="Destroys Item" value={research.destroyItem}/>
                 <SimpleValue label="Gives (lookup)" value={research.lookup}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Spawns Item" value={research.spawnedItem}>{ linkFn }</SimpleValue>
+                <SimpleValue label="Spawns Event" value={research.spawnedEvent}>{ linkFn }</SimpleValue>
             </tbody>
             <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ lc }</ListValue>
             <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>

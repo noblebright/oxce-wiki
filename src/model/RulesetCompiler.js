@@ -307,6 +307,7 @@ export default function compile(base, mod) {
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
         backLink(ruleset.entries, key, items.requiresBuy, "research", "$allowsPurchase");
         backLink(ruleset.entries, key, events.researchList, "research", "$fromEvent");
+        backLink(ruleset.entries, key, [research.spawnedEvent], "events", "$fromResearch");
         backLink(ruleset.entries, key, research.unlocks, "research", "unlockedBy");
         backLink(ruleset.entries, key, research.getOneFree, "research", "freeFrom");
         backLink(ruleset.entries, key, [research.lookup], "research", "seeAlso"); //lookup is just a single entry, so we gotta put it in a list.
