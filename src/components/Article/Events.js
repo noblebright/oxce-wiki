@@ -83,6 +83,7 @@ export default function Events({ruleset, lang, id, version}) {
 
     if(!events) return null;
 
+    const eventScript = ruleset.lookups.eventScriptsByEvent[events.name] || [];
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Event"/>
@@ -101,7 +102,7 @@ export default function Events({ruleset, lang, id, version}) {
             <ListValue label="Get Random Item" values={events.randomItemList}>{ linkFn }</ListValue>
             <ListValue label="Guaranteed Items" values={Object.entries(getGuaranteedItems(events))}>{ inventoryFn }</ListValue>
             <RandomItems label="Weighted Items" {...weightedItems}>{ linkFn }</RandomItems>
-            { (ruleset.lookups.eventScriptsByEvent[events.name] || []).map((triggerId, idx) => <EventScript key={idx} data={ruleset.lookups.eventScripts[triggerId]} linkFn={linkFn}/>) }
+            { [...eventScript].map((triggerId, idx) => <EventScript key={idx} data={ruleset.lookups.eventScripts[triggerId]} linkFn={linkFn}/>) }
         </Table>
     );
 }
