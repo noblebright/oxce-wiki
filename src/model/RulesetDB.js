@@ -2,18 +2,21 @@ import Dexie from "dexie";
 import yaml from "js-yaml";
 import deepmerge from "deepmerge";
 
-import { loadJSON, loadText, mappify, getSupportedLanguages } from "./utils";
+import { loadJSON, loadText, getModuleSupportedLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
 import FallbackDB from "./FallbackDB";
+import { schema } from "./YamlSchema";
 
 function initDexie() {
     const db = new Dexie("xcom");
     
-    db.version(1).stores({
+    db.version(2).stores({
         config: "key",
         versions: "repo,lastFetched",
-        rulesets: "sha,lastFetched",
-        precompiled: "[baseSha+modSha], lastGenerated"
+        files: "fileSha,lastUsed",
+        rulesets: null,
+        fileList: "sha,lastFetched",
+        precompiled: null
     });
     return db;
 }
@@ -31,16 +34,13 @@ async function getDB() {
 let db;
 
 async function getConfig(callback) {
-    const configArray = await db.config.toArray();
-    const configObj = configArray.length ? mappify(configArray, "key", "value") : null;
+    const configObj = await db.config.get("config");
     if(!configObj || !configObj.lastFetched || ((Date.now() - configObj.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
         callback && callback(["LOADING_CONFIG"]);
-        let config = await loadJSON("/config.json");
+        const config = await loadJSON("/config.json");
+        config.lastFetched = Date.now();
         await db.config.clear();
-        await db.config.bulkPut(
-            Object.keys(config).map(key => ({ key, value: config[key] }))
-        );
-        await db.config.put({key: "lastFetched", value: Date.now() });
+        await db.config.put({key: "config", ...config });
         return config;
     }
     return configObj;
@@ -79,49 +79,61 @@ function rewriteFilePaths(ruleset, loader, sha) {
     return ruleset;
 }
 
-async function getRuleset(repo, sha, path, callback) {
-    const ruleset = await db.rulesets.get(sha);
-    if(ruleset) {
-        console.log(`cached ruleset info found for ${sha}...`);
-        return ruleset.ruleset;
+async function getFileList(repo, sha, path, callback) {
+    const cachedList = await db.fileList.get(sha);
+    if(cachedList) {
+        console.log(`cached file list found for ${sha}...`);
+        return cachedList.fileList;
     }
     
     const loader = new GithubLoader(repo);
     console.log(`loading filelist for ${repo}@${sha}`);
     callback && callback(["LOADING_FILELIST", repo, sha]);
-    const fileList = await loader.loadSHA(sha, path);
-
-    console.log(`generating ruleset for ${repo}@${sha}`);
-    const rawRuleset = await generateRuleset(fileList, callback);
-    const newRuleset = rewriteFilePaths(rawRuleset, loader, sha);
-    
-    await db.rulesets.put({ sha, ruleset: newRuleset, lastFetched: Date.now() });
-    return newRuleset;
+    const fileList = await loader.loadFileList(sha, path);
+    await db.fileList.put({ sha, fileList, lastFetched: Date.now() });
+    return fileList;
 }
 
-async function generateRuleset([languageFiles, ruleFiles], callback) {
-    const files = [...languageFiles, ...ruleFiles];
+async function generateRuleset(module, db, callback) {
+    const [languageFiles, ruleFiles] = module.fileList;
+    const files = [...Object.entries(languageFiles), ...Object.entries(ruleFiles)];
     let processed = 0;
     callback && callback(["LOADING_FILE", null, processed, files.length]);
-    const promises = files.map(url => 
-        loadText(url).then(x => {
+    const promises = files.map(async ([fileSha, url]) => {
+        const cached = await db.files.get(fileSha);
+        if(cached) {
+          processed++;
+          callback && callback(["LOADING_FILE", url, processed, files.length]);
+          return cached.data;
+        }
+        console.log(`cache miss on ${url}`);
+        return loadText(url).then(async x => {
+            console.log(url, x.match(/(GUARD_POWER_ARMOR_CODEX_PAGE2.*)/));
+            x = x.replace(/(GUARD_POWER_ARMOR_CODEX_PAGE1.*)/, x => `${x}"`); //HACK
+            x = x.replace(/(GUARD_POWER_ARMOR_CODEX_PAGE2.*)/, x => `${x}"`); //HACK
             try {
-                const result = yaml.safeLoad(x, { json: true });
+                const result = yaml.load(x, { json: true, schema });
                 processed++;
                 callback && callback(["LOADING_FILE", url, processed, files.length]);
+                await db.files.put({ fileSha, data: result, lastUsed: Date.now() });
                 return result;
             } catch (e) {
+                console.log(x);
                 console.error(url);
                 throw e;
             }
-        })
+        });
+      }
     );
     const fileContents = await Promise.all(promises);
-    return fileContents.reduce((acc, obj) => deepmerge(acc, obj));
+    console.log(`generating ruleset for ${module.repo}@${module.commit}`);
+    const rawRuleset = fileContents.reduce((acc, obj) => deepmerge(acc, obj));
+    const loader = new GithubLoader(module.repo);
+    return rewriteFilePaths(rawRuleset, loader, module.sha);
 }
 
 export async function updateLanguage(value) {
-    return db.config.put({ key: "currentLanguage", value });
+  return db.config.put({ key: "currentLanguage", value });
 }
 
 export async function clearDB() {
@@ -134,35 +146,54 @@ export async function getMetadata(callback) {
         db = await getDB();
     }
     const config = await getConfig();
-    const {modRepo, modBranch} = config;
-    const modVersions = await getVersions(modRepo, modBranch, callback);
+    const currentLanguage = await db.config.get("currentLanguage");
+    const { repo, branch } = config.modules[config.modules.length - 1];
+    const modVersions = await getVersions(repo, branch, callback);
 
-    return { modVersions, config };
+    return { modVersions, config, currentLanguage };
 }
+
+function getCommit(module, modules, i, version) {
+  let modVersion;
+  if(i === modules.length - 1) {
+    modVersion = version;
+  } else {
+    modVersion = modules[i].branch;
+  }
+  if(!module.versions[modVersion]?.sha) {
+    throw new Error(`Unknown module ref: ${module.repo}@${modVersion}`);
+  }
+
+  //decorate module with commit
+  return Promise.resolve(module.versions[modVersion]?.sha);
+}
+
+const loadPipeline = [
+  { key: "versions", loader: (module, callback) => getVersions(module.repo, module.branch, callback) },
+  { key: "commit", loader: (module, callback, { i, modules, version }) => getCommit(module, modules, i, version) },
+  { key: "fileList", loader: (module, callback) => getFileList(module.repo, module.commit, module.path, callback) },
+  { key: "ruleset", loader: (module, callback) => generateRuleset(module, db, callback) }
+];
 
 export async function load(version, compiler, callback) {
     if(!db) {
         db = await getDB();
     }
     const config = await getConfig();
-    const {baseRepo, basePath, baseBranch = "master", modBranch, modRepo} = config;
-    const baseVersions = await getVersions(baseRepo, baseBranch, callback);
-    const modVersions = await getVersions(modRepo, modBranch, callback);
+    const modules = config.modules;
 
-    const baseSha = baseVersions[baseBranch].sha;
-    const baseRuleset = await getRuleset(baseRepo, baseSha, basePath, callback);
-    const modSha = modVersions[version]?.sha;
-
-    if(!modSha) {
-        throw new Error(`Unknown mod version: ${version}`);
+    for(const stage of loadPipeline) {
+      for(let i = 0; i < modules.length; i++) {
+        const module = modules[i];
+        modules[i][stage.key] = await stage.loader(module, callback, { i, modules, version });
+      }
     }
 
-    const modRuleset = await getRuleset(modRepo, modSha, null, callback);
-    
-    const supportedLanguages = getSupportedLanguages(baseRuleset, modRuleset);
+    const supportedLanguages = getModuleSupportedLanguages(modules);
     console.log(`supported languages:`, supportedLanguages);
     callback && callback(["COMPILING_RULESET"]);
-    const ruleset = compiler ? compiler(baseRuleset, modRuleset) : deepmerge(baseRuleset, modRuleset);
+    const rulesList = modules.map(x => x.ruleset);
+    const ruleset = compiler(rulesList, supportedLanguages);
     return { config, supportedLanguages, ruleset };
 }
 

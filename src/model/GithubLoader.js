@@ -47,6 +47,29 @@ export default class GithubLoader {
         return [languageFiles, ruleFiles];
     }
 
+    async loadFileList(sha, startPaths) {
+        const commitUrl = `https://api.github.com/repos/${this.repoName}/commits/${sha}`;
+        const commitData = await loadJSON(commitUrl, true);
+        const treeUrl = commitData.commit.tree.url;
+        const treeData = await loadJSON(`${treeUrl}?recursive=true`, true);
+        const fileList = treeData.tree;
+        
+        const languageFiles = {};
+        const ruleFiles = {};
+        fileList.forEach(file => {
+            if(startPaths && !startPaths.find(x => file.path.startsWith(x))) {
+                return;
+            }
+            if(file.path.match(/Language\/.*\.yml/)) {
+                languageFiles[file.sha] = this.getUrl(sha, file.path);
+            }
+            if(file.path.match(/.*\.rul$/)) {
+                ruleFiles[file.sha] = this.getUrl(sha, file.path);
+            }
+        });
+        return [languageFiles, ruleFiles];
+    }
+
     async load(version) {
         const versionRecord = this.versions[version];
         if(!versionRecord) {
