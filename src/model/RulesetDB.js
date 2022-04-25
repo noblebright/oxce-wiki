@@ -5,7 +5,7 @@ import deepmerge from "deepmerge";
 import { loadJSON, loadText, getModuleSupportedLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
 import FallbackDB from "./FallbackDB";
-import { schema } from "./YamlSchema";
+import { schema, customMerge } from "./YamlSchema";
 
 function initDexie() {
     const db = new Dexie("xcom");
@@ -108,8 +108,6 @@ async function generateRuleset(module, db, callback) {
         }
         console.log(`cache miss on ${url}`);
         return loadText(url).then(async x => {
-            x = x.replace(/(GUARD_POWER_ARMOR_CODEX_PAGE1.*)/, x => `${x}"`); //HACK
-            x = x.replace(/(GUARD_POWER_ARMOR_CODEX_PAGE2.*)/, x => `${x}"`); //HACK
             try {
                 const result = yaml.load(x, { json: true, schema });
                 processed++;

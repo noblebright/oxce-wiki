@@ -1,4 +1,5 @@
 import yaml from "js-yaml";
+import deepmerge from "deepmerge";
 
 const tags = ["!add", "!remove"];
 
@@ -18,6 +19,7 @@ const types = tags.map(tag => [
     ...tagDef,
     construct: (data) => {
       data[symbols[tag]] = true;
+      console.log("map", tag, data);
       return data;
     },
     kind: "mapping"
@@ -26,6 +28,7 @@ const types = tags.map(tag => [
     ...tagDef,
     construct: (data) => {
       data[symbols[tag]] = true;
+      console.log("seq", tag, data);
       return data;
     },
     kind: "sequence"
@@ -33,3 +36,27 @@ const types = tags.map(tag => [
 ]).flat();
 
 export const schema = yaml.JSON_SCHEMA.extend(types);
+
+export const customMerge = () => (a, b) => {
+  if(Array.isArray(a) && Array.isArray(b)) {
+    if(b[symbols["!add"]]) {
+      return a.concat(b);
+    } else if(b[symbols["!remove"]]) {
+      return a.filter(x => !b.includes(x));
+    } else {
+      return b;
+    }
+  } else if (typeof a === "object" && typeof b === "object") {
+    if(b[symbols["!add"]]) {
+      return deepmerge(a, b, { customMerge });
+    } else if(b[symbols["!remove"]]) {
+      Object.keys(b).forEach(k => {
+        delete a[k];
+      })
+      return a;
+    } else {
+      return b;
+    }
+  }
+  return b;
+}
