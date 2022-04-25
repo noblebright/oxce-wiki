@@ -3,6 +3,7 @@ import { initializeLookups, processGlobe, compileMissions } from "./MissionMappe
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
+
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -231,6 +232,16 @@ function generateCategory(ruleset, key) {
 
 const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange"];
 
+function resolveRefNode(entries, key) {
+    const entry = entries[key];
+    Object.keys(entry).forEach(sectionKey => {
+        const section = entry[sectionKey];
+        if(section.refNode) {
+            entry[sectionKey] = Object.assign({}, section.refNode, section);
+        }
+    });
+}
+
 export default function compile(rulesList, supportedLanguages) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };
     
@@ -262,6 +273,9 @@ export default function compile(rulesList, supportedLanguages) {
             generateSection(ruleset.entries, rules, metadata);
         });
     });
+    for(const key in ruleset.entries) {
+        resolveRefNode(ruleset.entries, key);
+    }
     console.timeEnd("entries");
 
     //add lookups
@@ -271,6 +285,9 @@ export default function compile(rulesList, supportedLanguages) {
             generateLookup(ruleset.lookups, rules, metadata);
         });
     });
+    for(const key in ruleset.lookups) {
+        resolveRefNode(ruleset.lookups, key);
+    }
     console.timeEnd("lookups")
 
     console.time("assets");

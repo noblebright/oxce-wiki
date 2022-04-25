@@ -201,6 +201,7 @@ export function compileMissions(ruleset) {
                         compileSite(ruleset, script, missionObj, regions, race);
                         break;
                     default:
+                        if(!missionObj.waves) debugger;
                         missionObj.waves.forEach(wave => {
                             addDeploymentData(ruleset, script.type, race, wave.ufo, wave.ufo);
                         });
