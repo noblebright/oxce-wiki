@@ -108,7 +108,6 @@ async function generateRuleset(module, db, callback) {
         }
         console.log(`cache miss on ${url}`);
         return loadText(url).then(async x => {
-            console.log(url, x.match(/(GUARD_POWER_ARMOR_CODEX_PAGE2.*)/));
             x = x.replace(/(GUARD_POWER_ARMOR_CODEX_PAGE1.*)/, x => `${x}"`); //HACK
             x = x.replace(/(GUARD_POWER_ARMOR_CODEX_PAGE2.*)/, x => `${x}"`); //HACK
             try {
@@ -118,7 +117,6 @@ async function generateRuleset(module, db, callback) {
                 await db.files.put({ fileSha, data: result, lastUsed: Date.now() });
                 return result;
             } catch (e) {
-                console.log(x);
                 console.error(url);
                 throw e;
             }
@@ -129,7 +127,7 @@ async function generateRuleset(module, db, callback) {
     console.log(`generating ruleset for ${module.repo}@${module.commit}`);
     const rawRuleset = fileContents.reduce((acc, obj) => deepmerge(acc, obj));
     const loader = new GithubLoader(module.repo);
-    return rewriteFilePaths(rawRuleset, loader, module.sha);
+    return rewriteFilePaths(rawRuleset, loader, module.commit);
 }
 
 export async function updateLanguage(value) {
