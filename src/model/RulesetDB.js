@@ -5,7 +5,7 @@ import deepmerge from "deepmerge";
 import { loadJSON, loadText, getModuleSupportedLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
 import FallbackDB from "./FallbackDB";
-import { schema, customMerge } from "./YamlSchema";
+import { schema } from "./YamlSchema";
 
 function initDexie() {
     const db = new Dexie("xcom");
@@ -98,30 +98,36 @@ async function generateRuleset(module, db, callback) {
     const [languageFiles, ruleFiles] = module.fileList;
     const files = [...Object.entries(languageFiles), ...Object.entries(ruleFiles)];
     let processed = 0;
-    callback && callback(["LOADING_FILE", null, processed, files.length]);
-    const promises = files.map(async ([fileSha, url]) => {
-        const cached = await db.files.get(fileSha);
-        if(cached) {
-          processed++;
-          callback && callback(["LOADING_FILE", url, processed, files.length]);
-          return cached.data;
-        }
+    //fetch all available files from indexDB
+    const cacheFetch = await db.files.bulkGet(files.map(([fileSha, url]) => fileSha));
+    const cacheMisses = [];
+
+    //Fill in cache misses with network calls
+    const promises = cacheFetch.map(async (record, i) => {
+        if(record) return record.data;
+
+        const [sha, url] = files[i];
         console.log(`cache miss on ${url}`);
-        return loadText(url).then(async x => {
-            try {
-                const result = yaml.load(x, { json: true, schema });
-                processed++;
-                callback && callback(["LOADING_FILE", url, processed, files.length]);
-                await db.files.put({ fileSha, data: result, lastUsed: Date.now() });
-                return result;
-            } catch (e) {
-                console.error(url);
-                throw e;
-            }
+        return loadText(url).then(text => {
+            cacheMisses.push({ fileSha: sha, data: text, lastUsed: Date.now()});
+            return text;
         });
-      }
-    );
-    const fileContents = await Promise.all(promises);
+    });
+    const textContents = await Promise.all(promises);
+    //after the bodies are loaded, store all cache misses in one shot
+    await db.files.bulkPut(cacheMisses);
+    const fileContents = textContents.map(rawText => {
+        const url = files[processed][1];
+        try {
+            const result = yaml.load(rawText, { json: true, schema });
+            callback && callback(["LOADING_FILE", url, processed, files.length]);
+            processed++;
+            return result;
+        } catch (e) {
+            console.error(url);
+            throw e;
+        }
+    })
     console.log(`generating ruleset for ${module.repo}@${module.commit}`);
     const rawRuleset = fileContents.reduce((acc, obj) => deepmerge(acc, obj));
     const loader = new GithubLoader(module.repo);
@@ -179,10 +185,12 @@ export async function load(version, compiler, callback) {
     const modules = config.modules;
 
     for(const stage of loadPipeline) {
+      console.time(stage.key);
       for(let i = 0; i < modules.length; i++) {
         const module = modules[i];
         modules[i][stage.key] = await stage.loader(module, callback, { i, modules, version });
       }
+      console.timeEnd(stage.key);
     }
 
     const supportedLanguages = getModuleSupportedLanguages(modules);
