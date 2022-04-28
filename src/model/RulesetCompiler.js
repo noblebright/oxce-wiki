@@ -3,7 +3,7 @@ import { initializeLookups, processGlobe, compileMissions } from "./MissionMappe
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
-
+import { customMerge } from "./YamlSchema";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -75,7 +75,7 @@ function generateSection(ruleset, rules, metadata) {
         if(!ruleset[name]) {
             ruleset[name] = { [sectionName]: entry };
         } else {
-            const mergedEntry = Object.assign({}, deepmerge(ruleset[name][sectionName], entry)); //if there's an existing entry, merge new data into it.
+            const mergedEntry = Object.assign({}, deepmerge(ruleset[name][sectionName], entry, { clone: false, customMerge })); //if there's an existing entry, merge new data into it.
             Object.assign(ruleset[name], { [sectionName]: mergedEntry });
         }
         if(filter && !filter(entry, ruleset, name)) {
@@ -114,7 +114,7 @@ function generateLookup(ruleset, rules, metadata) {
         if(!lookup[name]) {
             lookup[name] = entry;
         } else {
-            Object.assign(lookup[name], entry);
+            lookup[name] = deepmerge(lookup[name], entry, { clone: false, customMerge });
         }
     });
 }
@@ -134,7 +134,7 @@ function generateAssets(ruleset, assets) {
         if(!ruleset[name]) {
             ruleset[name] = asset;
         } else {
-            ruleset[name] = deepmerge(ruleset[name], asset);
+            ruleset[name] = deepmerge(ruleset[name], asset, { clone: false });
         }
     });
 }

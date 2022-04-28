@@ -19,7 +19,6 @@ const types = tags.map(tag => [
     ...tagDef,
     construct: (data) => {
       data[symbols[tag]] = true;
-      console.log("map", tag, data);
       return data;
     },
     kind: "mapping"
@@ -28,7 +27,6 @@ const types = tags.map(tag => [
     ...tagDef,
     construct: (data) => {
       data[symbols[tag]] = true;
-      console.log("seq", tag, data);
       return data;
     },
     kind: "sequence"

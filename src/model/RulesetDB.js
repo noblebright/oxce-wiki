@@ -49,7 +49,7 @@ async function getConfig(callback) {
 async function getVersions(repo, branchName, callback) {
     const repoVersions = await db.versions.get(repo);
     
-    if(!repoVersions || !repoVersions.lastFetched || ((Date.now() - repoVersions.lastFetched) > (1000 * 60 * 60 * 24))) { //check once per day
+    if(!repoVersions || !repoVersions.lastFetched || ((Date.now() - repoVersions.lastFetched) > (1000 * 60 * 60))) { //check once per hour
         const loader = new GithubLoader(repo);
         const versions = await loader.loadVersions(branchName);
         console.log(`fetching version info for ${repo}...`);
@@ -129,7 +129,7 @@ async function generateRuleset(module, db, callback) {
         }
     })
     console.log(`generating ruleset for ${module.repo}@${module.commit}`);
-    const rawRuleset = fileContents.reduce((acc, obj) => deepmerge(acc, obj));
+    const rawRuleset = fileContents.reduce((acc, obj) => deepmerge(acc, obj, { clone: false }));
     const loader = new GithubLoader(module.repo);
     return rewriteFilePaths(rawRuleset, loader, module.commit);
 }
