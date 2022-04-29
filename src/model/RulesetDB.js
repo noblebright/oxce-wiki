@@ -198,15 +198,20 @@ export async function load(version, compiler, callback) {
     const config = await getConfig();
     const modules = config.modules;
 
-    for(const stage of loadPipeline) {
-      console.time(stage.key);
-      for(let i = 0; i < modules.length; i++) {
-        const module = modules[i];
-        modules[i][stage.key] = await stage.loader(module, callback, { i, modules, version });
-      }
-      console.timeEnd(stage.key);
+    try {
+        for(const stage of loadPipeline) {
+            console.time(stage.key);
+            for(let i = 0; i < modules.length; i++) {
+              const module = modules[i];
+              modules[i][stage.key] = await stage.loader(module, callback, { i, modules, version });
+            }
+            console.timeEnd(stage.key);
+        }      
+    } catch (e) {
+        // If parsing goes south, delete the db.
+        await db.delete();
     }
-
+    
 
     const supportedLanguages = getModuleSupportedLanguages(modules);
     console.log(`supported languages:`, supportedLanguages);

@@ -7,8 +7,12 @@
             "path": ["bin/standard/xcom1", "bin/common"]
         },
         {
-            "repo": "SolariusScorch/XComFiles",
-            "branch": "master"
+            "repo": "BeatAroundTheBuscher/OXCE_40k",
+            "branch": "main"
+        },
+        {
+            "repo": "BeatAroundTheBuscher/ROSIGMA",
+            "branch": "main"
         }
     ],
     "contactURL": "https://discordapp.com/invite/XrQQTPg",
