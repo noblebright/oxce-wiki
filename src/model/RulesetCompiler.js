@@ -212,6 +212,17 @@ function getKillCriteriaItems(ruleset, killCriteria) {
     return [...items];
 }
 
+function getRandomBonusResearch(units) {
+    const oneFree = units.getOneFree ?? [];
+    const research = new Set(oneFree);
+    if(units.getOneFreeProtected) {
+        Object.keys(units.getOneFreeProtected).forEach(k => {
+            units.getOneFreeProtected[k].forEach(r => research.add(r));
+        });
+    }
+    return [...research];
+}
+
 function generateCategory(ruleset, key) {
     const entry = ruleset.entries[key];
     const items = entry.items;
@@ -336,6 +347,7 @@ export default function compile(rulesList, supportedLanguages) {
         generateCategory(ruleset, key);
         
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
+        backLink(ruleset.entries, key, getRandomBonusResearch(research), "research", "$randomBonusSources");
         backLink(ruleset.entries, key, items.requiresBuy, "research", "$allowsPurchase");
         backLink(ruleset.entries, key, events.researchList, "research", "$fromEvent");
         backLink(ruleset.entries, key, [research.spawnedEvent], "events", "$fromResearch");
