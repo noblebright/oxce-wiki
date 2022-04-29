@@ -79,6 +79,16 @@ function rewriteFilePaths(ruleset, loader, sha) {
     return ruleset;
 }
 
+function rewriteLocalization(ruleset) {
+    if(!ruleset.extraStrings) return;
+    ruleset.extraStrings.forEach(({type, strings}) => {
+        if(!ruleset[type]) {
+            ruleset[type] = {};
+        }
+        Object.assign(ruleset[type], strings);
+    });
+}
+
 async function getFileList(repo, sha, path, callback) {
     const cachedList = await db.fileList.get(sha);
     if(cachedList) {
@@ -116,21 +126,25 @@ async function generateRuleset(module, db, callback) {
     const textContents = await Promise.all(promises);
     //after the bodies are loaded, store all cache misses in one shot
     await db.files.bulkPut(cacheMisses);
-    const fileContents = textContents.map(rawText => {
+    const fileContents = [];
+    for(let processed = 0; processed < textContents.length; processed++) {
+        const rawText = textContents[processed];
         const url = files[processed][1];
         try {
             const result = yaml.load(rawText, { json: true, schema });
             callback && callback(["LOADING_FILE", url, processed, files.length]);
-            processed++;
-            return result;
+            await new Promise(r => setTimeout(r, 16)); //yield so react can update the progress bar
+            fileContents.push(result);
         } catch (e) {
             console.error(url);
             throw e;
         }
-    })
+    }
     console.log(`generating ruleset for ${module.repo}@${module.commit}`);
     const rawRuleset = fileContents.reduce((acc, obj) => deepmerge(acc, obj, { clone: false }));
     const loader = new GithubLoader(module.repo);
+    
+    rewriteLocalization(rawRuleset);
     return rewriteFilePaths(rawRuleset, loader, module.commit);
 }
 
@@ -192,6 +206,7 @@ export async function load(version, compiler, callback) {
       }
       console.timeEnd(stage.key);
     }
+
 
     const supportedLanguages = getModuleSupportedLanguages(modules);
     console.log(`supported languages:`, supportedLanguages);
