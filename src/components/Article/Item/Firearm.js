@@ -28,6 +28,7 @@ function getShots(item, suffix) {
 }
 
 function getArcing(item, suffix) {
+    if(suffix === "Melee") return false; // no such thing as an arcing melee weapon
     const confArcing = item[`conf${suffix}`]?.arcing;
     return confArcing || item.arcingShot || undefined;
 }
@@ -45,7 +46,7 @@ const GunAmmo = ({lc, linkFn, item, integral, melee, ruleset}) => (
     <tr>
         <td>{integral ? "-" : linkFn(item.type)}</td>
         <td>
-            {item.clipSize ? <div>{lc("clipSize")}: {item.clipSize}</div> : null}
+            {item.clipSize && item.clipSize !== -1 ? <div>{lc("clipSize")}: {item.clipSize}</div> : null}
             <div>
                 <Table>
                     <tbody>
@@ -99,6 +100,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     if(!hasAmmo(item)) {
         //this item does not use external ammo (no ammo or integral ammo like throwing knives)
         result = getAction(actionTypes);
+        result = result.concat(melee);
         return result;
     }
     if(!item.ammo) { //compatibleAmmo only, so only one segment.
