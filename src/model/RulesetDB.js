@@ -107,7 +107,6 @@ async function getFileList(repo, sha, path, callback) {
 async function generateRuleset(module, db, callback) {
     const [languageFiles, ruleFiles] = module.fileList;
     const files = [...Object.entries(languageFiles), ...Object.entries(ruleFiles)];
-    let processed = 0;
     //fetch all available files from indexDB
     const cacheFetch = await db.files.bulkGet(files.map(([fileSha, url]) => fileSha));
     const cacheMisses = [];
@@ -211,13 +210,20 @@ export async function load(version, compiler, callback) {
         // If parsing goes south, delete the db.
         await db.delete();
     }
-    
 
     const supportedLanguages = getModuleSupportedLanguages(modules);
     console.log(`supported languages:`, supportedLanguages);
     callback && callback(["COMPILING_RULESET"]);
     const rulesList = modules.map(x => x.ruleset);
     const ruleset = compiler(rulesList, supportedLanguages);
+
+    //clean up pipeline intermediates
+    config.modules.forEach(module => {
+        loadPipeline.forEach(stage => {
+            delete module[stage.key];
+        });
+    });
+
     return { config, supportedLanguages, ruleset };
 }
 
