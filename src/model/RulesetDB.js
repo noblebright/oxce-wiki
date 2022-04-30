@@ -160,12 +160,18 @@ export async function getMetadata(callback) {
     if(!db) {
         db = await getDB();
     }
-    const config = await getConfig();
-    const currentLanguage = await db.config.get("currentLanguage");
-    const { repo, branch } = config.modules[config.modules.length - 1];
-    const modVersions = await getVersions(repo, branch, callback);
+    let result;
+    try {
+        const config = await getConfig();
+        const currentLanguage = await db.config.get("currentLanguage");
+        const { repo, branch } = config.modules[config.modules.length - 1];
+        const modVersions = await getVersions(repo, branch, callback);
+        result = { modVersions, config, currentLanguage };
+    } catch (e) {
+        await db.delete();
+    }
 
-    return { modVersions, config, currentLanguage };
+    return result;
 }
 
 function getCommit(module, modules, i, version) {
