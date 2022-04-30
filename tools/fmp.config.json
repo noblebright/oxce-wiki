@@ -1,0 +1,16 @@
+{
+  "title": "Final Mod Pack",
+  "modules": [
+      {
+          "repo": "MeridianOXC/OpenXcom",
+          "branch": "oxce-plus",
+          "path": ["bin/standard/xcom1", "bin/common"]
+      },
+      {
+          "repo": "SolariusScorch/Final-Mod-Pack",
+          "branch": "master"
+      }
+  ],
+  "contactURL": "Matrix.to",
+  "contactLabel": "XCF Matrix"
+}

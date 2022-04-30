@@ -1,0 +1,1 @@
+cp tools/$1.config.json public/config.json

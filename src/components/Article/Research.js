@@ -60,6 +60,7 @@ export default function Research({ruleset, lang, id, version}) {
             <ListValue label="Allows Purchase" values={research.$allowsPurchase}>{ linkFn }</ListValue>
             <ListValue label="Manufacturing Process" values={research.manufacture}>{ linkFn }</ListValue>
             <ListValue label="Allows Transformation" values={research.$allowsTransform}>{ linkFn }</ListValue>
+            <ListValue label="Random Bonus Sources" values={research.$randomBonusSources}>{ linkFn }</ListValue>
         </Table>
     )
 }

@@ -1,0 +1,20 @@
+{
+    "title": "ROSIGMA",
+    "modules": [
+        {
+            "repo": "MeridianOXC/OpenXcom",
+            "branch": "oxce-plus",
+            "path": ["bin/standard/xcom1", "bin/common"]
+        },
+        {
+            "repo": "BeatAroundTheBuscher/OXCE_40k",
+            "branch": "main"
+        },
+        {
+            "repo": "BeatAroundTheBuscher/ROSIGMA",
+            "branch": "main"
+        }
+    ],
+    "contactURL": "https://discordapp.com/invite/XrQQTPg",
+    "contactLabel": "XCF Discord"
+}

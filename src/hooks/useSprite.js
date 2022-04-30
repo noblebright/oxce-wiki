@@ -1,8 +1,9 @@
 import React from "react";
 import { MissingSprite } from "../components/ComponentUtils";
 
-const useSprite = (ruleset, file, width, height, zoom = 4) => (id, {key, ...extraProps} = {}) => {
+const useSprite = (ruleset, file, width, height, zoom = 4) => (spriteRef, {key, ...extraProps} = {}) => {
     const sprite = ruleset.sprites[file];
+    const id = (typeof spriteRef === "object") ? spriteRef.index : spriteRef;
     if(!sprite || !sprite.files[id]) {
         return <MissingSprite size={`${Math.min(width, height) * zoom}px`}/>;
     }

@@ -1,9 +1,9 @@
 import deepmerge from "deepmerge";
-import { getSupportedLanguages } from "./utils";
 import { initializeLookups, processGlobe, compileMissions } from "./MissionMapper";
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
+import { customMerge } from "./YamlSchema";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -75,7 +75,7 @@ function generateSection(ruleset, rules, metadata) {
         if(!ruleset[name]) {
             ruleset[name] = { [sectionName]: entry };
         } else {
-            const mergedEntry = Object.assign({}, ruleset[name][sectionName], entry); //if there's an existing entry, merge new data into it.
+            const mergedEntry = Object.assign({}, deepmerge(ruleset[name][sectionName], entry, { clone: false, customMerge })); //if there's an existing entry, merge new data into it.
             Object.assign(ruleset[name], { [sectionName]: mergedEntry });
         }
         if(filter && !filter(entry, ruleset, name)) {
@@ -114,7 +114,7 @@ function generateLookup(ruleset, rules, metadata) {
         if(!lookup[name]) {
             lookup[name] = entry;
         } else {
-            Object.assign(lookup[name], entry);
+            lookup[name] = deepmerge(lookup[name], entry, { clone: false, customMerge });
         }
     });
 }
@@ -134,7 +134,7 @@ function generateAssets(ruleset, assets) {
         if(!ruleset[name]) {
             ruleset[name] = asset;
         } else {
-            ruleset[name] = deepmerge(ruleset[name], asset);
+            ruleset[name] = deepmerge(ruleset[name], asset, { clone: false });
         }
     });
 }
@@ -212,6 +212,17 @@ function getKillCriteriaItems(ruleset, killCriteria) {
     return [...items];
 }
 
+function getRandomBonusResearch(units) {
+    const oneFree = units.getOneFree ?? [];
+    const research = new Set(oneFree);
+    if(units.getOneFreeProtected) {
+        Object.keys(units.getOneFreeProtected).forEach(k => {
+            units.getOneFreeProtected[k].forEach(r => research.add(r));
+        });
+    }
+    return [...research];
+}
+
 function generateCategory(ruleset, key) {
     const entry = ruleset.entries[key];
     const items = entry.items;
@@ -232,51 +243,82 @@ function generateCategory(ruleset, key) {
 
 const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange"];
 
-export default function compile(base, mod) {
+function resolveRefNode(entries, key) {
+    const entry = entries[key];
+    Object.keys(entry).forEach(sectionKey => {
+        const section = entry[sectionKey];
+        if(section.refNode) {
+            entry[sectionKey] = Object.assign({}, section.refNode, section);
+        }
+    });
+}
+
+export default function compile(rulesList, supportedLanguages) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };
     
     //add languages
     console.time("l10n");
-    const supportedLanguages = getSupportedLanguages(base, mod);
-    supportedLanguages.forEach(key => {
-        ruleset.languages[key] = mod[key] ? deepmerge(base[key], mod[key]) : base[key];
+    supportedLanguages.forEach(lang => {
+        ruleset.languages[lang] = rulesList.reduce((acc, module) => {
+            if(module[lang]) {
+                acc = deepmerge(acc, module[lang]);
+            }
+            return acc;
+        }, {});
     });
     console.timeEnd("l10n");
 
     //add globalVars
-    globalKeys.forEach(key => ruleset.globalVars[key] = base[key] || mod[key]);
+    globalKeys.forEach(key => {
+        rulesList.forEach(rules => {
+            if(rules[key] !== undefined) {
+                ruleset.globalVars[key] = rules[key];
+            }
+        });
+    });
     
     //add entries
     console.time("entries");
     supportedSections.forEach(metadata => {
-        generateSection(ruleset.entries, base, metadata);
-        generateSection(ruleset.entries, mod, metadata);
+        rulesList.forEach(rules => {
+            generateSection(ruleset.entries, rules, metadata);
+        });
     });
+    for(const key in ruleset.entries) {
+        resolveRefNode(ruleset.entries, key);
+    }
     console.timeEnd("entries");
 
     //add lookups
     console.time("lookups");
     supportedLookups.forEach(metadata => {
-        generateLookup(ruleset.lookups, base, metadata);
-        generateLookup(ruleset.lookups, mod, metadata);
+        rulesList.forEach(rules => {
+            generateLookup(ruleset.lookups, rules, metadata);
+        });
     });
+    for(const key in ruleset.lookups) {
+        resolveRefNode(ruleset.lookups, key);
+    }
     console.timeEnd("lookups")
 
     console.time("assets");
     //add sprites
-    generateAssets(ruleset.sprites, base.extraSprites);
-    generateAssets(ruleset.sprites, mod.extraSprites);
+    rulesList.forEach(rules => {
+        generateAssets(ruleset.sprites, rules.extraSprites);
+    });
 
     //add sounds
-    generateAssets(ruleset.sounds, base.extraSounds);
-    generateAssets(ruleset.sounds, mod.extraSounds);
+    rulesList.forEach(rules => {
+        generateAssets(ruleset.sounds, rules.extraSounds);
+    });
     console.timeEnd("assets");
 
     //handle globe/region/mission/missionscript/deployment relationships
     console.time("missionMapping");
     initializeLookups(ruleset.lookups);
-    processGlobe(ruleset.lookups, base);
-    processGlobe(ruleset.lookups, mod);
+    rulesList.forEach(rules => {
+        processGlobe(ruleset.lookups, rules);
+    });
     compileMissions(ruleset);
     console.timeEnd("missionMapping");
 
@@ -305,6 +347,7 @@ export default function compile(base, mod) {
         generateCategory(ruleset, key);
         
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
+        backLink(ruleset.entries, key, getRandomBonusResearch(research), "research", "$randomBonusSources");
         backLink(ruleset.entries, key, items.requiresBuy, "research", "$allowsPurchase");
         backLink(ruleset.entries, key, events.researchList, "research", "$fromEvent");
         backLink(ruleset.entries, key, [research.spawnedEvent], "events", "$fromResearch");

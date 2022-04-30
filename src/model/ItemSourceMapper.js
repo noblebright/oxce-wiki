@@ -87,7 +87,7 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     backLinkSet(ruleset.entries, key, customCrafts && [...customCrafts], "items", "$deployedIn");
 }
 
-function handleCommand(command, terrainKey, ruleset, items, randomItems) {
+function handleCommand(scriptKey, command, terrainKey, ruleset, items, randomItems) {
     let blockObjs;
     
     //FIXME: Too lazy to do real lookups on globe geometry, default globeTerrain special value
@@ -105,8 +105,11 @@ function handleCommand(command, terrainKey, ruleset, items, randomItems) {
         // concat handles both array and non-arrays
         blockObjs = [].concat(command.groups || 0).map(groupId => groupCache[groupId]).filter(x => x).flat().map(blockId => terrainObj.mapBlocks[blockId]);
     }
-
-    blockObjs.filter(x => x.items || x.randomizedItems).forEach(block => {
+    const badBlocks = blockObjs.filter(x => !x);
+    if(badBlocks.length > 0) {
+        console.error(`Map Script ${scriptKey} referenced invalid ${terrainKey} blocks`);
+    }
+    blockObjs.filter(x => x && (x.items || x.randomizedItems)).forEach(block => {
         getMapBlockItems(block, items, randomItems);
     });
 }
@@ -159,11 +162,11 @@ function getDeploymentItems(alienDeployments, ruleset) {
                     command.verticalLevels.forEach(levelCommand => { //for each level
                         const levelTerrains = new Set(levelCommand.randomTerrain || [levelCommand.terrain || commandTerrainKey]);
                         levelTerrains.forEach(levelTerrainKey => { // for each possible terrain in the level
-                            handleCommand(levelCommand, levelTerrainKey, ruleset, items, randomItems);
+                            handleCommand(scriptKey, levelCommand, levelTerrainKey, ruleset, items, randomItems);
                         });
                     });
                 } else {
-                    handleCommand(command, commandTerrainKey, ruleset, items, randomItems);
+                    handleCommand(scriptKey, command, commandTerrainKey, ruleset, items, randomItems);
                 }
             })
         });

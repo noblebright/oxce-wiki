@@ -34,11 +34,16 @@ const FallbackDB = {
         put: makePut("versions", "repo")
 
     },
-    rulesets: {
+    files: {
+        get() { return Promise.resolve() },
+        put() { return Promise.resolve() },
+        bulkGet(x) { return x.map(x => undefined)},
+        bulkPut() { return Promise.resolve() }
+    },
+    fileList: {
         get() { return Promise.resolve() },
         put() { return Promise.resolve() }
-    },
-    precompiled: {}
+    }
 };
 
 export default FallbackDB;

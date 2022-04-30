@@ -53,3 +53,7 @@ export const mappify = (array, key, value) => {
 export function getSupportedLanguages(base, mod) {
     return Object.keys(possibleLanguages).filter(x => base[x] || mod[x]);
 }
+
+export function getModuleSupportedLanguages(modules) {
+    return Object.keys(possibleLanguages).filter(x => modules.every(module => module.ruleset[x]));
+}
