@@ -4,6 +4,7 @@ import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
 import CraftStats from "./CraftStats";
+import { getCraftSlots } from "../../model/CraftWeaponMapper";
 
 function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;
@@ -21,12 +22,20 @@ function WeaponSlots({crafts, lc}) {
         </React.Fragment>
     )
 }
+
 export default function Crafts({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
     const crafts = ruleset.entries[id].crafts;
 
     if(!crafts) return null;
+
+    const slots = [...getCraftSlots(crafts)];
+    const equipment = slots.reduce((acc, slot) => {
+        const lookup = ruleset.lookups.weaponsBySlot[slot] || [];
+        lookup.forEach(x => acc.add(x));
+        return acc;
+    }, new Set());
 
     return (
         <Table bordered striped size="sm" className="auto-width">
@@ -56,6 +65,7 @@ export default function Crafts({ruleset, lang, id, version}) {
            </tbody>
             <ListValue label="Required Research" values={crafts.requires}>{ linkFn }</ListValue>
             <ListValue label="Required Services" values={crafts.requiresBaseBuyFunc}>{ linkFn }</ListValue>
+            <ListValue label="Available Equipment" values={[...equipment]}>{ linkFn }</ListValue>
         </Table>
     )
 }

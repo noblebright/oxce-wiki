@@ -13,6 +13,7 @@ import MotionScanner from "./MotionScanner";
 import MindProbe from "./MindProbe";
 import PsiAmp from "./PsiAmp";
 import ElectroFlare from "./ElectroFlare";
+import CraftWeapons from "../CraftWeapons";
 
 const experienceStrings = [
     "ETM_DEFAULT",
@@ -114,7 +115,8 @@ const DefaultComponent = ({items, spriteFn}) => (
                 <SimpleValue label="Type" value={items.battleType}>{ getBattleType }</SimpleValue>
     </tbody>
 )
-export default function Item({ruleset, lang, id, version}) {
+export default function Item(props) {
+    const {ruleset, lang, id, version} = props;
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
     const spriteFn = useSprite(ruleset, "BIGOBS.PCK", 32, 48); //BIGOBS.PCK, 32px x 48px
@@ -128,6 +130,7 @@ export default function Item({ruleset, lang, id, version}) {
     }
     const BattleComponent = componentMap[items.battleType] || DefaultComponent;
     return (
+        <React.Fragment>
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Item"/>
             { BattleComponent && <BattleComponent ruleset={ruleset} items={items} lc={lc} linkFn={linkFn} spriteFn={spriteFn}/> }
@@ -141,11 +144,13 @@ export default function Item({ruleset, lang, id, version}) {
             <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
             <ListValue label="Component Of" values={items.componentOf}>{ linkFn }</ListValue>
             <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
-            <ListValue label="Craft Weapon Entry" values={items.craftWeapons}>{ linkFn }</ListValue>
-            <ListValue label="Craft Ammo For" values={items.craftAmmo}>{ linkFn }</ListValue>
+            <ListValue label="Craft Weapon Entry" values={items.$craftWeapons}>{ linkFn }</ListValue>
+            <ListValue label="Craft Ammo For" values={items.$craftAmmo}>{ linkFn }</ListValue>
             <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
             <ListValue label="Sources" values={items.$foundFrom}>{ linkFn }</ListValue>
             <ListValue label="Script Tags" values={Object.entries(items.tags || {})}/>
         </Table>
+        { items.$craftWeapons && items.$craftWeapons.map(id => <CraftWeapons {...props} key={id} id={id} />)}
+        </React.Fragment>
     )
 }

@@ -12,6 +12,8 @@ export default function CraftWeapons({ruleset, lang, id, version}) {
     
     if(!craftWeapons) return null;
 
+    const mountedOn = [...(ruleset.lookups.craftsBySlot[craftWeapons.weaponType] || [])];
+    
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Craft Weapon"/>
@@ -33,6 +35,7 @@ export default function CraftWeapons({ruleset, lang, id, version}) {
             </tbody>
             <ListValue label="Required Research" values={craftWeapons.requires}>{ linkFn }</ListValue>
             <ListValue label="Required Services" values={craftWeapons.requiresBaseBuyFunc}>{ linkFn }</ListValue>
+            <ListValue label="Mountable On" values={mountedOn}>{ linkFn }</ListValue>
         </Table>
     )
 }

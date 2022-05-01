@@ -4,6 +4,7 @@ import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
 import { customMerge } from "./YamlSchema";
+import { mapCraftsWeapons } from "./CraftWeaponMapper";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -231,6 +232,7 @@ function generateCategory(ruleset, key) {
     items.categories.forEach(category => {
         if(!ruleset.entries[category]) {
             ruleset.entries[category] = {};
+            ruleset.lookups.categories.push(category);
         }
         if(!ruleset.entries[category].category) {
             ruleset.entries[category].category = {
@@ -327,6 +329,10 @@ export default function compile(rulesList, supportedLanguages) {
     const allSoldiers = Object.keys(ruleset.entries).filter(k => ruleset.entries[k].soldiers);
 
     ruleset.lookups.hwps = [];
+    ruleset.lookups.craftsBySlot = {};
+    ruleset.lookups.weaponsBySlot = {};
+    ruleset.lookups.categories = [];
+
     //add backreferences
     console.time("backrefs");
     for(let key in ruleset.entries) {
@@ -357,8 +363,8 @@ export default function compile(rulesList, supportedLanguages) {
         backLink(ruleset.entries, key, manufacture.requires, "research", "manufacture");
         backLink(ruleset.entries, key, manufacture.producedItems && Object.keys(manufacture.producedItems), "items", "manufacture");
         backLink(ruleset.entries, key, manufacture.requiredItems && Object.keys(manufacture.requiredItems), "items", "componentOf");
-        backLink(ruleset.entries, key, [craftWeapons.launcher], "items", "craftWeapons");
-        backLink(ruleset.entries, key, [craftWeapons.clip], "items", "craftAmmo");
+        backLink(ruleset.entries, key, [craftWeapons.launcher], "items", "$craftWeapons");
+        backLink(ruleset.entries, key, [craftWeapons.clip], "items", "$craftAmmo");
         backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
         backLink(ruleset.entries, key, [manufacture.spawnedPersonType], "soldiers", "manufacture");
         backLink(ruleset.entries, key, [units.armor], "armors", "npcUnits");
@@ -371,7 +377,9 @@ export default function compile(rulesList, supportedLanguages) {
         backLink(ruleset.entries, key, [alienDeployments.unlockedResearch], "research", "$fromMission");
         backLinkSet(ruleset.entries, key, [alienDeployments.nextStage], "alienDeployments", "$prevStage");
         backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "$foundFrom");
-        
+
+        mapCraftsWeapons(ruleset.lookups, entry);
+
         if(ufos.raceBonus) {
             Object.entries(ufos.raceBonus).forEach(([race, data]) => {
                 if(data.craftCustomDeploy) {

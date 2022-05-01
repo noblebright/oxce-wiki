@@ -13,6 +13,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { Helmet } from "react-helmet-async";
 import useRuleset from "../../hooks/useRuleset";
 import useMobileLayout from "../../hooks/useMobileLayout";
+import useLocale from "../../hooks/useLocale";
 import SideBar from "./Sidebar";
 import Article from "../Article";
 import GunSim from "../GunSim";
@@ -83,9 +84,25 @@ const OptionsDropdown = ({title, children}) => (
     </Dropdown>
 );
 
+const CategoryDropdown = ({ lang, version, ruleset }) => {
+  const lc = useLocale(lang, ruleset);
+  
+  if(!ruleset) return null;
+  const categories = ruleset.lookups.categories;
+  return (
+    <NavDropdown className="CategoryDropdown" title={lc("categories")} rootCloseEvent="click">
+      { categories.map(key => 
+      <NavDropdown.Item key={key} as={Link} to={`/${version}/article/${key}`}>
+        { lc(key)}
+      </NavDropdown.Item>) }
+    </NavDropdown>
+  );
+};
+
 export default function Ruleset({ lang, setLanguage, versions }) {
     const { version } = useParams();
     const { result, status, statusKey } = useRuleset(version, versions);
+    
     const { path } = useRouteMatch();
     const isMobile = useMobileLayout();
     const [showSidebar, setShowSidebar] = useState(false);
@@ -110,6 +127,7 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                 <Col>
                     <Navbar bg="dark" variant="dark">
                         <Navbar.Brand>{isMobile && <Hamburger onClick={() => setShowSidebar(!showSidebar)}/>}<Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
+                        {!isMobile && ruleset?.lookups.categories && <CategoryDropdown ruleset={ruleset} lang={lang} version={version} />}
                         <Nav className="mr-auto">
                           {!isMobile && <Link to={`/${version}/gunSim`}>Gun Profiler</Link>}
                         </Nav>
