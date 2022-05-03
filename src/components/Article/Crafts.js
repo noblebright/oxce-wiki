@@ -2,6 +2,7 @@ import React from "react";
 import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
+import useSprite from "../../hooks/useSprite";
 import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
 import CraftStats from "./CraftStats";
 import { getCraftSlots } from "../../model/CraftWeaponMapper";
@@ -26,6 +27,7 @@ function WeaponSlots({crafts, lc}) {
 export default function Crafts({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
+    const spriteFn = useSprite(ruleset, "BASEBITS.PCK", 32, 48); //BIGOBS.PCK, 32px x 48px
     const crafts = ruleset.entries[id].crafts;
 
     if(!crafts) return null;
@@ -41,6 +43,7 @@ export default function Crafts({ruleset, lang, id, version}) {
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Craft"/>
             <tbody>
+                <SimpleValue label="Sprite" value={spriteFn(crafts.sprite + 33)}/>
                 <SimpleValue label="Weapon Slots" value={crafts.weapons}/>
                 <WeaponSlots crafts={crafts} lc={lc}/>
                 <SimpleValue label="Soldier Capacity" value={crafts.soldiers}/>
