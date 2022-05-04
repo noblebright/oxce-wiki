@@ -28,6 +28,9 @@ function getShotTypes(weapon, ammo) {
             if(!hasCost(weapon, type)) {
                 return false;
             }
+            if(!weapon[`conf${type}`]) {
+                return validAmmoSlots.has("0");
+            }
             return validAmmoSlots.has(`${weapon[`conf${type}`].ammoSlot}`);
         });
     }    
@@ -114,7 +117,7 @@ export function getChartData(ruleset, state) {
         }
         data.push(dataPoint);
     }
-    return data;
+    return { data, weaponEntry, compareWeaponEntry };
 }
 
 window.getChartData = function (statMode, direction, soldier, armor, weapon, ammo, target, kneeling = false, oneHanded = false) {
