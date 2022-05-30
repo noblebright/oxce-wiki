@@ -14,7 +14,12 @@ function WeaponSlots({crafts, lc}) {
     const weaponTypes = (crafts.weaponTypes || [0,0,0,0]).map(x => [].concat(x));
     const weaponStrings = (crafts.weaponStrings || ["STR_WEAPON_ONE", "STR_WEAPON_TWO"]);
 
-    for(let i = 0; i < crafts.weapons; i++) {
+    const definedWeapons = Math.min(crafts.weapons, weaponTypes.length, weaponStrings.length);
+
+    if(definedWeapons * 3 - crafts.weapons - weaponTypes.length - weaponStrings.length !== 0) {
+        console.warn(`${crafts.type} Definition mismatch for weapons, weaponTypes, and weaponStrings`);
+    }
+    for(let i = 0; i < definedWeapons; i++) {
         weaponEntry.push([`Weapon Slot ${i + 1}`, `${lc(weaponStrings[i])} (Type: ${weaponTypes[i].join(", ")})`]);
     }
     return (
