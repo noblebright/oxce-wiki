@@ -111,7 +111,9 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     //heterogenous ammo case.
     result = [];
     Object.keys(item.ammo).forEach(key => {
-        const actions = getAction(actionTypes.filter(x => `${item[`conf${x}`]?.ammoSlot}` === key)); //cast to string
+        const actions = getAction(actionTypes.filter(x => hasCost(item, x) && !item[`conf${x}`] ? 
+            key === "0" : // if there's a shot type but no conf object, assume slot 0
+            `${item[`conf${x}`]?.ammoSlot}` === key)); //cast to string
         result = result.concat(actions);
         result = result.concat(getAmmo(item.ammo[key].compatibleAmmo, `ammo${key}`));
     });
