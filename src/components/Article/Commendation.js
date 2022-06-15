@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Table from "react-bootstrap/Table";
 
 import useLocale from "../../hooks/useLocale";
+import useLink from "../../hooks/useLink";
 import SoldierBonus from "./SoldierBonus";
 import { ListHeader, ListValue, SectionHeader } from "../ComponentUtils.js";
 
@@ -79,6 +80,7 @@ function getKillString(killCriteria, lc) {
 
 export default function Commendation({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
+    const linkFn = useLink(version, lc);
     const commendations = ruleset.entries[id].commendations;
     const normalCriteria = commendations?.criteria;
 
@@ -92,8 +94,8 @@ export default function Commendation({ruleset, lang, id, version}) {
     return (
         <Table bordered striped size="sm" className="auto-width">
             <SectionHeader label="Commendation"/>
-            <ListValue label="Counted Mission Marker Types" values={commendations.missionMarkerFilter}>{lc}</ListValue>
-            <ListValue label="Counted Mission Types" values={commendations.missionTypeFilter}>{lc}</ListValue>
+            <ListValue label="Counted Mission Marker Types" values={commendations.missionMarkerFilter}>{linkFn}</ListValue>
+            <ListValue label="Counted Mission Types" values={commendations.missionTypeFilter}>{linkFn}</ListValue>
             <ListHeader label="Commendation Bonuses"/>
             <tbody>
             {
