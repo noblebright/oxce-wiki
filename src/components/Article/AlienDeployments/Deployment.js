@@ -19,7 +19,7 @@ function NumberAppearing({deployment}) {
     const low = deployment.lowQty;
     const delta = (deployment.dQty ?? 0) + (deployment.extraQty ?? 0);
     const high = deployment.highQty;
-    const mid = Math.ceil((low + high) / 2);
+    const mid = Math.floor((low + high) / 2);
 
     return (
         <React.Fragment>

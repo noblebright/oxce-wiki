@@ -214,7 +214,9 @@ export async function load(version, compiler, callback) {
         }      
     } catch (e) {
         // If parsing goes south, delete the db.
+        console.error(e);
         await db.delete();
+        throw e;
     }
 
     const supportedLanguages = getModuleSupportedLanguages(modules);
