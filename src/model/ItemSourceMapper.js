@@ -78,12 +78,14 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     backLinkSet(ruleset.entries, key, unitItems && [...unitItems], "items", "$foundFrom");
 
     //Items from deployment terrains and subterrains
-    const [deploymentItems, deploymentRandomItems, customCrafts] = getDeploymentItems(alienDeployments, ruleset);
+    const [deploymentItems, deploymentRandomItems, customCrafts, itemSetItems] = getDeploymentItems(alienDeployments, ruleset);
     alienDeployments.$terrainItems = [...deploymentItems];
     alienDeployments.$terrainRandomItems = [...deploymentRandomItems];
     alienDeployments.$customCrafts = [...customCrafts];
+    alienDeployments.$itemSetItems = [...itemSetItems];
     backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, deploymentRandomItems && [...deploymentRandomItems], "items", "$foundFrom");
+    backLinkSet(ruleset.entries, key, itemSetItems && [...itemSetItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, customCrafts && [...customCrafts], "items", "$deployedIn");
 }
 
@@ -122,6 +124,7 @@ function getDeploymentItems(alienDeployments, ruleset) {
     const items = new Set();
     const randomItems = new Set();
     const customCrafts = new Set();
+    const itemSetItems = new Set();
 
     //Items from alienDeployments
     if(alienDeployments.missionBountyItem) {
@@ -132,7 +135,7 @@ function getDeploymentItems(alienDeployments, ruleset) {
         //eslint-disable-next-line no-unused-expressions
         deployment.itemSets?.forEach(itemSet => {
             itemSet.forEach(item => {
-                randomItems.add(item);
+                itemSetItems.add(item);
             });
         });
     });
@@ -171,5 +174,5 @@ function getDeploymentItems(alienDeployments, ruleset) {
             })
         });
     });
-    return [items, randomItems, customCrafts];
+    return [items, randomItems, customCrafts, itemSetItems];
 }

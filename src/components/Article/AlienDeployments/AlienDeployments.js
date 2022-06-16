@@ -10,6 +10,21 @@ import EnviroEffect from "./EnviroEffect";
 import StartingConditions from "./StartingConditions";
 import Triggers from "./Triggers";
 
+function getMapItems(ruleset, entry) {
+    const items = new Set(entry.$terrainItems);
+    const randomItems = new Set(entry.$terrainRandomItems);
+    
+    entry.$relatedUfos.forEach(key => {
+        const ufo = ruleset.entries[key].ufos;
+        //eslint-disable-next-line no-unused-expressions
+        ufo.$ufoItems?.forEach(item => items.add(item));
+        //eslint-disable-next-line no-unused-expressions
+        ufo.$ufoRandomItems?.forEach(item => randomItems.add(item));
+    });    
+    
+    return [[...items], [...randomItems]];
+}
+
 export default function AlienDeployments({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
@@ -32,6 +47,8 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
 
     const startingConditions = ruleset.lookups.startingConditions[alienDeployments.startingCondition];
     const enviroEffects = ruleset.lookups.enviroEffects[alienDeployments.enviroEffects];
+
+    const [mapItems, mapRandomItems] = getMapItems(ruleset, alienDeployments);
 
     return (
         <React.Fragment>
@@ -60,8 +77,8 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                 </tbody>
                 <ListValue label="Variant Of" values={alienDeployments.$variantOf}>{ linkFn }</ListValue>
                 <ListValue label="Previous Stage" values={alienDeployments.$prevStage}>{ linkFn }</ListValue>
-                <ListValue label="Map Items" values={alienDeployments.$terrainItems}>{ linkFn }</ListValue>
-                <ListValue label="Map Items (Random)" values={alienDeployments.$terrainRandomItems}>{ linkFn }</ListValue>
+                <ListValue label="Map Items" values={mapItems}>{ linkFn }</ListValue>
+                <ListValue label="Map Items (Random)" values={mapRandomItems}>{ linkFn }</ListValue>
                 <ListValue label="Civilians" values={Object.entries(alienDeployments.civiliansByType || {})}>{ inventoryFn }</ListValue>
                 <ListValue label="Spawned Units" values={alienDeployments.$spawnedUnits}>{ linkFn }</ListValue>
                 <EnviroEffect value={enviroEffects} linkFn={linkFn} lc={lc}/>
