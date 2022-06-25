@@ -67,9 +67,9 @@ export function mapUnitSources(backLinkSet, ruleset) {
             console.warn(`No races found for deployment ${deploymentKey}!`)
         }
         races.forEach(raceId => { //for each possible race
-            const raceObj = ruleset.entries[raceId].alienRaces;
+            const raceObj = ruleset.entries[raceId]?.alienRaces;
             if(!raceObj) {
-                console.error(`No alienRaces found for ${raceId}!`);
+                console.error(`No alienRaces ${raceId} found for ${deploymentKey}!`);
                 return;
             }
 

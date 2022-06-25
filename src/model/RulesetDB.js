@@ -133,7 +133,10 @@ async function generateRuleset(module, db, callback) {
             const result = yaml.load(rawText, { json: true, schema });
             callback && callback(["LOADING_FILE", url, processed, files.length]);
             await new Promise(r => setTimeout(r, 16)); //yield so react can update the progress bar
-            fileContents.push(result);
+            if(!result) {
+                console.warn(`Skipping empty file: ${url}`);
+            }
+            fileContents.push(result ?? {}); // if it's nullish, just make it empty object as a noop
         } catch (e) {
             console.error(url);
             throw e;
