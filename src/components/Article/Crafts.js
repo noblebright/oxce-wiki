@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useSprite from "../../hooks/useSprite";
-import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
+import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue, Percent } from "../ComponentUtils.js";
 import CraftStats from "./CraftStats";
 import { getCraftSlots } from "../../model/CraftWeaponMapper";
 
@@ -29,6 +29,28 @@ function WeaponSlots({crafts, lc}) {
     )
 }
 
+// from src/Savegame/Craft.cpp
+function getFuelConsumption(crafts) {
+    return crafts.refuelItem ? 1 : Math.floor(crafts.speedMax / 100);
+}
+
+// from src/fmath.h
+function Nautical(x)
+{
+	return x * (1 / 60.0) * (Math.PI / 180.0);
+}
+
+// from src/Savegame/MovingTarget.cpp
+function getRadianSpeed(speed) {
+    return Nautical(speed) / 720.0;   
+}
+
+// from src/fmath.h
+function getXcomDistance(nautical) //go back to nm from radians
+{
+    return nautical * 60.0 * (180.0 / Math.PI);
+}
+
 export default function Crafts({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);
     const linkFn = useLink(version, lc);
@@ -43,6 +65,9 @@ export default function Crafts({ruleset, lang, id, version}) {
         lookup.forEach(x => acc.add(x));
         return acc;
     }, new Set());
+
+
+    const range = getXcomDistance(crafts.fuelMax / 2.0 / getFuelConsumption(crafts) * getRadianSpeed(crafts.speedMax) * 120);
 
     return (
         <Table bordered striped size="sm" className="auto-width">
@@ -60,7 +85,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <SimpleValue label="Sale Price" value={crafts.costSell}>{ Money }</SimpleValue>
                 <BooleanValue label="Show in Monthly Costs" value={crafts.forceShowInMonthlyCosts}/>
                 <SimpleValue label="Refuel Item" value={crafts.refuelItem}>{ linkFn }</SimpleValue>
-                <SimpleValue label="Refuel Rate (per 30 min)" value={crafts.repairRate}/>
+                <SimpleValue label="Repair Rate (per 30 min)" value={crafts.repairRate}/>
                 <SimpleValue label="Transfer Time" value={crafts.transferTime}>{ Hours }</SimpleValue>
                 <SimpleValue label="Score Loss (when destroyed)" value={crafts.score}/>
                 <BooleanValue label="Keep Craft After Failed Mission?" value={crafts.keepCraftAfterFailedMission}/>
@@ -68,6 +93,8 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <BooleanValue label="Notify When Refueled?" value={crafts.notifyWhenRefueled}/>
                 <BooleanValue label="Auto Patrol?" value={crafts.autoPatrol}/>
                 <SimpleValue label="Max Altitude" value={crafts.maxAltitude}/>
+                <SimpleValue label="Max Range" value={Math.floor(range)}/>
+                <SimpleValue label="Global Coverage" value={Math.floor(range * 100 / 10800)}>{Percent}</SimpleValue>
                 <SimpleValue label="Max Items" value={crafts.maxItems}/>
                 <CraftStats stats={crafts}/>
            </tbody>
