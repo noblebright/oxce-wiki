@@ -17,9 +17,9 @@ function getMapItems(ruleset, entry) {
     entry.$relatedUfos.forEach(key => {
         const ufo = ruleset.entries[key].ufos;
         //eslint-disable-next-line no-unused-expressions
-        ufo.$ufoItems?.forEach(item => items.add(item));
+        ufo?.$ufoItems?.forEach(item => items.add(item));
         //eslint-disable-next-line no-unused-expressions
-        ufo.$ufoRandomItems?.forEach(item => randomItems.add(item));
+        ufo?.$ufoRandomItems?.forEach(item => randomItems.add(item));
     });    
     
     return [[...items], [...randomItems]];
