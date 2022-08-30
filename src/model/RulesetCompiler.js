@@ -353,6 +353,7 @@ export default function compile(rulesList, supportedLanguages) {
         generateCategory(ruleset, key);
         
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
+        backLink(ruleset.entries, key, ruleset.lookups.startingConditions[alienDeployments.startingCondition]?.allowedCraft, "crafts", "$specialMissionAllowed");
         backLink(ruleset.entries, key, getRandomBonusResearch(research), "research", "$randomBonusSources");
         backLink(ruleset.entries, key, items.requiresBuy, "research", "$allowsPurchase");
         backLink(ruleset.entries, key, events.researchList, "research", "$fromEvent");

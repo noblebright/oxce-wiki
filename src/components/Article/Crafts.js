@@ -100,6 +100,7 @@ export default function Crafts({ruleset, lang, id, version}) {
            </tbody>
             <ListValue label="Required Research" values={crafts.requires}>{ linkFn }</ListValue>
             <ListValue label="Required Services" values={crafts.requiresBaseBuyFunc}>{ linkFn }</ListValue>
+            <ListValue label="Special Mission Capable" values={crafts.$specialMissionAllowed}>{ linkFn }</ListValue>
             <ListValue label="Available Equipment" values={[...equipment]}>{ linkFn }</ListValue>
         </Table>
     )
