@@ -175,3 +175,15 @@ const unitFactions = {
 };
 
 export const getUnitFaction = x => unitFactions[`${x}`];
+
+//HACK: used to distinguish linkFn entries that should not have links associated with them.  Should be rare.
+//TODO: refacotr useLink to pass ruleset and not link things that aren't valid keys.
+export class NoLink { 
+    constructor(text) {
+        this.text = text;
+    }
+
+    toString() {
+        return this.text;
+    }
+}

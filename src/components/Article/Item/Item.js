@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../../hooks/useLink";
 import useLocale from "../../../hooks/useLocale";
 import useSprite from "../../../hooks/useSprite";
-import { Hours, ListValue, Money, BooleanValue, getBattleType, SectionHeader, SimpleValue, ListHeader, Percent } from "../../ComponentUtils.js";
+import { Hours, ListValue, Money, BooleanValue, getBattleType, SectionHeader, SimpleValue, ListHeader, Percent, NoLink } from "../../ComponentUtils.js";
 import Firearm from "./Firearm";
 import Ammo from "./Ammo";
 import Melee from "./Melee";
@@ -129,6 +129,7 @@ export default function Item(props) {
         return null; //empty object.
     }
     const BattleComponent = componentMap[items.battleType] || DefaultComponent;
+    const foundFrom = items.specialType ? [...(items.$foundFrom ?? []), new NoLink("Map Terrrain")] : items.$foundFrom;
     return (
         <React.Fragment>
         <Table bordered striped size="sm" className="auto-width">
@@ -147,7 +148,7 @@ export default function Item(props) {
             <ListValue label="Craft Weapon Entry" values={items.$craftWeapons}>{ linkFn }</ListValue>
             <ListValue label="Craft Ammo For" values={items.$craftAmmo}>{ linkFn }</ListValue>
             <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
-            <ListValue label="Sources" values={items.$foundFrom}>{ linkFn }</ListValue>
+            <ListValue label="Sources" values={foundFrom}>{ linkFn }</ListValue>
             <ListValue label="Script Tags" values={Object.entries(items.tags || {})}/>
         </Table>
         { items.$craftWeapons && items.$craftWeapons.map(id => <CraftWeapons {...props} key={id} id={id} />)}
