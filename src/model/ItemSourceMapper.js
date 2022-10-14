@@ -42,6 +42,7 @@ function handleBattlescapeTerrain(battlescapeTerrainData) {
 export function mapItemSources(backLinkSet, ruleset, key) {
     const entry = ruleset.entries[key];
     const alienDeployments = entry.alienDeployments || {};
+    const manufacture = entry.manufacture || {};
     const ufos = entry.ufos || {};
     const units = entry.units || {};
     const crafts = entry.crafts || {};
@@ -83,10 +84,33 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     alienDeployments.$terrainRandomItems = [...deploymentRandomItems];
     alienDeployments.$customCrafts = [...customCrafts];
     alienDeployments.$itemSetItems = [...itemSetItems];
+
+    //Items from manufacturing
+    const manufactureItems = getManufactureItems(manufacture, ruleset);
+    backLinkSet(ruleset.entries, key, manufactureItems && [...manufactureItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, deploymentItems && [...deploymentItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, deploymentRandomItems && [...deploymentRandomItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, itemSetItems && [...itemSetItems], "items", "$foundFrom");
     backLinkSet(ruleset.entries, key, customCrafts && [...customCrafts], "items", "$deployedIn");
+}
+
+function getManufactureItems(manufacture, ruleset) {
+    const items = new Set();
+    if(!manufacture.producedItems) { // no producedItem specified, OXC-style self-named manufacture
+        items.add(manufacture.name);
+    } else {
+        Object.keys(manufacture.producedItems).forEach(key => {
+            items.add(key);
+        });
+        
+        //eslint-disable-next-line no-unused-expressions
+        manufacture.randomProducedItems?.forEach(([qty_unused, producedItems]) => {
+            Object.keys(producedItems).forEach(key => {
+                items.add(key);
+            });
+        });
+    }
+    return items;
 }
 
 function handleCommand(scriptKey, command, terrainKey, ruleset, items, randomItems) {
