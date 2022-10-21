@@ -5,6 +5,7 @@ import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
 import { customMerge } from "./YamlSchema";
 import { mapCraftsWeapons } from "./CraftWeaponMapper";
+import { getDamageKey } from "./utils";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}
@@ -224,23 +225,34 @@ function getRandomBonusResearch(units) {
     return [...research];
 }
 
+function addToCategory(ruleset, category, key, extraProps = {}) {
+    if(!ruleset.entries[category]) {
+        ruleset.entries[category] = {};
+        ruleset.lookups.categories.push(category);
+    }
+    if(!ruleset.entries[category].category) {
+        ruleset.entries[category].category = {
+            entries: []
+        };
+    }
+    ruleset.entries[category].category.entries.push(key);
+    Object.assign(ruleset.entries[category].category, extraProps);
+}
+
 function generateCategory(ruleset, key) {
     const entry = ruleset.entries[key];
     const items = entry.items;
     
     if(!items?.categories) return;
     items.categories.forEach(category => {
-        if(!ruleset.entries[category]) {
-            ruleset.entries[category] = {};
-            ruleset.lookups.categories.push(category);
-        }
-        if(!ruleset.entries[category].category) {
-            ruleset.entries[category].category = {
-                entries: []
-            };
-        }
-        ruleset.entries[category].category.entries.push(key);
+        addToCategory(ruleset, category, key);
     });
+}
+
+function getSelfDamageTypes(item) {
+    const meleeType = item.meleeAlter?.ResistType ?? item.meleeType;
+    const damageType = item.damageAlter?.ResistType ?? item.damageType;
+    return [meleeType, damageType].filter(x => x !== undefined).map(getDamageKey);
 }
 
 const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange"];
@@ -403,12 +415,22 @@ export default function compile(rulesList, supportedLanguages) {
 
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
+            const selfDamageTypes = getSelfDamageTypes(entry.items);
+            selfDamageTypes.forEach(damageType => {
+                addToCategory(ruleset, damageType, key, { damageType: true });
+            });
             if(compatibleAmmo) {
-                entry.items.allCompatibleAmmo = compatibleAmmo;
+                entry.items.$allCompatibleAmmo = compatibleAmmo;
+                compatibleAmmo.forEach(ammo => {
+                    const ammoDamageTypes = getSelfDamageTypes(ruleset.entries[ammo]);
+                    ammoDamageTypes.forEach(damageType => {
+                        addToCategory(ruleset, damageType, key, { damageType: true });
+                    });     
+                });
             }
         }
 
-        backLink(ruleset.entries, key, entry.items?.allCompatibleAmmo, "items", "ammoFor");
+        backLink(ruleset.entries, key, entry.items?.$allCompatibleAmmo, "items", "ammoFor");
 
         if(entry.facilities?.prisonType !== undefined) {
             ruleset.prisons[entry.facilities.prisonType] = ruleset.prisons[entry.facilities.prisonType] || [];

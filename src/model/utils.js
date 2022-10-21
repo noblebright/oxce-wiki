@@ -57,3 +57,12 @@ export function getSupportedLanguages(base, mod) {
 export function getModuleSupportedLanguages(modules) {
     return Object.keys(possibleLanguages).filter(x => modules.every(module => module.ruleset[x]));
 }
+
+export const damageKeys = [
+    "STR_DAMAGE_UC", "STR_DAMAGE_ARMOR_PIERCING", "STR_DAMAGE_INCENDIARY", "STR_DAMAGE_HIGH_EXPLOSIVE", "STR_DAMAGE_LASER_BEAM",
+    "STR_DAMAGE_PLASMA_BEAM", "STR_DAMAGE_STUN", "STR_DAMAGE_MELEE", "STR_DAMAGE_ACID", "STR_DAMAGE_SMOKE",
+    "STR_DAMAGE_10", "STR_DAMAGE_11", "STR_DAMAGE_12", "STR_DAMAGE_13", "STR_DAMAGE_14",
+    "STR_DAMAGE_15", "STR_DAMAGE_16", "STR_DAMAGE_17", "STR_DAMAGE_18", "STR_DAMAGE_19"
+];
+
+export const getDamageKey = x => damageKeys[x];

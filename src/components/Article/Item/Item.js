@@ -144,7 +144,7 @@ export default function Item(props) {
             <ListValue label="Services Required to Purchase" values={items.requiresBuyBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
             <ListValue label="Component Of" values={items.componentOf}>{ linkFn }</ListValue>
-            <ListValue label="Compatible Ammunition" values={items.allCompatibleAmmo}>{ linkFn }</ListValue>
+            <ListValue label="Compatible Ammunition" values={items.$allCompatibleAmmo}>{ linkFn }</ListValue>
             <ListValue label="Craft Weapon Entry" values={items.$craftWeapons}>{ linkFn }</ListValue>
             <ListValue label="Craft Ammo For" values={items.$craftAmmo}>{ linkFn }</ListValue>
             <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>

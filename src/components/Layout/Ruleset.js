@@ -86,14 +86,16 @@ const OptionsDropdown = ({title, children}) => (
 
 const CategoryDropdown = ({ lang, version, ruleset }) => {
   const lc = useLocale(lang, ruleset);
-  
+  const displayStr = key => ruleset.entries[key].category.damageType ? `${lc("damageType")}: ${lc(key)}` : lc(key);
+  const alphaSort = (a, b) => displayStr(a) > displayStr(b) ? 1 : -1;
+
   if(!ruleset) return null;
   const categories = ruleset.lookups.categories;
   return (
     <NavDropdown className="CategoryDropdown" title={lc("categories")} rootCloseEvent="click">
-      { categories.map(key => 
+      { categories.sort(alphaSort).map(key => 
       <NavDropdown.Item key={key} as={Link} to={`/${version}/article/${key}`}>
-        { lc(key)}
+        { displayStr(key) }
       </NavDropdown.Item>) }
     </NavDropdown>
   );

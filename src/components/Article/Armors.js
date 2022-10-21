@@ -3,7 +3,8 @@ import Table from "react-bootstrap/Table";
 import useLink from "../../hooks/useLink";
 import useLocale from "../../hooks/useLocale";
 import useBonusString from "../../hooks/useBonusString";
-import { BooleanValue, damageKeys, KeyValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, StatRecovery, UnitStats } from "../ComponentUtils.js";
+import { BooleanValue, KeyValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, StatRecovery, UnitStats } from "../ComponentUtils.js";
+import { damageKeys } from "../../model/utils";
 import useImage from "../../hooks/useImage";
 
 function ArmorRating({armors, lc}) {
