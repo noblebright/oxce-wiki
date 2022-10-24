@@ -6,7 +6,7 @@ const getArmorList = (state, soldier, lc) => {
     return usableArmors ? usableArmors.sort(alphaSort(lc)) : [state.entries[soldier].units.armor]; // no usable armors = vanilla HWP
 }
 const getAmmoList = (state, weapon, lc) => {
-    const ammoList = state.entries[weapon].items.allCompatibleAmmo;
+    const ammoList = state.entries[weapon].items.$allCompatibleAmmo;
     return ammoList ? ammoList.sort(alphaSort(lc)) : [];
 }
 
