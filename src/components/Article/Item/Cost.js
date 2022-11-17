@@ -10,6 +10,24 @@ export function hasCost(value, suffix) {
     return (costObj && costObj.time) || tu;
 }
 
+function isFlat(value, suffix, resource) {
+    console.log(suffix, resource);
+    switch(true) {
+        case value[`flat${suffix}`]?.[resource] !== undefined:  // flatSuffix (e.g. flatMelee.time === true)
+            console.log(value[`flat${suffix}`]);
+            return value[`flat${suffix}`][resource];
+        case value["flatRate"]: //flatRate is always TU only
+            console.log(value["flatRate"]);
+            return resource === "time"; 
+        case resource === "time": //TU is % by default
+            console.log(resource);
+            return false; 
+        default: //non-TU resources are flat by default
+            console.log("default");
+            return true; 
+    }
+}
+
 const Cost = ({value, suffix, lc, defaultTu}) => {
     const costObj = value[`cost${suffix}`];
     const tu = value[`tu${suffix}`];
@@ -19,7 +37,7 @@ const Cost = ({value, suffix, lc, defaultTu}) => {
     const cost = {...{ time: tu || defaultTu }, ...costObj};
     return (
         <React.Fragment>
-            { costKeys.map((key, idx) => (cost[key] ? <div key={key}><span>{cost[key]}{value["flatRate"] || cost[`flat${suffix}`] || key !== costKeys[0] ? "" : "%"}</span> <span>{lc(costStrings[idx])}</span></div> : null)) }
+            { costKeys.map((key, idx) => (cost[key] ? <div key={key}><span>{cost[key]}{isFlat(value, suffix, key) ? "" : "%"}</span> <span>{lc(costStrings[idx])}</span></div> : null)) }
         </React.Fragment>
     );
 };

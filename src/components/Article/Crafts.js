@@ -80,6 +80,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <SimpleValue label="Vehicle Capacity" value={crafts.vehicles}/>
                 <SimpleValue label="Pilots Required" value={crafts.pilots}/>
                 <BooleanValue label="Allow Landing?" value={crafts.allowLanding}/>
+                <BooleanValue label="Undetectable?" value={crafts.undetectable}/>
                 <SimpleValue label="Purchase Cost" value={crafts.costBuy}>{ Money }</SimpleValue>
                 <SimpleValue label="Rental Cost" value={crafts.costRent}>{ Money }</SimpleValue>
                 <SimpleValue label="Sale Price" value={crafts.costSell}>{ Money }</SimpleValue>
