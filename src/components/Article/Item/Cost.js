@@ -14,16 +14,12 @@ function isFlat(value, suffix, resource) {
     console.log(suffix, resource);
     switch(true) {
         case value[`flat${suffix}`]?.[resource] !== undefined:  // flatSuffix (e.g. flatMelee.time === true)
-            console.log(value[`flat${suffix}`]);
             return value[`flat${suffix}`][resource];
-        case value["flatRate"]: //flatRate is always TU only
-            console.log(value["flatRate"]);
-            return resource === "time"; 
+        case value["flatRate"] && resource === "time": //flatRate is always TU only
+            return true; 
         case resource === "time": //TU is % by default
-            console.log(resource);
             return false; 
         default: //non-TU resources are flat by default
-            console.log("default");
             return true; 
     }
 }

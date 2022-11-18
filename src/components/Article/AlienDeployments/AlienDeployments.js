@@ -66,9 +66,14 @@ export default function AlienDeployments({ruleset, lang, id, version}) {
                     <SimpleValue label="Duration" value={alienDeployments.duration}>{ x => `${x[0]} - ${x[1]}` }</SimpleValue>
                     <SimpleValue label="Point Penalty" value={alienDeployments.points}/>
                     <SimpleValue label="Grants Research" value={alienDeployments.unlockedResearch}>{ linkFn }</SimpleValue>
+                    <SimpleValue label="Grants Research on Failure" value={alienDeployments.unlockedResearchOnFailure}>{ linkFn }</SimpleValue>
+                    <SimpleValue label="Grants Research on Despawn" value={alienDeployments.unlockedResearchOnDespawn}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Grants Item" value={alienDeployments.missionBountyItem}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Despawn Penalty" value={alienDeployments.despawnPenalty}/>
                     <SimpleValue label="Abort Penalty" value={alienDeployments.abortPenalty}/>
+                    <SimpleValue label="Turn Limit" value={alienDeployments.turnLimit}/>
+                    <SimpleValue label="Mission Reward" value={alienDeployments.missionBountyItem}/>
+                    <SimpleValue label="Mission Reward Amount" value={alienDeployments.missionBountyItemCount}/>
                     <SimpleValue label="Turn Limit" value={alienDeployments.turnLimit}/>
                     <SimpleValue label="Related Ufo" value={alienDeployments.$relatedUfo}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Alien Race" value={availableRaces}>
