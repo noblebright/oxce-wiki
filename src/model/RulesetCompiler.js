@@ -413,6 +413,7 @@ export default function compile(rulesList, supportedLanguages) {
             ruleset.lookups.hwps.push(key);
         }
 
+        // Add categories for damage types
         if(entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
             const selfDamageTypes = getSelfDamageTypes(entry.items);
@@ -428,6 +429,11 @@ export default function compile(rulesList, supportedLanguages) {
                     });     
                 });
             }
+        }
+
+        // Add category for commendations
+        if(entry.commendations) {
+            addToCategory(ruleset, "STR_COMMENDATIONS", key);
         }
 
         backLink(ruleset.entries, key, entry.items?.$allCompatibleAmmo, "items", "ammoFor");
