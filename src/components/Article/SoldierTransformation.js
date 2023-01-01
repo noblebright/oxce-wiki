@@ -51,7 +51,7 @@ export default function SoldierTransformation({ruleset, lang, id, version}) {
                 <BooleanValue label="Upper Bound Mode?" value={UPPER_BOUND_LABEL[upperBoundMode]}/>
             </tbody>
             <ListValue label="Requires Research" values={transform.requires}>{ linkFn }</ListValue>
-            <ListValue label="Requires Services" values={transform.requiresBaseFunc}>{ lc }</ListValue>
+            <ListValue label="Requires Services" values={transform.requiresBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Allowed Soldier Types" values={transform.allowedSoldierTypes}>{ linkFn }</ListValue>
             <ListValue label="Required Transformations" values={transform.requiredPreviousTransformations}>{ linkFn }</ListValue>
             <ListValue label="Forbidden Transformations" values={transform.forbiddenPreviousTransformations}>{ linkFn }</ListValue>

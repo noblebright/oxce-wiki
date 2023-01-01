@@ -21,6 +21,7 @@ import SoldierTransformation from "./SoldierTransformation";
 import Commendation from "./Commendation";
 import Events from "./Events";
 import Category from "./Category";
+import BaseService from "./BaseService";
 
 import "./Article.css";
 
@@ -71,6 +72,7 @@ export default function Article({ ruleset, lang }) {
                 <Commendation {...articleProps}/>
                 <Events {...articleProps}/>
                 <Category {...articleProps}/>
+                <BaseService {...articleProps}/>
                 <Modal show={showDebug} onHide={handleHide} dialogClassName="modal-80w" centered animation={false}>
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>

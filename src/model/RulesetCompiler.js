@@ -5,6 +5,7 @@ import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
 import { customMerge } from "./YamlSchema";
 import { mapCraftsWeapons } from "./CraftWeaponMapper";
+import { mapPrisons, mapServices, resolveServices } from "./FacilityMapper";
 import { getDamageKey } from "./utils";
 /*
 {
@@ -169,17 +170,6 @@ function backLink(entries, id, list, targetSection, field) {
     }
 }
 
-function augmentServices(entries, id, list) {
-    if(!list) return;
-    for(let key of list) {
-        if(!entries[key]) {
-            entries[key] = {};
-        }
-        entries[key].providedBy = entries[key].providedBy || [];
-        entries[key].providedBy.push(id);
-    }
-}
-
 function getCompatibleAmmo(entry) {
     const ammo = new Set();
     const item = entry.items || {};
@@ -255,7 +245,7 @@ function getSelfDamageTypes(item) {
     return [meleeType, damageType].filter(x => x !== undefined).map(getDamageKey);
 }
 
-const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange"];
+const globalKeys = ["maxViewDistance", "oneHandedPenaltyGlobal", "kneelBonusGlobal", "fireDamageRange", "damageRange", "explosiveDamageRange", "hireEngineersRequiresBaseFunc", "hireScientistsRequiresBaseFunc"];
 
 function resolveRefNode(entries, key) {
     const entry = entries[key];
@@ -268,7 +258,7 @@ function resolveRefNode(entries, key) {
 }
 
 export default function compile(rulesList, supportedLanguages) {
-    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, prisons: {}, globalVars: {}, lookups: {} };
+    const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, globalVars: {}, lookups: {} };
     
     //add languages
     console.time("l10n");
@@ -344,6 +334,7 @@ export default function compile(rulesList, supportedLanguages) {
     ruleset.lookups.craftsBySlot = {};
     ruleset.lookups.weaponsBySlot = {};
     ruleset.lookups.categories = [];
+    ruleset.lookups.prisons = [];
 
     //add backreferences
     console.time("backrefs");
@@ -392,6 +383,8 @@ export default function compile(rulesList, supportedLanguages) {
         backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "$foundFrom");
 
         mapCraftsWeapons(ruleset.lookups, entry);
+        mapPrisons(ruleset.lookups, entry);
+        mapServices(entry, key);
 
         if(ufos.raceBonus) {
             Object.entries(ufos.raceBonus).forEach(([race, data]) => {
@@ -438,24 +431,19 @@ export default function compile(rulesList, supportedLanguages) {
 
         backLink(ruleset.entries, key, entry.items?.$allCompatibleAmmo, "items", "ammoFor");
 
-        if(entry.facilities?.prisonType !== undefined) {
-            ruleset.prisons[entry.facilities.prisonType] = ruleset.prisons[entry.facilities.prisonType] || [];
-            ruleset.prisons[entry.facilities.prisonType].push(key);
-        }
-        
         if(entry.alienDeployments && !getPossibleRaces(key, ruleset).size) {
             entry.hide = true;
         }
 
         mapItemSources(backLinkSet, ruleset, key);
-
-        //augmentServices(ruleset.entries, key, facilities.provideBaseFunc);
     }
     console.timeEnd("backrefs");
 
     console.time("unitSources");
     mapUnitSources(backLinkSet, ruleset);
     console.timeEnd("unitSources");
+
+    resolveServices(ruleset);
 
     backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
         if(obj[key] instanceof Set) {

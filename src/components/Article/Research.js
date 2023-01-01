@@ -44,7 +44,7 @@ export default function Research({ruleset, lang, id, version}) {
                 <SimpleValue label="Spawns Item" value={research.spawnedItem}>{ linkFn }</SimpleValue>
                 <SimpleValue label="Spawns Event" value={research.spawnedEvent}>{ linkFn }</SimpleValue>
             </tbody>
-            <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ lc }</ListValue>
+            <ListValue label="Requires Service" values={research.requiresBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Get as a Result of " values={research.seeAlso}>{ linkFn }</ListValue>
             <ListValue label="Mission Reward" values={research.$fromMission}>{ linkFn }</ListValue>
             <ListValue label="Event Reward" values={research.$fromEvent}>{ linkFn }</ListValue>

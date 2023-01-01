@@ -42,7 +42,7 @@ export default function Soldiers({ruleset, lang, id, version}) {
             </tbody>
             <ListValue label="Requires Research" values={soldiers.requires}>{ linkFn }</ListValue>
             <ListValue label="Manufacture Process" values={soldiers.manufacture}>{ linkFn }</ListValue>
-            <ListValue label="Requires Services" values={soldiers.requiresBuyBaseFunc}>{ lc }</ListValue>
+            <ListValue label="Requires Services" values={soldiers.requiresBuyBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Available Armors" values={soldiers.usableArmors}>{ linkFn }</ListValue>
             <ListValue label="Available Transforms" values={soldiers.$allowedTransform}>{ linkFn }</ListValue>
             <UnitStats min={soldiers.minStats} max={soldiers.maxStats} lc={lc} />

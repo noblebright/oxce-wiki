@@ -82,6 +82,7 @@ function intersects(ray1, ray2, t) {
 const numEntries = (Object.keys(unitWidths).length + 1) * 24 * 110 * 50;
 const buffer = new Uint16Array(numEntries);
 const VOXEL_PER_TILE = 16;
+const ITERATIONS = 100000;
 
 class Target {
 	constructor(x, y, z, width, height) {
@@ -102,7 +103,7 @@ function getAccuracy(width, height, accuracy, distance) {
 	const target = new Target(160, source.y + (distance * VOXEL_PER_TILE), 160, width, height);
 	let hits = 0;
 
-	for(let i = 0; i < 100000; i++) {
+	for(let i = 0; i < ITERATIONS; i++) {
 		let p = { x: target.x + target.width/2, y: target.y, z: target.z + target.height/2 } // shooting at center mass
 		applyAccuracy(source, p, accuracy);
 		if(intersects({...source}, {...p}, target)) {
@@ -110,7 +111,7 @@ function getAccuracy(width, height, accuracy, distance) {
 		}
 	}
 	//console.log(`width: ${width}, height: ${height}, accuracy: ${accuracy}, distance: ${distance}, hits: ${Math.floor(hits / 100000 * 65535)}`)
-	return Math.floor(hits / 100000 * 65535); // map onto UINT_16
+	return Math.floor(hits / ITERATIONS * 65535); // map onto UINT_16
 }
 
 function applyAccuracy(origin, target, accuracy) {

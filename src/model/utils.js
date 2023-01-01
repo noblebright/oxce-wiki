@@ -66,3 +66,12 @@ export const damageKeys = [
 ];
 
 export const getDamageKey = x => damageKeys[x];
+
+export const makeObjectPath = (obj, keyPath) => {
+    if(!keyPath || !keyPath.length) { return obj }
+    const [head, ...rest] = keyPath;
+    if(!obj[head]) {
+        obj[head] = {};
+    }
+    return makeObjectPath(obj[head], rest);
+}

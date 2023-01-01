@@ -70,12 +70,13 @@ export default function Research({ruleset, lang, id, version}) {
                 </SimpleValue>
             </tbody>
             <ListValue label="Required Research" values={facilities.requires}>{ linkFn }</ListValue>
-            <ListValue label="Required Services" values={facilities.requiresBaseFunc}>{ lc }</ListValue>
-            <ListValue label="Services Provided" values={facilities.provideBaseFunc}>{ lc }</ListValue>
-            <ListValue label="Services Forbidden" values={facilities.forbiddenBaseFunc}>{ lc }</ListValue>
+            <ListValue label="Required Services" values={facilities.requiresBaseFunc}>{ linkFn }</ListValue>
+            <ListValue label="Services Provided" values={facilities.provideBaseFunc}>{ linkFn }</ListValue>
+            <ListValue label="Services Forbidden" values={facilities.forbiddenBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Upgrades From" values={facilities.buildOverFacilities}>{ linkFn }</ListValue>
             <ListValue label="Upgrades To" values={facilities.upgradesTo}>{ linkFn }</ListValue>
             <ItemCosts facilities={facilities}>{ inventoryFn }</ItemCosts>
+            <ListValue label="Prison For" values={[...(ruleset.lookups.prisons[facilities.prisonType]?.holds ?? [])]}>{ linkFn }</ListValue>
         </Table>
     )
 }

@@ -139,7 +139,7 @@ export default function Item(props) {
             <ListValue label="Categories" values={items.categories}>{ linkFn }</ListValue>
             <ListValue label="Supported Inventory Sections" values={items.supportedInventorySections}>{ lc }</ListValue>
             <ListValue label="Associated Commendations" values={items.$givesCommendation}>{ linkFn }</ListValue>
-            <ListValue label="Prison Type" values={ruleset.prisons[items.prisonType || (items.liveAlien ? 0 : null)]}>{ linkFn }</ListValue>
+            <ListValue label="Held In" values={[...(ruleset.lookups.prisons[items.prisonType || (items.liveAlien ? 0 : null)]?.provides ?? [])]}>{ linkFn }</ListValue>
             <ListValue label="Research Required to Purchase" values={items.requiresBuy}>{ linkFn }</ListValue>
             <ListValue label="Services Required to Purchase" values={items.requiresBuyBaseFunc}>{ linkFn }</ListValue>
             <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
@@ -150,6 +150,7 @@ export default function Item(props) {
             <ListValue label="Wearable Armor" values={items.wearableArmors}>{ linkFn }</ListValue>
             <ListValue label="Sources" values={foundFrom}>{ linkFn }</ListValue>
             <ListValue label="Script Tags" values={Object.entries(items.tags || {})}/>
+            
         </Table>
         { items.$craftWeapons && items.$craftWeapons.map(id => <CraftWeapons {...props} key={id} id={id} />)}
         </React.Fragment>
