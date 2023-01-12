@@ -64,6 +64,7 @@ function MiscItem({ ruleset, items, lc, linkFn }) {
                 <SimpleValue label="Storage Space" value={items.size}/>
                 <SimpleValue label="Name in Inventory" value={items.name}>{lc}</SimpleValue>
                 <SimpleValue label="Ammo Name Modifier" value={items.nameAsAmmo}>{lc}</SimpleValue>
+                <SimpleValue label="Monthly Buy Limit" value={items.monthlyBuyLimit}>{Money}</SimpleValue>
                 <SimpleValue label="Monthly Maintenance" value={items.monthlyMaintenance}>{Money}</SimpleValue>
                 <SimpleValue label="Monthly Salary" value={items.monthlySalary}>{Money}</SimpleValue>
                 <SimpleValue label={lc("manaExperience")} value={items.manaExperience}/>

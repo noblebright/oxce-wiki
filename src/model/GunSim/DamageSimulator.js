@@ -1,37 +1,60 @@
 import { getMultiplier } from "./Multipliers";
-import { generate, mergeStats } from "./utils";
+import { mergeStats } from "./utils";
 import { defaultDTProps } from "../Constants";
 
-const randomTypes = [
+const randomTypeHisto = [
     null,
-    power => generate(200) / 100 * power,
-    power => (generate(100) + 50) / 100 * power,
-    power => power,
-    (power, ruleset) => {
-        const fireDamageRange = ruleset.fireDamageRange && [5, 10];
-        const delta = fireDamageRange[1] - fireDamageRange[0]
-        return generate(delta) + fireDamageRange[0] / 100 * power;
+    [0, 200],
+    [50, 150],
+    [100, 100],
+    ruleset => ruleset.fireDamageRange || [5, 10],
+    [0,0],
+    () => (power, resist, armor) => {
+        // 0-100 * 2
+        let sum = 0;
+        for(let i = 0; i <= 100; i++) { //0-1
+            const penetratingDamage = Math.floor(((power * i / 100) * resist) - armor);
+            // distribution: 1,2,3,...,100, 101, 100,
+            // sum of 1-100 = 5050
+            // so, 1-100 * 2 + 101 = 10201
+            sum += Math.max(0, penetratingDamage * (i + 1) / 10201); // 0 = 1/10201 -> 100 = 101/10201
+        }
+        for(let i = 101; i <= 200; i++) {
+            const penetratingDamage = Math.floor(((power * i / 100) * resist) - armor);
+            sum += Math.max(0, penetratingDamage * (201 - i) / 10201); // 101 = 100/10201 -> 200 = 1/10201             
+        }
+        return sum;
     },
-    () => 0,
-    power => (generate(100) + generate(100)) / 100 * power,
-    power => (generate(150) + 50) / 100 * power,
-    (power, ruleset) => {
+    [50, 200],
+    ruleset => {
         const damageRange = ruleset.globalVars.damageRange ?? 100;
-        return (generate(damageRange * 2) + (100 - damageRange)) / 100 * power;
+        return [100 - damageRange, 100 + damageRange];
     },
-    (power, ruleset) => {
+    ruleset => {
         const damageRange = ruleset.globalVars.explosiveDamageRange ?? 50;
-        return (generate(damageRange * 2) + (100 - damageRange)) / 100 * power;
+        return [100 - damageRange, 100 + damageRange];
     }
 ];
 
-function getExpectedDamage(ruleset, randomType, power, multipliers, stats, armorRating, armorPen, resist) {
-    const powerBonus = getMultiplier(multipliers, stats);
+function getDamageHistogram(ruleset, randomType, effectivePower, resist, effectiveArmor) {
+    const range = typeof randomTypeHisto[randomType] === "function" ? randomTypeHisto[randomType](ruleset) : randomTypeHisto[randomType];
+    if(typeof range === "function") { //0-100 * 2
+        return range(effectivePower, resist, effectiveArmor);
+    }
+    const histoLength = range[1] - range[0] + 1;
+    let sum = 0;
+    for(let i = 0; i < histoLength; i++) {
+        const penetratingDamage = Math.floor(((effectivePower * (i + range[0]) / 100) * resist) - effectiveArmor);
+        sum += Math.max(0, penetratingDamage);
+    }
+    return sum / histoLength;
+}
 
-    const incomingDamage = randomTypes[randomType](power + powerBonus, ruleset);
-    const resistedDamage = Math.floor(incomingDamage * resist);
+function getExpectedDamage(ruleset, randomType, power, multipliers, stats, armorRating, armorPen, resist) {
+    const effectivePower = power + getMultiplier(multipliers, stats);
     const effectiveArmor = Math.floor(armorRating * armorPen);
-    return Math.max(0, resistedDamage - effectiveArmor); //can't take negative damage
+
+    return getDamageHistogram(ruleset, randomType, effectivePower, resist, effectiveArmor);
 }
 
 const getDamageAlter = (key, defaultValue) => (weapon, ammo) => {
@@ -125,7 +148,7 @@ function getExplosive(weapon, ammo) {
     }
 }
 
-export function getAverageDamage(ruleset, iterations, state, weaponKey = "weapon", ammoKey = "ammo") {
+export function getAverageDamage(ruleset, state, weaponKey = "weapon", ammoKey = "ammo", powerModifier = 0) {
     const entries = ruleset.entries;
     const {stat, soldier, armor, target, direction} = state;
     const weaponEntry = entries[state[weaponKey]].items;  
@@ -137,7 +160,7 @@ export function getAverageDamage(ruleset, iterations, state, weaponKey = "weapon
     const soldierStats = soldierEntry[stat];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
     const randomType = getRandomType(weaponEntry, ammoEntry);
-    const power = getBasePower(weaponEntry, ammoEntry);
+    const power = getBasePower(weaponEntry, ammoEntry) + powerModifier;
     const multipliers = getMultipliers(weaponEntry, ammoEntry);
     const armorPen = getArmorPen(weaponEntry, ammoEntry);
     const damageType = getDamageType(weaponEntry, ammoEntry);
@@ -152,9 +175,5 @@ export function getAverageDamage(ruleset, iterations, state, weaponKey = "weapon
     const penetratingDamageMultiplier = getToHealth(weaponEntry, ammoEntry) * randomHealthFactor + 
                                         getToStun(weaponEntry, ammoEntry) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
 
-    let totalDamage = 0;
-    for(let i = 0; i < iterations; i++) {
-        totalDamage += getExpectedDamage(ruleset, randomType, power, multipliers, adjustedStats, armorRating, armorPen, resist) * penetratingDamageMultiplier;
-    }
-    return Math.floor(totalDamage / iterations);
+    return getExpectedDamage(ruleset, randomType, power, multipliers, adjustedStats, armorRating, armorPen, resist) * penetratingDamageMultiplier;
 }

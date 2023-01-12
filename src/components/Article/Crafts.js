@@ -82,6 +82,7 @@ export default function Crafts({ruleset, lang, id, version}) {
                 <BooleanValue label="Allow Landing?" value={crafts.allowLanding}/>
                 <BooleanValue label="Undetectable?" value={crafts.undetectable}/>
                 <SimpleValue label="Purchase Cost" value={crafts.costBuy}>{ Money }</SimpleValue>
+                <SimpleValue label="Monthly Buy Limit" value={crafts.monthlyBuyLimit}>{Money}</SimpleValue>
                 <SimpleValue label="Rental Cost" value={crafts.costRent}>{ Money }</SimpleValue>
                 <SimpleValue label="Sale Price" value={crafts.costSell}>{ Money }</SimpleValue>
                 <BooleanValue label="Show in Monthly Costs" value={crafts.forceShowInMonthlyCosts}/>

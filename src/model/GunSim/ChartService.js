@@ -3,8 +3,6 @@ import { unitWidths, ShotType } from "../Constants";
 import { computeAccuracyInputs } from "./Simulator";
 import { mergeStats } from "./utils";
 
-const iterations = 100000;
-
 function hasCost(value, suffix) {
     const costObj = value[`cost${suffix}`];
     const tu = value[`tu${suffix}`];
@@ -79,22 +77,38 @@ function lookupAcc(accuracyData, targetWidth, targetHeight, acc, distance, shots
     return accuracyData[offset] * shots  * 100 /  65535;
 }
 
+function getRangeModifiedDamage(powerRangeObj, avgDamage, distance, ruleset, state, weaponKey = "weapon", ammoKey = "ammo") {
+    if(!powerRangeObj) return avgDamage;
+    const modifiedDistance = distance - powerRangeObj.powerRangeThreshold;
+    if(modifiedDistance <= 0) return avgDamage;
+    const powerModifier = -modifiedDistance * powerRangeObj.powerRangeReduction;
+    return getAverageDamage(ruleset, state, weaponKey, ammoKey, powerModifier);
+}
+
+function getPowerRangeObj(weapon, ammo) {
+    if(ammo && ammo.powerRangeThreshold) return ammo;
+    if(weapon.powerRangeThreshold) return weapon;
+    return null;
+}
+
 export function getChartData(ruleset, state) {
-    const avgDamage = getAverageDamage(ruleset, iterations, state);
+    const avgDamage = getAverageDamage(ruleset, state);
     let compareAvgDamage;
     if(state.compare) {
-        compareAvgDamage = getAverageDamage(ruleset, iterations, state, "compareWeapon", "compareAmmo");
+        compareAvgDamage = getAverageDamage(ruleset, state, "compareWeapon", "compareAmmo");
     }
     const weaponEntry = ruleset.entries[state.weapon].items;
     const ammoEntry = ruleset.entries[state.ammo]?.items;
+    const powerRangeObj = getPowerRangeObj(weaponEntry, ammoEntry);
     const shotTypes = getShotTypes(weaponEntry, ammoEntry);
     const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
     
     const compareWeaponEntry = state.compare && ruleset.entries[state.compareWeapon]?.items;
     const compareAmmoEntry = state.compare && ruleset.entries[state.compareAmmo]?.items;
+    const comparePowerRangeObj = getPowerRangeObj(compareWeaponEntry, compareAmmoEntry);
     const compareShotTypes = state.compare && getShotTypes(compareWeaponEntry, compareAmmoEntry);
     const compareShotsPerTurnByType = state.compare && getShotsPerTurn(ruleset, state, "compareWeapon");
-    
+
     const data = [];
 
     for(let distance = 1; distance <= 50; distance++) {
@@ -104,7 +118,7 @@ export function getChartData(ruleset, state) {
             const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
             const shotsPerTurn = shotsPerTurnByType[shotType];
             dataPoint[`${shotType}HitRatio`] = hitRatio;
-            dataPoint[`${shotType}Damage`] = avgDamage * hitRatio / 100 * shotsPerTurn;
+            dataPoint[`${shotType}Damage`] = getRangeModifiedDamage(powerRangeObj, avgDamage, distance, ruleset, state) * hitRatio / 100 * shotsPerTurn;
         }
         if(state.compare) {
             for(let shotType of compareShotTypes) {
@@ -112,7 +126,7 @@ export function getChartData(ruleset, state) {
                 const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
                 const shotsPerTurn = compareShotsPerTurnByType[shotType];
                 dataPoint[`Compare${shotType}HitRatio`] = hitRatio;
-                dataPoint[`Compare${shotType}Damage`] = compareAvgDamage * hitRatio / 100 * shotsPerTurn;
+                dataPoint[`Compare${shotType}Damage`] = getRangeModifiedDamage(comparePowerRangeObj, compareAvgDamage, distance, ruleset, state, "compareWeapon", "compareAmmo") * hitRatio / 100 * shotsPerTurn;
             }
         }
         data.push(dataPoint);

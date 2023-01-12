@@ -29,6 +29,7 @@ export default function Soldiers({ruleset, lang, id, version}) {
                 <BooleanValue label="Pilot?" value={soldiers.allowPiloting}/>
                 <SimpleValue label="Purchase Cost" value={soldiers.costBuy}>{ Money }</SimpleValue>
                 <SimpleValue label="Monthly Salary" value={soldiers.costSalary}>{ Money }</SimpleValue>
+                <SimpleValue label="Monthly Buy Limit" value={soldiers.monthlyBuyLimit}>{Money}</SimpleValue>
                 <SimpleValue label={`Monthly Salary (${lc("STR_SQUADDIE")})`} value={soldiers.costSalarySquaddie}>{ Money }</SimpleValue>
                 <SimpleValue label={`Monthly Salary (${lc("STR_SERGEANT")})`} value={soldiers.costSalarySergeant}>{ Money }</SimpleValue>
                 <SimpleValue label={`Monthly Salary (${lc("STR_CAPTAIN")})`} value={soldiers.costSalaryCaptain}>{ Money }</SimpleValue>
