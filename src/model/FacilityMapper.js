@@ -33,9 +33,10 @@ const serviceMapping = {
     manufacture: [["requiresBaseFunc", "requiredToManufacture"]]
 }
 
-let serviceCache = {};
+let serviceCache;
 
 export function mapServices(entry, id) {
+    if(!serviceCache) serviceCache = {};
     Object.keys(entry).forEach(key => {
         if(serviceMapping[key]) {
             const entity = entry[key];

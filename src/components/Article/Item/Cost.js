@@ -11,7 +11,6 @@ export function hasCost(value, suffix) {
 }
 
 function isFlat(value, suffix, resource) {
-    console.log(suffix, resource);
     switch(true) {
         case value[`flat${suffix}`]?.[resource] !== undefined:  // flatSuffix (e.g. flatMelee.time === true)
             return value[`flat${suffix}`][resource];

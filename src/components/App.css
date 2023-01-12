@@ -30,8 +30,8 @@ html, body, #root {
 }
 
 .ListHeader {
-  background-color: var(--gray);
-  color: var(--light);
+  --bs-table-bg: var(--bs-gray-600);
+  color: var(--bs-gray-100);
   font-weight: 600;
 }
 
@@ -45,4 +45,8 @@ html, body, #root {
 
 .hide {
   display: none !important;
+}
+
+#root a { /* stupid specificity games with bootstrap@5.2.0 CSS normalizer */
+  text-decoration: none;
 }

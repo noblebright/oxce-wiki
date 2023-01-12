@@ -36,47 +36,11 @@ const randomTypeHisto = [
     }
 ];
 
-function getDamageHistogram(ruleset, randomType, effectivePower, resist, effectiveArmor) {
-    const range = typeof randomTypeHisto[randomType] === "function" ? randomTypeHisto[randomType](ruleset) : randomTypeHisto[randomType];
-    if(typeof range === "function") { //0-100 * 2
-        return range(effectivePower, resist, effectiveArmor);
-    }
-    const histoLength = range[1] - range[0] + 1;
-    let sum = 0;
-    for(let i = 0; i < histoLength; i++) {
-        const penetratingDamage = Math.floor(((effectivePower * (i + range[0]) / 100) * resist) - effectiveArmor);
-        sum += Math.max(0, penetratingDamage);
-    }
-    return sum / histoLength;
+function getPowerRangeObj(weapon, ammo) {
+    if(ammo?.powerRangeThreshold) return ammo;
+    if(weapon.powerRangeThreshold) return weapon;
+    return null;
 }
-
-function getExpectedDamage(ruleset, randomType, power, multipliers, stats, armorRating, armorPen, resist) {
-    const effectivePower = power + getMultiplier(multipliers, stats);
-    const effectiveArmor = Math.floor(armorRating * armorPen);
-
-    return getDamageHistogram(ruleset, randomType, effectivePower, resist, effectiveArmor);
-}
-
-const getDamageAlter = (key, defaultValue) => (weapon, ammo) => {
-    switch(true) {
-        case ammo.damageAlter?.[key] !== undefined && 
-             ammo.damageAlter?.[key] !== 0: 
-            return ammo.damageAlter[key];
-        case weapon.damageAlter?.[key] !== undefined && 
-             weapon.damageAlter?.[key] !== 0:
-            return weapon.damageAlter[key];
-        case ammo.damageType !== undefined && 
-            defaultDTProps[ammo.damageType][key] !== undefined: 
-            return defaultDTProps[ammo.damageType][key];
-        case weapon.damageType !== undefined &&
-            defaultDTProps[weapon.damageType][key] !== undefined: 
-            return defaultDTProps[weapon.damageType][key];
-        default:
-            return defaultValue;
-    }
-}
-
-const getRandomType = getDamageAlter("RandomType", 8);
 
 function getBasePower(weapon, ammo) {
     return ammo.power !== undefined ? ammo.power : weapon.power;
@@ -95,15 +59,6 @@ function getMultipliers(weapon, ammo) {
         default: return {};
     }
 }
-
-const getArmorPen = getDamageAlter("ArmorEffectiveness", 1);
-const getDamageType = getDamageAlter("ResistType", 1);
-const getToHealth = getDamageAlter("ToHealth", 1);
-const getRandomHealth = getDamageAlter("RandomHealth", false);
-const getRandomStun = getDamageAlter("RandomStun", true);
-const getToStun = getDamageAlter("ToHealth", 0.25);
-const getIgnorePainImmunity = getDamageAlter("IgnorePainImmunity", false);
-const getIgnoreDirection = getDamageAlter("IgnoreDirection", false);
 
 function getTargetStats(entries, damageType, targetEntry, direction, explosive) {
     const targetArmor = entries[targetEntry.armor].armors;
@@ -132,48 +87,103 @@ function getTargetStats(entries, damageType, targetEntry, direction, explosive) 
     return { armorRating, painImmune, resist };
 }
 
-const getFixRadius = getDamageAlter("FixRadius", undefined);
+class DamageSimulator {
+    constructor(ruleset, state, weaponKey = "weapon", ammoKey = "ammo") {
+        this.ruleset = ruleset;
+        this.state = state;
+        this.weaponEntry = ruleset.entries[state[weaponKey]].items;
+        this.ammoEntry = ruleset.entries[state[ammoKey]]?.items;
+        this.powerRangeObj = getPowerRangeObj(this.weaponEntry, this.ammoEntry);
+        this.basicDamage = this.#getAverageDamage(); // damage without distance dropoff.
+    }
 
-function getExplosive(weapon, ammo) {
-    const fixRadius = getFixRadius(weapon, ammo);
-    switch(true) {
-        case fixRadius !== undefined: 
-            return fixRadius !== 0;
-        case ammo.blastRadius !== undefined: 
-            return ammo.blastRadius !== 0;
-        case weapon.blastRadius !== undefined: 
-            return weapon.blastRadius !== 0;
-        default:
-            return false;
+    #getDamageHistogram(randomType, effectivePower, resist, effectiveArmor) {
+        const range = typeof randomTypeHisto[randomType] === "function" ? randomTypeHisto[randomType](this.ruleset) : randomTypeHisto[randomType];
+        if(typeof range === "function") { //0-100 * 2
+            return range(effectivePower, resist, effectiveArmor);
+        }
+        const histoLength = range[1] - range[0] + 1;
+        let sum = 0;
+        for(let i = 0; i < histoLength; i++) {
+            const penetratingDamage = Math.floor(((effectivePower * (i + range[0]) / 100) * resist) - effectiveArmor);
+            sum += Math.max(0, penetratingDamage);
+        }
+        return sum / histoLength;
+    }
+
+    #getDamageAlter(key, defaultValue) {
+        const ammo = this.ammoEntry ?? {};
+        const weapon = this.weaponEntry;
+        switch(true) {
+            case ammo.damageAlter?.[key] !== undefined && 
+                 ammo.damageAlter?.[key] !== 0: 
+                return ammo.damageAlter[key];
+            case weapon.damageAlter?.[key] !== undefined && 
+                 weapon.damageAlter?.[key] !== 0:
+                return weapon.damageAlter[key];
+            case ammo.damageType !== undefined && 
+                defaultDTProps[ammo.damageType][key] !== undefined: 
+                return defaultDTProps[ammo.damageType][key];
+            case weapon.damageType !== undefined &&
+                defaultDTProps[weapon.damageType][key] !== undefined: 
+                return defaultDTProps[weapon.damageType][key];
+            default:
+                return defaultValue;
+        }
+    }
+    
+    #getExplosive() {
+        const weapon = this.weaponEntry;
+        const ammo = this.ammoEntry ?? {};
+        const fixRadius = this.#getDamageAlter("FixRadius", undefined);
+        switch(true) {
+            case fixRadius !== undefined: 
+                return fixRadius !== 0;
+            case ammo.blastRadius !== undefined: 
+                return ammo.blastRadius !== 0;
+            case weapon.blastRadius !== undefined: 
+                return weapon.blastRadius !== 0;
+            default:
+                return false;
+        }
+    }
+
+    #getAverageDamage(powerModifier = 0) {
+        const entries = this.ruleset.entries;
+        const {stat, soldier, armor, target, direction} = this.state;
+        const targetEntry = entries[target].units;  //needed for armor info
+        const soldierEntry = entries[soldier].soldiers;  //needed for stats
+        const armorEntry = entries[armor].armors; //needed for stats
+        const soldierStats = soldierEntry[stat];
+        const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
+        const randomType = this.#getDamageAlter("RandomType", 8);
+        const power = getBasePower(this.weaponEntry, this.ammoEntry ?? {}) + powerModifier;
+        const multipliers = getMultipliers(this.weaponEntry, this.ammoEntry ?? {});
+        const armorPen = this.#getDamageAlter("ArmorEffectiveness", 1);
+        const damageType = this.#getDamageAlter("ResistType", 1);
+        const isExplosive = this.#getExplosive();
+        const ignoreDirection = this.#getDamageAlter("IgnoreDirection", false);
+        const ignorePainImmunity = this.#getDamageAlter("IgnorePainImmunity", false);
+        const randomHealthFactor = this.#getDamageAlter("RandomHealth", false) ? .5 : 1; // RandomX is uniform 1-N distribution
+        const randomStunFactor = this.#getDamageAlter("RandomStun", true) ? .5 : 1;     // Average distribution is n / 2
+    
+        // IgnoreDirection defaults to front armor
+        const { armorRating, painImmune, resist } = getTargetStats(entries, damageType, targetEntry, ignoreDirection ? "front" : direction, isExplosive);
+        const penetratingDamageMultiplier = this.#getDamageAlter("ToHealth", 1) * randomHealthFactor + 
+                                            this.#getDamageAlter("ToHealth", 0.25) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
+    
+        const effectivePower = power + getMultiplier(multipliers, adjustedStats);
+        const effectiveArmor = Math.floor(armorRating * armorPen);
+        return this.#getDamageHistogram(randomType, effectivePower, resist, effectiveArmor) * penetratingDamageMultiplier;
+    }
+
+    getRangeModifiedDamage(distance, powerModifier = 0) {
+        if(!this.powerRangeObj) return this.basicDamage;
+        const modifiedDistance = distance - this.powerRangeObj.powerRangeThreshold;
+        if(modifiedDistance <= 0) return this.basicDamage;
+        const distanceModifier = -modifiedDistance * this.powerRangeObj.powerRangeReduction;
+        return this.#getAverageDamage(distanceModifier + powerModifier);
     }
 }
 
-export function getAverageDamage(ruleset, state, weaponKey = "weapon", ammoKey = "ammo", powerModifier = 0) {
-    const entries = ruleset.entries;
-    const {stat, soldier, armor, target, direction} = state;
-    const weaponEntry = entries[state[weaponKey]].items;  
-    const targetEntry = entries[target].units;  //needed for armor info
-    const soldierEntry = entries[soldier].soldiers;  //needed for stats
-    const armorEntry = entries[armor].armors; //needed for stats
-    const ammoEntry = entries[state[ammoKey]]?.items ?? {};
-
-    const soldierStats = soldierEntry[stat];
-    const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
-    const randomType = getRandomType(weaponEntry, ammoEntry);
-    const power = getBasePower(weaponEntry, ammoEntry) + powerModifier;
-    const multipliers = getMultipliers(weaponEntry, ammoEntry);
-    const armorPen = getArmorPen(weaponEntry, ammoEntry);
-    const damageType = getDamageType(weaponEntry, ammoEntry);
-    const isExplosive = getExplosive(weaponEntry, ammoEntry);
-    const ignoreDirection = getIgnoreDirection(weaponEntry, ammoEntry);
-    const ignorePainImmunity = getIgnorePainImmunity(weaponEntry, ammoEntry);
-    const randomHealthFactor = getRandomHealth(weaponEntry, ammoEntry) ? .5 : 1; // RandomX is uniform 1-N distribution
-    const randomStunFactor = getRandomStun(weaponEntry, ammoEntry) ? .5 : 1;     // Average distribution is n / 2
-
-    // IgnoreDirection defaults to front armor
-    const { armorRating, painImmune, resist } = getTargetStats(entries, damageType, targetEntry, ignoreDirection ? "front" : direction, isExplosive);
-    const penetratingDamageMultiplier = getToHealth(weaponEntry, ammoEntry) * randomHealthFactor + 
-                                        getToStun(weaponEntry, ammoEntry) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
-
-    return getExpectedDamage(ruleset, randomType, power, multipliers, adjustedStats, armorRating, armorPen, resist) * penetratingDamageMultiplier;
-}
+export default DamageSimulator;

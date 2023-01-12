@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import Table from "react-bootstrap/Table";
 
-export const SectionHeader = ({label}) => (label ? <thead><tr><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
-export const ListHeader = ({label}) => (<thead>{label && <tr><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
+export const SectionHeader = ({label}) => (label ? <thead><tr className="table-dark"><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
+export const ListHeader = ({label}) => (<thead>{label && <tr className="table-secondary"><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
 
 export const ContainerValue = ({children}) => <tr><td colSpan="2">{children}</td></tr>;
 export const SimpleValue = ({label, value, children, showZero}) => ((showZero ? (value || value === 0) : value) ? <tr><td>{label}</td><td>{children ? children(value) : value}</td></tr> : null);
@@ -117,8 +117,8 @@ export const battleType = [
 
 export const getBattleType = (val) => battleType[val];
 
-export const Actions = ({children}) => (<tbody><tr><td colSpan="2"><Table>{children}</Table></td></tr></tbody>);
-export const ActionHeader = ({label}) => (<thead>{label && <tr><th className="ListHeader">{label}</th><th className="ListHeader">Accuracy</th><th className="ListHeader">Cost</th></tr>}</thead>);
+export const Actions = ({children}) => (<tbody><tr><td colSpan="2"><Table striped>{children}</Table></td></tr></tbody>);
+export const ActionHeader = ({label}) => (<thead>{label && <tr className="table-secondary"><th className="ListHeader">{label}</th><th className="ListHeader">Accuracy</th><th className="ListHeader">Cost</th></tr>}</thead>);
 export const ActionValue = ({label, cost, show, accuracy, shots}) => (
     show ? 
     <tr>

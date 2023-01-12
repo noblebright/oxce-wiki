@@ -40,23 +40,23 @@ export default function GunSim({ ruleset, lang }) {
             <Form className="GunSimSidebar">
                 <Form.Group className="mb-3" controlId="soldier">
                     <Form.Label>Stat Basis</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={stat} onChange={e => setStat(e.target.value)}>
+                    <Form.Select size="sm" value={stat} onChange={e => setStat(e.target.value)}>
                         <option value="statCaps">Stat Max</option>
                         <option value="trainingStatCaps">Training Max</option>
                         <option value="maxStats">Starting Max</option>
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="soldier">
                     <Form.Label>Soldier Type</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={soldier} onChange={e => setSoldier(e.target.value, lc)}>
+                    <Form.Select size="sm" value={soldier} onChange={e => setSoldier(e.target.value, lc)}>
                         { soldierOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="soldierArmor">
                     <Form.Label>Armor Type</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={armor} onChange={e => setArmor(e.target.value)}>
+                    <Form.Select size="sm" value={armor} onChange={e => setArmor(e.target.value)}>
                         { armorOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="conditional">
                     <div>
@@ -66,54 +66,54 @@ export default function GunSim({ ruleset, lang }) {
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="weapon">
                     <Form.Label>Weapon 1</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={weapon} onChange={e => setWeapon(e.target.value, lc)}>
+                    <Form.Select size="sm" value={weapon} onChange={e => setWeapon(e.target.value, lc)}>
                         { weaponOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="ammo">
                     <Form.Label>Ammo</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={ammo} onChange={e => setAmmo(e.target.value)}>
+                    <Form.Select size="sm" value={ammo} onChange={e => setAmmo(e.target.value)}>
                         { ammoOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="compare">
                     <Form.Check type="checkbox" id="compare" checked={compare} onChange={e => setCompare(e.target.checked)} label="Compare"/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="compareWeapon">
                     <Form.Label>Weapon 2</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={compareWeapon} onChange={e => setCompareWeapon(e.target.value, lc)} disabled={!compare}>
+                    <Form.Select size="sm" value={compareWeapon} onChange={e => setCompareWeapon(e.target.value, lc)} disabled={!compare}>
                         { weaponOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="compareAmmo">
                     <Form.Label>Ammo 2</Form.Label>
-                    <Form.Control as="select" size="sm" custom value={compareAmmo} onChange={e => setCompareAmmo(e.target.value)} disabled={!compare}>
+                    <Form.Select size="sm" value={compareAmmo} onChange={e => setCompareAmmo(e.target.value)} disabled={!compare}>
                         { compareAmmoOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="target" value={target} onChange={e => setTarget(e.target.value)}>
                     <Form.Label>Target</Form.Label>
-                    <Form.Control as="select" size="sm" custom>
+                    <Form.Select size="sm">
                         { targetOptions }
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="target" value={direction} onChange={e => setDirection(e.target.value)}>
                     <Form.Label>Facing</Form.Label>
-                    <Form.Control as="select" size="sm" custom>
+                    <Form.Select size="sm">
                         <option value="front">Front</option>
                         <option value="left">Left</option>
                         <option value="right">Right</option>
                         <option value="rear">Rear</option>
-                    </Form.Control>
+                    </Form.Select>
                 </Form.Group>
                 <Button variant="primary" onClick={startRun} disabled={!accuracyDataLoaded}>Submit</Button>
             </Form>
             <div className="GunSimContent">
-                <Form.Control as="select" size="sm" custom value={mode} onChange={e => setMode(e.target.value)}>
+                <Form.Select size="sm" value={mode} onChange={e => setMode(e.target.value)}>
                     <option value="HitRatio">Hit Ratio</option>
                     <option value="Damage">Damage</option>
-                </Form.Control>
+                </Form.Select>
                 { chartData ? <ResultChart data={chartData} mode={mode} lc={lc}/> : null }
             </div>
         </main>

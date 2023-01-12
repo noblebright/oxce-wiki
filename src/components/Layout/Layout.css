@@ -62,5 +62,5 @@
 
 .CategoryDropdown .dropdown-menu {
     max-height: 50vh;
-    overflow: scroll;
+    overflow-y: scroll;
 }

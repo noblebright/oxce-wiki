@@ -48,7 +48,7 @@ const GunAmmo = ({lc, linkFn, item, integral, melee, ruleset}) => (
         <td>
             {item.clipSize && item.clipSize !== -1 ? <div>{lc("clipSize")}: {item.clipSize}</div> : null}
             <div>
-                <Table>
+                <Table striped>
                     <tbody>
                         <DamageAlter type={melee ? item.meleeType : item.damageType} 
                                      alter={melee ? item.meleeAlter : item.damageAlter} 
@@ -74,7 +74,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
         <tr key={key}>
             <td></td>
             <td colSpan="2">
-                <Table>
+                <Table className="table-secondary" striped>
                     <tbody>
                         {ammoList.map(x => <GunAmmo key={x} lc={lc} linkFn={linkFn} item={ruleset.entries[x].items} ruleset={ruleset}/>)}
                     </tbody>      
@@ -88,7 +88,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
         <tr key="MeleeAmmo">
             <td></td>
             <td colSpan="2">
-                <Table>
+                <Table className="table-secondary" striped>
                     <tbody>
                         <GunAmmo lc={lc} linkFn={linkFn} item={item} integral ruleset={ruleset} melee/>
                     </tbody>
@@ -110,6 +110,7 @@ function buildActions(item, lc, linkFn, bonusFn, ruleset) {
     }
     //heterogenous ammo case.
     result = [];
+    //FIXME: Handle cases where ammo slot has no compatibleAmmo.
     Object.keys(item.ammo).forEach(key => {
         const actions = getAction(actionTypes.filter(x => hasCost(item, x) && !item[`conf${x}`] ? 
             key === "0" : // if there's a shot type but no conf object, assume slot 0

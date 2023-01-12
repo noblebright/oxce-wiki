@@ -4,12 +4,10 @@ import Modal from "react-bootstrap/Modal";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Container from 'react-bootstrap/Container';
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import NavItem from "react-bootstrap/NavItem";
-import NavLink from "react-bootstrap/NavLink";
-import Dropdown from "react-bootstrap/Dropdown";
 import { Helmet } from "react-helmet-async";
 import useRuleset from "../../hooks/useRuleset";
 import useMobileLayout from "../../hooks/useMobileLayout";
@@ -22,6 +20,7 @@ import { clearDB } from "../../model/RulesetDB";
 
 import "./Layout.css";
 import ErrorBoundary from "../Article/ArticleError";
+import { LinkContainer } from "react-router-bootstrap";
 
 function Welcome() {
     const [content, setContent] = useState();
@@ -66,24 +65,6 @@ const Hamburger = (props) => (
   </svg>
 );
 
-//Clone of NavDropdown that supports alignRight.
-const OptionsDropdown = ({title, children}) => (
-    <Dropdown as={NavItem}>
-      <Dropdown.Toggle
-        as={NavLink}
-      >
-        {title}
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu
-        rootCloseEvent="click"
-        alignRight={true}
-      >
-        {children}
-      </Dropdown.Menu>
-    </Dropdown>
-);
-
 const CategoryDropdown = ({ lang, version, ruleset }) => {
   const lc = useLocale(lang, ruleset);
   const displayStr = key => ruleset.entries[key].category.damageType ? `${lc("damageType")}: ${lc(key)}` : lc(key);
@@ -92,7 +73,7 @@ const CategoryDropdown = ({ lang, version, ruleset }) => {
   if(!ruleset) return null;
   const categories = ruleset.lookups.categories;
   return (
-    <NavDropdown className="CategoryDropdown" title={lc("categories")} rootCloseEvent="click">
+    <NavDropdown className="CategoryDropdown" title={lc("categories")} id="CategoryDropdown" rootCloseEvent="click" menuVariant="dark">
       { categories.sort(alphaSort).map(key => 
       <NavDropdown.Item key={key} as={Link} to={`/${version}/article/${key}`}>
         { displayStr(key) }
@@ -125,24 +106,33 @@ export default function Ruleset({ lang, setLanguage, versions }) {
                 <title>{`${config.title} Mod Data Viewer`}</title>
                 <meta name="description" content={`${config.title} Mod Data Viewer`} />
             </Helmet>
-            <Row noGutters>
-                <Col>
-                    <Navbar bg="dark" variant="dark">
-                        <Navbar.Brand>{isMobile && <Hamburger onClick={() => setShowSidebar(!showSidebar)}/>}<Link to={`/${version}`}>{config.title} - {version}</Link></Navbar.Brand>
-                        {!isMobile && ruleset?.lookups.categories && <CategoryDropdown ruleset={ruleset} lang={lang} version={version} />}
-                        <Nav className="mr-auto">
-                          {!isMobile && <Link to={`/${version}/gunSim`}>Gun Profiler</Link>}
-                        </Nav>
-                        {!isMobile && <NavDropdown title={possibleLanguages[lang]} rootCloseEvent="click">
-                            { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
-                        </NavDropdown>}
-                        <OptionsDropdown title={<Gear/>}>
-                            <NavDropdown.Item onClick={clearDB}>Clear Local DB</NavDropdown.Item>
-                        </OptionsDropdown>
-                    </Navbar>
-                </Col>
+            <Row className="g-0">
+              <Navbar bg="dark" variant="dark">
+                <Container fluid>
+                  <Navbar.Brand>
+                    {isMobile && <Hamburger onClick={() => setShowSidebar(!showSidebar)}/>}
+                    <LinkContainer to={`/${version}`}>
+                      <Nav.Link>{config.title} - {version}</Nav.Link>
+                    </LinkContainer>
+                  </Navbar.Brand>
+                  <Nav className="me-auto">
+                  {!isMobile && ruleset?.lookups.categories && <CategoryDropdown ruleset={ruleset} lang={lang} version={version} />}
+                    <LinkContainer to={`/${version}/gunSim`}>
+                      <Nav.Link>Gun Profiler</Nav.Link>
+                    </LinkContainer>
+                  </Nav>
+                  <Nav>
+                    {!isMobile && <NavDropdown title={possibleLanguages[lang]} id="languageDropdown" rootCloseEvent="click" menuVariant="dark">
+                        { supportedLanguages.map(key => <NavDropdown.Item key={key} onClick={() => setLanguage(key)}>{possibleLanguages[key]}</NavDropdown.Item>) }
+                    </NavDropdown>}
+                    <NavDropdown title={<Gear/>} id="OptionsDropdown" align="end" rootCloseEvent="click" menuVariant="dark">
+                      <NavDropdown.Item onClick={clearDB}>Clear Local DB</NavDropdown.Item>
+                    </NavDropdown>
+                  </Nav>
+                </Container>
+              </Navbar>
             </Row>
-            <Row noGutters className="content">
+            <Row className="content g-0">
                 {!isMobile && <Col xs={12} sm={4} md={3} lg={2} className="sidebarContainer"><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset}/></Col>}
                 {isMobile && <div className={`mobileSidebarContainer ${showSidebar ? "" : "hide"}`}><SideBar lang={lang} currentVersion={version} versions={versions} ruleset={ruleset} onClick={() => setShowSidebar(false)}/></div>}
                 <Col xs={12} sm={8} md={9} lg={10} className="mainContainer">

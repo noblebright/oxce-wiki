@@ -28,9 +28,7 @@ export default function Sidebar({lang, currentVersion, versions, ruleset, onClic
     return (
         <div className="sidebar">
             <InputGroup className="py-3 px-3 searchComponent">
-                <InputGroup.Prepend>
-                    <InputGroup.Text id="search-addon1"><SearchIcon/></InputGroup.Text>
-                </InputGroup.Prepend>
+                <InputGroup.Text id="search-addon1"><SearchIcon/></InputGroup.Text>
                 <FormControl
                 placeholder="Search"
                 aria-label="Search"
