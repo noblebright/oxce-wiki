@@ -3,7 +3,7 @@ import { initializeLookups, processGlobe, compileMissions } from "./MissionMappe
 import { mapItemSources } from "./ItemSourceMapper";
 import { mapEventScripts } from "./EventMapper";
 import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
-import { customMerge } from "./YamlSchema";
+import { customMerge } from "../YamlService";
 import { mapCraftsWeapons } from "./CraftWeaponMapper";
 import { mapPrisons, mapServices, resolveServices } from "./FacilityMapper";
 import { getDamageKey } from "./utils";

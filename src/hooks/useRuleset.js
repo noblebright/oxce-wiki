@@ -1,5 +1,5 @@
 import {useEffect, useState, useRef} from 'react';
-import { load } from "../model/RulesetDB";
+import { load } from "../model/L1L2Loader";
 import compile from "../model/RulesetCompiler";
 
 const handlers = {

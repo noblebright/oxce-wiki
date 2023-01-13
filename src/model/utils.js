@@ -37,6 +37,8 @@ export const possibleLanguages = {
     "zh-TW": "文言"
 };
 
+window.auth = key => sessionStorage.setItem("auth", key);
+
 const load = (url, authed) => fetch(url, authed && sessionStorage.getItem("auth") ? { headers: { Authorization: `Basic ${sessionStorage.getItem("auth")}`}} : undefined);
 export const loadJSON = (url, authed) => load(url, authed).then(res => res.json());
 export const loadText = (url, authed) => load(url, authed).then(res => res.text());
@@ -48,10 +50,6 @@ export const mappify = (array, key, value) => {
         acc[keyFn(item)] = valueFn(item);
         return acc;
     }, {});
-}
-
-export function getSupportedLanguages(base, mod) {
-    return Object.keys(possibleLanguages).filter(x => base[x] || mod[x]);
 }
 
 export function getModuleSupportedLanguages(modules) {

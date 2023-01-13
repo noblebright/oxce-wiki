@@ -16,7 +16,7 @@ import SideBar from "./Sidebar";
 import Article from "../Article";
 import GunSim from "../GunSim";
 import { possibleLanguages } from "../../model/utils";
-import { clearDB } from "../../model/RulesetDB";
+import { clearDB } from "../../model/L1L2Loader";
 
 import "./Layout.css";
 import ErrorBoundary from "../Article/ArticleError";

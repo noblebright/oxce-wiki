@@ -5,7 +5,7 @@ import deepmerge from "deepmerge";
 import { loadJSON, loadText, getModuleSupportedLanguages } from "./utils";
 import GithubLoader from "./GithubLoader";
 import FallbackDB from "./FallbackDB";
-import { schema } from "./YamlSchema";
+import { schema } from "./YamlService";
 
 function initDexie() {
     const db = new Dexie("xcom");
@@ -169,7 +169,7 @@ export async function getMetadata(callback) {
         const currentLanguage = await db.config.get("currentLanguage");
         const { repo, branch } = config.modules[config.modules.length - 1];
         const modVersions = await getVersions(repo, branch, callback);
-        result = { modVersions, config, currentLanguage };
+        result = { modVersions, config, currentLanguage, defaultVersion: branch };
     } catch (e) {
         await db.delete();
     }

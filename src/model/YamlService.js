@@ -3,7 +3,7 @@ import deepmerge from "deepmerge";
 
 const tags = ["!add", "!remove"];
 
-export const symbols = tags.reduce((acc, tag) => {
+const symbols = tags.reduce((acc, tag) => {
   acc[tag] = Symbol(tag);
   return acc;
 }, {});
@@ -58,3 +58,12 @@ export const customMerge = () => (a, b) => {
   }
   return b;
 }
+
+export const mergeSection = (ruleset, name, sectionName, entry) => Object.assign({}, deepmerge(ruleset[name][sectionName], entry, { clone: false, customMerge }));
+export const mergeList = list => list.reduce((acc, obj) => deepmerge(acc, obj, { clone: false }));
+
+export function parse(text) {
+    return yaml.load(text, { json: true, schema });
+}
+
+export default { mergeSection, mergeList, parse };

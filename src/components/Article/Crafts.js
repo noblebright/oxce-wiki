@@ -5,7 +5,7 @@ import useLocale from "../../hooks/useLocale";
 import useSprite from "../../hooks/useSprite";
 import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue, Percent } from "../ComponentUtils.js";
 import CraftStats from "./CraftStats";
-import { getCraftSlots } from "../../model/CraftWeaponMapper";
+import { getCraftSlots } from "../../model/compiler/CraftWeaponMapper";
 
 function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;

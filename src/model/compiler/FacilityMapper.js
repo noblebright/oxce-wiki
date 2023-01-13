@@ -1,4 +1,4 @@
-import { makeObjectPath } from "./utils";
+import { makeObjectPath } from "../utils";
 
 export function mapPrisons(lookups, entry) {
     const prisons = lookups.prisons;
