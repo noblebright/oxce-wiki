@@ -6,7 +6,7 @@ import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
 import { customMerge } from "../YamlService";
 import { mapCraftsWeapons } from "./CraftWeaponMapper";
 import { mapPrisons, mapServices, resolveServices } from "./FacilityMapper";
-import { getDamageKey } from "./utils";
+import { getDamageKey } from "../utils";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}

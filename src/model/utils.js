@@ -52,8 +52,8 @@ export const mappify = (array, key, value) => {
     }, {});
 }
 
-export function getModuleSupportedLanguages(modules) {
-    return Object.keys(possibleLanguages).filter(x => modules.every(module => module.ruleset[x]));
+export function getModuleSupportedLanguages(rulesets) {
+    return Object.keys(possibleLanguages).filter(x => rulesets.every(ruleset => ruleset[x]));
 }
 
 export const damageKeys = [

@@ -1,3 +1,4 @@
+import Dexie from "dexie";
 import { loadJSON } from "./utils";
 import GithubLoader from "./GithubLoader";
 import FallbackDB from "./FallbackDB";
@@ -31,13 +32,14 @@ async function getDB() {
     }
 }
 
-async function checkCache(cacheFn, missFn, expiresInHours, hitFn) {
+async function checkCache(key, cacheFn, missFn, expiresInHours, hitFn) {
     const cachedObj = await cacheFn();
     if(!cachedObj || !cachedObj.lastFetched || ((Date.now() - cachedObj.lastFetched) > (1000 * 60 * 60 * expiresInHours))) { //check once per day
-        return await missFn();
+        const row = await missFn();
+        return key ? row[key] : row;
     } else {
         hitFn?.();
-        return cachedObj;
+        return key ? cachedObj[key] : cachedObj;
     }
     
 }
@@ -58,14 +60,16 @@ class L1L2DB {
     async getConfig() {
         const callback = this.callback;
         return checkCache(
+            null, // get the whole object
             async () => this.db.config.get("config"),
             async () => {
                 callback && callback(["LOADING_CONFIG"]);
                 const config = await loadJSON("/config.json");
                 config.lastFetched = Date.now();
-                await db.config.clear();
-                await db.config.put({key: "config", ...config });
-                return config;
+                await this.db.config.clear();
+                const row = {key: "config", ...config };
+                this.db.config.put(row);
+                return row;
             },
             24
         );
@@ -74,14 +78,16 @@ class L1L2DB {
     async getVersions(repo, branchName) {
         const callback = this.callback;
         return checkCache(
+            "versions",
             async () => this.db.versions.get(repo),
             async () => {
                 const loader = new GithubLoader(repo);
                 const versions = await loader.loadVersions(branchName);
                 console.log(`fetching version info for ${repo}...`);
                 callback && callback(["LOADING_VERSIONS", repo]);
-                await db.versions.put({ repo, lastFetched: Date.now(), versions });
-                return versions;
+                const row = { repo, lastFetched: Date.now(), versions }
+                this.db.versions.put(row);
+                return row;
             },
             1,
             () => console.log(`cached version info found for ${repo}`)
@@ -100,17 +106,20 @@ class L1L2DB {
         console.log(`loading filelist for ${repo}@${sha}`);
         callback && callback(["LOADING_FILELIST", repo, sha]);
         const fileList = await loader.loadFileList(sha, path);
-        await db.fileList.put({ sha, fileList, lastUsed: Date.now() });
+        await this.db.fileList.put({ sha, fileList, lastUsed: Date.now() });
         return fileList;
     }
 
     async getRuleset(sha) {
         const cachedRuleset = await this.db.rulesets.get(sha);
         if(cachedRuleset) {
-            console.log(`Pre-parsed ruleset found for ${sha}...`);
             return cachedRuleset.fileList;
         }
         return null;
+    }
+
+    async getL2(l2Keys) {
+        return this.db.files.bulkGet(l2Keys);
     }
 
     async delete() {
@@ -121,8 +130,8 @@ class L1L2DB {
         this.db.files.bulkPut(l2Entries);
     }
 
-    async putL1(entry) {
-        this.db.rulesets.put(entry);
+    async putL1(sha, entry) {
+        this.db.rulesets.put({sha, fileList:entry});
     }
 }
 

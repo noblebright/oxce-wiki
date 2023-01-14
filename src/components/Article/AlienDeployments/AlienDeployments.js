@@ -4,7 +4,7 @@ import useLink from "../../../hooks/useLink";
 import useLocale from "../../../hooks/useLocale";
 import useInventory from "../../../hooks/useInventory";
 import { BooleanValue, SectionHeader, SimpleValue, SimpleSelect, ListValue } from "../../ComponentUtils.js";
-import { getPossibleRaces } from "../../../model/UnitSourceMapper";
+import { getPossibleRaces } from "../../../model/compiler/UnitSourceMapper";
 import { Deployment, Reinforcements } from "./Deployment";
 import EnviroEffect from "./EnviroEffect";
 import StartingConditions from "./StartingConditions";

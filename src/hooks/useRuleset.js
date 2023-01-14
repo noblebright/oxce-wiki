@@ -1,6 +1,6 @@
 import {useEffect, useState, useRef} from 'react';
 import { load } from "../model/L1L2Loader";
-import compile from "../model/RulesetCompiler";
+import compile from "../model/compiler/RulesetCompiler";
 
 const handlers = {
     "INIT": () => ({ status: "Initializing...", min:0, max: 10, now: 10}),

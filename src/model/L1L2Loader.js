@@ -1,5 +1,6 @@
 import L1L2DB from "./L1L2DB";
 import YamlService from "./YamlService";
+import GithubLoader from "./GithubLoader";
 import { getModuleSupportedLanguages, loadText } from "./utils";
 
 function rewriteFilePaths(ruleset, loader, sha, foldCase) {
@@ -28,7 +29,7 @@ function rewriteLocalization(ruleset) {
     });
 }
 
-async function loadRuleset({ repo, branch, path }, db, { onL2Miss }) {
+async function loadRuleset({ repo, branch, path }, db) {
     const versions = await db.getVersions(repo, branch);
     if(!versions[branch]?.sha) {
         throw new Error(`Unknown module ref: ${repo}@${branch}`);
@@ -41,7 +42,7 @@ async function loadRuleset({ repo, branch, path }, db, { onL2Miss }) {
     const ruleset = await db.getRuleset(sha);
     if(ruleset) {
         console.log(`Found pre-computed ruleset for ${repo}@${branch}`);
-        return ruleset;
+        return YamlService.hydrate(ruleset);
     }
 
     console.log(`L1 cache miss for ${repo}@${branch}`);
@@ -49,22 +50,32 @@ async function loadRuleset({ repo, branch, path }, db, { onL2Miss }) {
     const files = [...Object.entries(languageFiles), ...Object.entries(ruleFiles)];
     
     //fetch all available files from L2
-    const cacheFetch = await db.files.bulkGet(files.map(([fileSha, url]) => fileSha));
+    const cacheFetch = await db.getL2(files.map(([fileSha, url]) => fileSha));
     const cacheMisses = [];
     
+    const loader = new GithubLoader(repo);
+
     //Fill in cache misses with network calls
     const promises = cacheFetch.map(async (record, i) => {
-        if(record) return record.data;
+        if(record) return YamlService.hydrate(record.data);
 
-        const [sha, url] = files[i];
+        const [fileSha, url] = files[i];
         console.log(`cache miss on ${url}`);
         const text = await loadText(url);
         const result = YamlService.parse(text);
         if(!result) {
             console.warn(`Skipping empty file: ${url}`);
+            return {};
+        } else {
+            const [rules] = result; // result is dehydrated, pull out the rules part for rewriting
+            // mutate ruleset as necessary
+            rewriteLocalization(rules);
+            rewriteFilePaths(rules, loader, sha, foldCase);
+
+            // only cache successfully parsed files
+            cacheMisses.push({ fileSha, data: result, lastUsed: Date.now()});
         }
-        cacheMisses.push({ fileSha: sha, data: result ?? {}, lastUsed: Date.now()});
-        return result ?? {};
+        return YamlService.hydrate(result);
     });
 
     const parsedFiles = await Promise.all(promises);
@@ -74,18 +85,14 @@ async function loadRuleset({ repo, branch, path }, db, { onL2Miss }) {
 
     console.log(`generating ruleset for ${repo}@${sha}`);
     const rawRuleset = YamlService.mergeList(parsedFiles);
-    const loader = new GithubLoader(repo);
     
-    // mutators
-    rewriteLocalization(rawRuleset);
-    rewriteFilePaths(rawRuleset, loader, sha, foldCase);
-
     // write new entry into L1, but don't wait
-    db.putL1(rawRuleset);
+    db.putL1(sha, YamlService.dehydrate(rawRuleset));
     return rawRuleset;
 }
 
 export async function load(version, compiler, callback) {
+    console.time("fullLoad");
     const db = new L1L2DB(callback);
     await db.connect();
 
@@ -95,27 +102,32 @@ export async function load(version, compiler, callback) {
 
     let rulesList;
     try {
-        ruleLists = await Promise.all(modules.map(module => loadRuleset(module, db)));
+        rulesList = await Promise.all(modules.map(m => loadRuleset(m, db)));
     } catch (e) {
         // If parsing goes south, delete the db.
         console.error(e);
         await db.delete();
+        console.timeEnd("fullLoad");
         throw e;
     }
 
-    const supportedLanguages = getModuleSupportedLanguages(modules);
+    const supportedLanguages = getModuleSupportedLanguages(rulesList);
     console.log(`supported languages:`, supportedLanguages);
     callback && callback(["COMPILING_RULESET"]);
     const ruleset = compiler(rulesList, supportedLanguages);
-
+    console.timeEnd("fullLoad");
     return { config, supportedLanguages, ruleset };
 }
 
 export async function updateLanguage(value) {
+    const db = new L1L2DB();
+    await db.connect();
     return db.config.put({ key: "currentLanguage", value });
 }
   
 export async function clearDB() {
+    const db = new L1L2DB();
+    await db.connect();
     await db.delete();
     window.location.reload();
 }

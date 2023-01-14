@@ -11,10 +11,10 @@ export default class GithubLoader {
     }
 
     async loadVersions(branchName = "master") {
-        const [branches, tags] = await Promise.all(
+        const [branches, tags] = await Promise.all([
             loadJSON(`https://api.github.com/repos/${this.repoName}/branches`, true),
             loadJSON(`https://api.github.com/repos/${this.repoName}/tags`, true)
-        );
+        ]);
         
         const branch = branches.find(x => x.name === branchName)
         this.versions = {
