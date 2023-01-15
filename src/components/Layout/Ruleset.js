@@ -52,7 +52,6 @@ function Dialog({ children }) {
 }
 
 function LoadingDialog({status}) {     
-  console.log(status);
     return (
       <Dialog>
           <ProgressBar min={0} max={status.max} now={status.now} animated/>
