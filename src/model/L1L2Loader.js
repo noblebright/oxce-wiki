@@ -29,7 +29,8 @@ function rewriteLocalization(ruleset) {
     });
 }
 
-async function loadRuleset({ repo, branch, path }, db) {
+async function loadRuleset({ repo, branch, path }, db, callback) {
+    callback && callback(["LOADING_VERSIONS", repo]);
     const versions = await db.getVersions(repo, branch);
     if(!versions[branch]?.sha) {
         throw new Error(`Unknown module ref: ${repo}@${branch}`);
@@ -39,9 +40,11 @@ async function loadRuleset({ repo, branch, path }, db) {
     const sha = versions[branch].sha;
 
     // check L1
+    callback && callback(["LOADING_FILELIST", repo, sha, 1]);
     const ruleset = await db.getRuleset(sha);
     if(ruleset) {
         console.log(`Found pre-computed ruleset for ${repo}@${branch}`);
+        callback && callback(["LOADING_FILELIST_COMPLETE", repo, sha, 1]);
         return YamlService.hydrate(ruleset);
     }
 
@@ -55,19 +58,27 @@ async function loadRuleset({ repo, branch, path }, db) {
     
     const loader = new GithubLoader(repo);
 
-    //Fill in cache misses with network calls
+    callback && callback(["LOADING_FILELIST", repo, sha, cacheFetch.length]);
     const promises = cacheFetch.map(async (record, i) => {
-        if(record) return YamlService.hydrate(record.data);
-
         const [fileSha, url] = files[i];
+
+        // found in L2, so use that.
+        if(record)  {
+            callback && callback(["LOADING_FILE", url, 1]);
+            return YamlService.hydrate(record.data);
+        }
+
+        //Fill in cache misses with network calls
         console.log(`cache miss on ${url}`);
         const text = await loadText(url);
         const result = YamlService.parse(text);
         if(!result) {
             console.warn(`Skipping empty file: ${url}`);
+            callback && callback(["LOADING_FILE", url, 1]);
             return {};
         } else {
             const [rules] = result; // result is dehydrated, pull out the rules part for rewriting
+
             // mutate ruleset as necessary
             rewriteLocalization(rules);
             rewriteFilePaths(rules, loader, sha, foldCase);
@@ -75,6 +86,7 @@ async function loadRuleset({ repo, branch, path }, db) {
             // only cache successfully parsed files
             cacheMisses.push({ fileSha, data: result, lastUsed: Date.now()});
         }
+        callback && callback(["LOADING_FILE", url, 1]);
         return YamlService.hydrate(result);
     });
 
@@ -87,26 +99,29 @@ async function loadRuleset({ repo, branch, path }, db) {
     const rawRuleset = YamlService.mergeList(parsedFiles);
     
     // write new entry into L1, but don't wait
+    callback && callback(["LOADING_FILELIST_COMPLETE", repo, sha, 1]);
     db.putL1(sha, YamlService.dehydrate(rawRuleset));
     return rawRuleset;
 }
 
 export async function load(version, compiler, callback) {
     console.time("fullLoad");
-    const db = new L1L2DB(callback);
+    const db = new L1L2DB();
     await db.connect();
 
+    callback && callback(["LOADING_CONFIG"]);
     const config = await db.getConfig();
     const modules = config.modules;
     modules.at(-1).branch = version; // patch in the version we want for the last module.
 
     let rulesList;
     try {
-        rulesList = await Promise.all(modules.map(m => loadRuleset(m, db)));
+        rulesList = await Promise.all(modules.map(m => loadRuleset(m, db, callback)));
     } catch (e) {
         // If parsing goes south, delete the db.
         console.error(e);
         await db.delete();
+        callback && callback(["ERROR", e]);
         console.timeEnd("fullLoad");
         throw e;
     }
@@ -114,6 +129,7 @@ export async function load(version, compiler, callback) {
     const supportedLanguages = getModuleSupportedLanguages(rulesList);
     console.log(`supported languages:`, supportedLanguages);
     callback && callback(["COMPILING_RULESET"]);
+    await new Promise(r => setTimeout(r, 16)); //yield so react can update the progress bar
     const ruleset = compiler(rulesList, supportedLanguages);
     console.timeEnd("fullLoad");
     return { config, supportedLanguages, ruleset };

@@ -45,10 +45,6 @@ async function checkCache(key, cacheFn, missFn, expiresInHours, hitFn) {
 }
 
 class L1L2DB {
-    constructor(callback) {
-        this.callback = callback;
-    }
-
     async connect() {
         this.db = await getDB();
     }
@@ -58,12 +54,10 @@ class L1L2DB {
     }
     
     async getConfig() {
-        const callback = this.callback;
         return checkCache(
             null, // get the whole object
             async () => this.db.config.get("config"),
             async () => {
-                callback && callback(["LOADING_CONFIG"]);
                 const config = await loadJSON("/config.json");
                 config.lastFetched = Date.now();
                 await this.db.config.clear();
@@ -76,7 +70,6 @@ class L1L2DB {
     }
     
     async getVersions(repo, branchName) {
-        const callback = this.callback;
         return checkCache(
             "versions",
             async () => this.db.versions.get(repo),
@@ -84,7 +77,6 @@ class L1L2DB {
                 const loader = new GithubLoader(repo);
                 const versions = await loader.loadVersions(branchName);
                 console.log(`fetching version info for ${repo}...`);
-                callback && callback(["LOADING_VERSIONS", repo]);
                 const row = { repo, lastFetched: Date.now(), versions }
                 this.db.versions.put(row);
                 return row;
@@ -95,7 +87,6 @@ class L1L2DB {
     }
 
     async getFileList(repo, sha, path) {
-        const callback = this.callback;
         const cachedList = await this.db.fileList.get(sha);
         if(cachedList) {
             console.log(`cached file list found for ${sha}...`);
@@ -104,7 +95,6 @@ class L1L2DB {
         
         const loader = new GithubLoader(repo);
         console.log(`loading filelist for ${repo}@${sha}`);
-        callback && callback(["LOADING_FILELIST", repo, sha]);
         const fileList = await loader.loadFileList(sha, path);
         await this.db.fileList.put({ sha, fileList, lastUsed: Date.now() });
         return fileList;

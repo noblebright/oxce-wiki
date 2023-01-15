@@ -63,7 +63,7 @@ export const mergeList = list => list.reduce((acc, obj) => deepmerge(acc, obj, {
   message boundaries (if we need to use webworkers).
 
   In order to persist, we need to convert the tag data into an external data structure.
-  Unfortunately, the parser won't give use the path at parse time,
+  Unfortunately, the parser won't give us the path at parse time,
   so we need to re-traverse the tree to find the tags and store them.
 */
 
@@ -109,6 +109,8 @@ export function findTags(result) {
   return tagsFound ? tagPaths : null;
 }
 
+
+// TODO: Make this async if we need to shift parsing to workers.
 export function parse(text) {
     const result = yaml.load(text, { json: true, schema });
     return dehydrate(result);
@@ -125,6 +127,7 @@ export function hydrate([tree, tagPaths]) {
       node[Symbol.for(tag)] = true;
     })
   });
+  return tree;
 }
 
 export function dehydrate(result) {
