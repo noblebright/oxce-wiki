@@ -12,7 +12,7 @@ const colors = {
 
 export default function ResultChart({ data, mode, lc }) {
     const weapon = data.weaponEntry.type;
-    const compareWeapon = data.compareWeaponEntry.type;
+    const compareWeapon = data.compareWeaponEntry?.type;
 
     return (
         <ResponsiveContainer width="90%" height="80%">
