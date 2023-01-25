@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script type="module">
+import { getTTK, add } from "./debug.js";
+
+console.time("ttk");
+const result = getTTK(40, 10, 1, 0, 200, 20, 0.5);
+document.body.innerText = JSON.stringify(result);
+console.timeEnd("ttk");
+
+</script>
+</head>
+<body></body>
+</html>
