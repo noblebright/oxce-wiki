@@ -1,11 +1,11 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
-import useBonusString from "../../../hooks/useBonusString";
-import { BooleanValue, ListHeader, SimpleValue, Percent, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
-import Cost, { hasCost } from "./Cost";
-import Damage from "./Damage";
-import DamageAlter from "./DamageAlter";
+import useBonusString from "../../../hooks/useBonusString.js";
+import { BooleanValue, ListHeader, SimpleValue, Percent, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils.js";
+import Cost, { hasCost } from "./Cost.js";
+import Damage from "./Damage.js";
+import DamageAlter from "./DamageAlter.js";
 
 function FuseTrigger({triggers}) {
     return triggers ? (

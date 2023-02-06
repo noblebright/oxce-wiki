@@ -1,2 +1,2 @@
-import RulesetCompiler from "./RulesetCompiler";
+import RulesetCompiler from "./RulesetCompiler.js";
 export default RulesetCompiler;

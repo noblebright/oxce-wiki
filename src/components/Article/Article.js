@@ -1,27 +1,27 @@
 import React, {useState} from "react";
 import { Redirect, useParams } from "react-router-dom";
-import Modal from "react-bootstrap/Modal";
+import {Modal} from "react-bootstrap";
 import ReactJson from "react-json-view";
 
-import useLocale from "../../hooks/useLocale";
-import Research from "./Research";
-import Manufacture from "./Manufacture";
-import TechTree from "./TechTree";
-import Item from "./Item";
-import Facilities from "./Facilities";
-import Crafts from "./Crafts";
-import CraftWeapons from "./CraftWeapons";
-import Ufos from "./Ufos";
-import Units from "./Units";
-import Soldiers from "./Soldiers";
-import Armors from "./Armors";
-import AlienDeployments from "./AlienDeployments";
-import AlienRaces from "./AlienRaces";
-import SoldierTransformation from "./SoldierTransformation";
-import Commendation from "./Commendation";
-import Events from "./Events";
-import Category from "./Category";
-import BaseService from "./BaseService";
+import useLocale from "../../hooks/useLocale.js";
+import Research from "./Research.js";
+import Manufacture from "./Manufacture.js";
+import TechTree from "./TechTree.js";
+import Item from "./Item/index.js";
+import Facilities from "./Facilities.js";
+import Crafts from "./Crafts.js";
+import CraftWeapons from "./CraftWeapons.js";
+import Ufos from "./Ufos.js";
+import Units from "./Units.js";
+import Soldiers from "./Soldiers.js";
+import Armors from "./Armors.js";
+import AlienDeployments from "./AlienDeployments/index.js";
+import AlienRaces from "./AlienRaces.js";
+import SoldierTransformation from "./SoldierTransformation.js";
+import Commendation from "./Commendation.js";
+import Events from "./Events.js";
+import Category from "./Category.js";
+import BaseService from "./BaseService.js";
 
 import "./Article.css";
 

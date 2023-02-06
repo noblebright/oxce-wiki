@@ -1,9 +1,9 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
-import useLocale from "../../hooks/useLocale";
-import useGunSim from "../../hooks/useGunSim";
-import { getChartData, loadAccuracyData } from "../../model/GunSim/ChartService";
-import ResultChart from "./ResultChart";
+import useLocale from "../../hooks/useLocale.js";
+import useGunSim from "../../hooks/useGunSim.js";
+import { getChartData, loadDependencies } from "../../model/GunSim/ChartService.js";
+import ResultChart from "./ResultChart.js";
 
 import "./gunSim.css";
 
@@ -21,10 +21,10 @@ export default function GunSim({ ruleset, lang }) {
     
     const [chartData, setChartData] = useState();
     const [mode, setMode] = useState("Damage");
-    const [accuracyDataLoaded, setAccuracyDataLoaded] = useState(false);
+    const [loaded, setLoaded] = useState(false);
     
     useEffect(() => {
-        loadAccuracyData().then(() => setAccuracyDataLoaded(true));
+        loadDependencies().then(() => setLoaded(true));
     }, []);
 
     const startRun = useCallback(() => {
@@ -107,7 +107,7 @@ export default function GunSim({ ruleset, lang }) {
                         <option value="rear">Rear</option>
                     </Form.Select>
                 </Form.Group>
-                <Button variant="primary" onClick={startRun} disabled={!accuracyDataLoaded}>Submit</Button>
+                <Button variant="primary" onClick={startRun} disabled={!loaded}>Submit</Button>
             </Form>
             <div className="GunSimContent">
                 <Form.Select size="sm" value={mode} onChange={e => setMode(e.target.value)}>

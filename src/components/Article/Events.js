@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../hooks/useLink";
-import useLocale from "../../hooks/useLocale";
-import useInventory from "../../hooks/useInventory";
+import {Table} from "react-bootstrap";
+import useLink from "../../hooks/useLink.js";
+import useLocale from "../../hooks/useLocale.js";
+import useInventory from "../../hooks/useInventory.js";
 import { BooleanValue, SectionHeader, SimpleValue, Money, ListHeader, ListValue, Percent } from "../ComponentUtils.js";
 
 function getGuaranteedItems(event) {

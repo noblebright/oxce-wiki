@@ -1,26 +1,21 @@
 import React, {useState, useEffect} from "react";
 import { Route, Redirect, Link, Switch, useParams, useRouteMatch } from "react-router-dom";
-import Modal from "react-bootstrap/Modal";
-import ProgressBar from "react-bootstrap/ProgressBar";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from 'react-bootstrap/Container';
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
+import {Modal, ProgressBar, Row, Col, Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
-import useRuleset from "../../hooks/useRuleset";
-import useMobileLayout from "../../hooks/useMobileLayout";
-import useLocale from "../../hooks/useLocale";
-import SideBar from "./Sidebar";
-import Article from "../Article";
-import GunSim from "../GunSim";
-import { possibleLanguages } from "../../model/utils";
-import { clearDB } from "../../model/L1L2Loader";
+import { LinkContainer } from "react-router-bootstrap";
+import useRuleset from "../../hooks/useRuleset.js";
+import useMobileLayout from "../../hooks/useMobileLayout.js";
+import useLocale from "../../hooks/useLocale.js";
+import SideBar from "./Sidebar.js";
+import Article from "../Article/index.js";
+import GunSim from "../GunSim/index.js";
+import { possibleLanguages } from "../../model/utils.js";
+import { clearDB } from "../../model/L1L2Loader.js";
+import ErrorBoundary from "../Article/ArticleError.js";
 
 import "./Layout.css";
-import ErrorBoundary from "../Article/ArticleError";
-import { LinkContainer } from "react-router-bootstrap";
+
+
 
 function Welcome() {
     const [content, setContent] = useState();

@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import Table from "react-bootstrap/Table";
-import useInventory from "../../hooks/useInventory";
-import useLink from "../../hooks/useLink";
-import useLocale from "../../hooks/useLocale";
+import {Table} from "react-bootstrap";
+import useInventory from "../../hooks/useInventory.js";
+import useLink from "../../hooks/useLink.js";
+import useLocale from "../../hooks/useLocale.js";
 import { ListHeader, ListValue, Money, SectionHeader, SimpleValue } from "../ComponentUtils.js";
 
 

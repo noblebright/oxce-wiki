@@ -1,10 +1,10 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
 import { Percent, BooleanValue, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
-import useLocale from "../../hooks/useLocale";
-import useImage from "../../hooks/useImage";
-import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale.js";
+import useImage from "../../hooks/useImage.js";
+import useLink from "../../hooks/useLink.js";
 
 const huntMode = [
     "Prefer Interceptors",

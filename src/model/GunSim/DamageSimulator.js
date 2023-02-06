@@ -1,6 +1,6 @@
-import { getMultiplier } from "./Multipliers";
-import { mergeStats } from "./utils";
-import { defaultDTProps } from "../Constants";
+import { getMultiplier } from "./Multipliers.js";
+import { mergeStats } from "./utils.js";
+import { defaultDTProps } from "../Constants.js";
 
 const randomTypeHisto = [
     null,

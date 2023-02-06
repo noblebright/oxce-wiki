@@ -1,6 +1,6 @@
-import { getMultiplier } from "./Multipliers";
-import { mergeStats } from "./utils";
-import { unitWidths, ShotType } from "../Constants";
+import { getMultiplier } from "./Multipliers.js";
+import { mergeStats } from "./utils.js";
+import { unitWidths, ShotType } from "../Constants.js";
 
 function getAccuracy(ruleset, stats, weapon, shotType, kneeling, oneHanded, distance) {
     let acc = weapon[`accuracy${shotType}`];

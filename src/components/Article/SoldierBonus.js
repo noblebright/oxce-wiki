@@ -1,7 +1,7 @@
 import React from "react";
 
 import { StatRecovery, UnitStats, SectionHeader, SimpleValue } from "../ComponentUtils.js";
-import useBonusString from "../../hooks/useBonusString";
+import useBonusString from "../../hooks/useBonusString.js";
 
 export default function SoldierBonus({bonus, lc, showHeader = true}) {
     const bonusFn = useBonusString(lc);

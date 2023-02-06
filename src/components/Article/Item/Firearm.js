@@ -1,12 +1,12 @@
 import React from "react";
-import Table from "react-bootstrap/table";
+import {Table} from "react-bootstrap";
 
-import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, BooleanValue, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, Percent, getUnitFaction } from "../../ComponentUtils";
-import DamageAlter from "./DamageAlter";
-import Damage from "./Damage";
-import Cost, { hasCost } from "./Cost";
-import { ShotType } from "../../../model/Constants";
+import useBonusString from "../../../hooks/useBonusString.js";
+import { ListHeader, BooleanValue, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, Percent, getUnitFaction } from "../../ComponentUtils.js";
+import DamageAlter from "./DamageAlter.js";
+import Damage from "./Damage.js";
+import Cost, { hasCost } from "./Cost.js";
+import { ShotType } from "../../../model/Constants.js";
 
 const actionTypes = Object.values(ShotType);
 const actionLabel = {

@@ -1,11 +1,11 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../hooks/useLink";
-import useLocale from "../../hooks/useLocale";
-import useSprite from "../../hooks/useSprite";
+import {Table} from "react-bootstrap";
+import useLink from "../../hooks/useLink.js";
+import useLocale from "../../hooks/useLocale.js";
+import useSprite from "../../hooks/useSprite.js";
 import { BooleanValue, Hours, ListValue, Money, SectionHeader, SimpleValue, Percent } from "../ComponentUtils.js";
-import CraftStats from "./CraftStats";
-import { getCraftSlots } from "../../model/compiler/CraftWeaponMapper";
+import CraftStats from "./CraftStats.js";
+import { getCraftSlots } from "../../model/compiler/CraftWeaponMapper.js";
 
 function WeaponSlots({crafts, lc}) {
     if(!crafts.weapons) return null;

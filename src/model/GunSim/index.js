@@ -1,3 +1,3 @@
-import { computeAccuracyInputs } from "./Simulator";
-import { getAverageDamage } from "./DamageSimulator";
+import { computeAccuracyInputs } from "./Simulator.js";
+import { getAverageDamage } from "./DamageSimulator.js";
 export { computeAccuracyInputs, getAverageDamage };

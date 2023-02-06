@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 
-import useMetadata from "../hooks/useMetadata";
-import Ruleset from "./Layout/Ruleset";
+import useMetadata from "../hooks/useMetadata.js";
+import Ruleset from "./Layout/Ruleset.js";
 
 import './App.css';
 

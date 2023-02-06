@@ -1,5 +1,5 @@
 import React from "react";
-import { SimpleValue, Percent } from "../ComponentUtils";
+import { SimpleValue, Percent } from "../ComponentUtils.js";
 
 export default function CraftStats({stats}) {
   if(!stats) return null;

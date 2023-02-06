@@ -1,4 +1,4 @@
-import { loadJSON } from "./utils";
+import { loadJSON } from "./utils.js";
 
 export default class GithubLoader {
     constructor(repoName) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { MissingSprite } from "../ComponentUtils";
+import { MissingSprite } from "../ComponentUtils.js";
 
 export default function FacilitySprite({ ruleset, file, id, size = 1}) {
     if(size === 1) {

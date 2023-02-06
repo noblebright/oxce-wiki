@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 import { BooleanValue, SectionHeader, ListHeader, ContainerValue, SimpleValue, ListValue, Percent } from "../../ComponentUtils.js";
 
 function getAliens(ruleset, race, deployment) {

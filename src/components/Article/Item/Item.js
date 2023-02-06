@@ -1,19 +1,19 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../../hooks/useLink";
-import useLocale from "../../../hooks/useLocale";
-import useSprite from "../../../hooks/useSprite";
+import {Table} from "react-bootstrap";
+import useLink from "../../../hooks/useLink.js";
+import useLocale from "../../../hooks/useLocale.js";
+import useSprite from "../../../hooks/useSprite.js";
 import { Hours, ListValue, Money, BooleanValue, getBattleType, SectionHeader, SimpleValue, ListHeader, Percent, NoLink } from "../../ComponentUtils.js";
-import Firearm from "./Firearm";
-import Ammo from "./Ammo";
-import Melee from "./Melee";
-import Grenade from "./Grenade";
-import MediKit from "./MediKit";
-import MotionScanner from "./MotionScanner";
-import MindProbe from "./MindProbe";
-import PsiAmp from "./PsiAmp";
-import ElectroFlare from "./ElectroFlare";
-import CraftWeapons from "../CraftWeapons";
+import Firearm from "./Firearm.js";
+import Ammo from "./Ammo.js";
+import Melee from "./Melee.js";
+import Grenade from "./Grenade.js";
+import MediKit from "./MediKit.js";
+import MotionScanner from "./MotionScanner.js";
+import MindProbe from "./MindProbe.js";
+import PsiAmp from "./PsiAmp.js";
+import ElectroFlare from "./ElectroFlare.js";
+import CraftWeapons from "../CraftWeapons.js";
 
 const experienceStrings = [
     "ETM_DEFAULT",

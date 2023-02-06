@@ -1,9 +1,9 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../hooks/useLink";
-import useLocale from "../../hooks/useLocale";
+import {Table} from "react-bootstrap";
+import useLink from "../../hooks/useLink.js";
+import useLocale from "../../hooks/useLocale.js";
 import { BooleanValue, HeightStats, ListValue, Percent, SectionHeader, SimpleValue, UnitStats } from "../ComponentUtils.js";
-import Armors from "./Armors";
+import Armors from "./Armors.js";
 
 
 const specAb = [

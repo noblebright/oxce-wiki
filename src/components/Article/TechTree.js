@@ -1,9 +1,9 @@
 import React, {useMemo, useCallback} from "react";
 import {useHistory} from "react-router-dom";
 
-import useLocale from "../../hooks/useLocale";
-import { buildCytoTree } from "../../model/treeBuilder";
-import Cytoscape from "../Cytoscape";
+import useLocale from "../../hooks/useLocale.js";
+import { buildCytoTree } from "../../model/treeBuilder.js";
+import Cytoscape from "../Cytoscape.js";
 
 function getStyling(nodeCount) {
     if(nodeCount > 20) {

@@ -1,11 +1,11 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
-import SoldierBonus from "./SoldierBonus";
+import SoldierBonus from "./SoldierBonus.js";
 import { BooleanValue, Money, Days, Hours, UnitStats, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
-import useLocale from "../../hooks/useLocale";
-import useInventory from "../../hooks/useInventory";
-import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale.js";
+import useInventory from "../../hooks/useInventory.js";
+import useLink from "../../hooks/useLink.js";
 
 const UPPER_BOUND_LABEL = [
     "DYNAMIC",

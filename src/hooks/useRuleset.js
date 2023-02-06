@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState, useRef} from 'react';
-import { load } from "../model/L1L2Loader";
-import compile from "../model/compiler";
+import { load } from "../model/L1L2Loader.js";
+import compile from "../model/compiler/index.js";
 
 const handlers = {
     "INIT": counters => () => ({ status: "Initializing...", ...getCounters(counters)}),

@@ -1,7 +1,8 @@
-import DamageSimulator from "./DamageSimulator";
-import { unitWidths, ShotType } from "../Constants";
-import { computeAccuracyInputs } from "./Simulator";
-import { mergeStats } from "./utils";
+import DamageSimulator from "./DamageSimulator.js";
+import { unitWidths, ShotType } from "../Constants.js";
+import { computeAccuracyInputs } from "./Simulator.js";
+import { mergeStats } from "./utils.js";
+import { instantiate } from "../wasmInterface.js";
 
 function hasCost(value, suffix) {
     const costObj = value[`cost${suffix}`];
@@ -58,11 +59,25 @@ function getShotsPerTurn(ruleset, state, key = "weapon") {
 }
 
 let accuracyData;
+let getTTK;
 
-export function loadAccuracyData() {
-    return fetch("/accuracyLookup.dat")
+async function loadWASM() {
+    const stream = fetch("release.wasm");
+    const wasm = WebAssembly.compileStreaming(stream);
+    return instantiate(wasm, {});
+}
+
+export function loadDependencies() {
+    // load accuracy into buffer
+    const accuracy = fetch("/accuracyLookup.dat")
             .then(response => response.arrayBuffer())
             .then(buffer => { accuracyData = new Uint16Array(buffer)});
+
+    // load WASM code
+    const wasm = loadWASM().then(iface => { getTTK = iface.getTTK; });
+
+    // wait for both
+    return Promise.all([accuracy, wasm]);
 }
 
 const widthOffsets = Object.values(unitWidths).reduce((acc, width, idx) => {

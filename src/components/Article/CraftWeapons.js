@@ -1,9 +1,9 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../hooks/useLink";
-import useLocale from "../../hooks/useLocale";
+import {Table} from "react-bootstrap";
+import useLink from "../../hooks/useLink.js";
+import useLocale from "../../hooks/useLocale.js";
 import { BooleanValue, ListValue, Percent, SectionHeader, SimpleValue } from "../ComponentUtils.js";
-import CraftStats from "./CraftStats";
+import CraftStats from "./CraftStats.js";
 
 export default function CraftWeapons({ruleset, lang, id, version}) {
     const lc = useLocale(lang, ruleset);

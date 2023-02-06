@@ -1,7 +1,7 @@
 import React from "react";
 
-import useBonusString from "../../../hooks/useBonusString";
-import { getDamageKey } from "../../../model/utils";
+import useBonusString from "../../../hooks/useBonusString.js";
+import { getDamageKey } from "../../../model/utils.js";
 
 export default function Damage({ items, lc, children, melee }) {
     const bonusFn = useBonusString(lc);

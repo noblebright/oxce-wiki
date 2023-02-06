@@ -1,7 +1,7 @@
-import L1L2DB from "./L1L2DB";
-import YamlService from "./YamlService";
-import GithubLoader from "./GithubLoader";
-import { getModuleSupportedLanguages, loadText } from "./utils";
+import L1L2DB from "./L1L2DB.js";
+import YamlService from "./YamlService.js";
+import GithubLoader from "./GithubLoader.js";
+import { getModuleSupportedLanguages, loadText } from "./utils.js";
 
 function rewriteFilePaths(ruleset, loader, sha, foldCase) {
     const rewriter = entry => {

@@ -1,12 +1,12 @@
 import deepmerge from "deepmerge";
-import { initializeLookups, processGlobe, compileMissions } from "./MissionMapper";
-import { mapItemSources } from "./ItemSourceMapper";
-import { mapEventScripts } from "./EventMapper";
-import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper";
-import { customMerge } from "../YamlService";
-import { mapCraftsWeapons } from "./CraftWeaponMapper";
-import { mapPrisons, mapServices, resolveServices } from "./FacilityMapper";
-import { getDamageKey } from "../utils";
+import { initializeLookups, processGlobe, compileMissions } from "./MissionMapper.js";
+import { mapItemSources } from "./ItemSourceMapper.js";
+import { mapEventScripts } from "./EventMapper.js";
+import { mapUnitSources, getPossibleRaces } from "./UnitSourceMapper.js";
+import { customMerge } from "../YamlService.js";
+import { mapCraftsWeapons } from "./CraftWeaponMapper.js";
+import { mapPrisons, mapServices, resolveServices } from "./FacilityMapper.js";
+import { getDamageKey } from "../utils.js";
 /*
 {
     languages: { en-US: {}, en-GB: {}, ...}

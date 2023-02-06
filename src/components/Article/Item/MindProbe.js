@@ -1,6 +1,6 @@
 import React from "react";
-import { ListHeader, SimpleValue } from "../../ComponentUtils";
-import Cost from "./Cost";
+import { ListHeader, SimpleValue } from "../../ComponentUtils.js";
+import Cost from "./Cost.js";
 
 export default function MindProbe({ ruleset, items, lc, linkFn, spriteFn}) {
     return (

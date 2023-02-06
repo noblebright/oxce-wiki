@@ -1,9 +1,9 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
-import useLocale from "../../hooks/useLocale";
+import useLocale from "../../hooks/useLocale.js";
 import { BooleanValue, SectionHeader, ListHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
-import useLink from "../../hooks/useLink";
+import useLink from "../../hooks/useLink.js";
 
 function ProtectedTopics({topics, linkFn}) {
     if(!topics) return null;

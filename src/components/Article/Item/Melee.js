@@ -1,11 +1,11 @@
 import React from "react";
-import Table from "react-bootstrap/table";
+import {Table} from "react-bootstrap";
 
-import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils";
-import DamageAlter from "./DamageAlter";
-import Damage from "./Damage";
-import Cost, { hasCost } from "./Cost";
+import useBonusString from "../../../hooks/useBonusString.js";
+import { ListHeader, SimpleValue, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils.js";
+import DamageAlter from "./DamageAlter.js";
+import Damage from "./Damage.js";
+import Cost, { hasCost } from "./Cost.js";
 
 export default function Melee({ ruleset, items, lc, linkFn, spriteFn }) {
     const bonusFn = useBonusString(lc);

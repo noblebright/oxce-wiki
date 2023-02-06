@@ -10,51 +10,53 @@ const colors = {
     CompareAuto: "#fb6a4a",
 };
 
+function LineChartContainer({ data, children }) {
+    return (
+        <LineChart
+                        width={500}
+                        height={300}
+                        margin={{
+                            top: 5, right:30, left: 20, bottom: 5
+                        }}
+                        data={data.data}
+                    >
+                        <CartesianGrid strokeDasharray="3 3"/>
+                        <XAxis dataKey="distance">
+                            <Label value="Distance" offset={-5} position="insideBottom" />
+                        </XAxis>
+                        <YAxis name={mode} label={{ value: mode, angle: -90, position: "insideLeft" }}/>
+                        <Tooltip />
+                        <Legend />
+                        {children}
+        </LineChart>
+    )
+}
+const modes = ["Aimed", "Snap", "Auto"];
+function LineSeries({ data, lc, suffix }) { //HitRatio, Damage
+    const weapon = data.weaponEntry.type;
+    const compareWeapon = data.compareWeaponEntry.type;
+    const series = [];
+    for(const mode of modes) {
+        const key = `${mode}${suffix}`;
+        const compareKey = `Compare${mode}${suffix}`;
+        if(data.data[0][key]) {
+            series.push(<Line key={key} type="monoTone" dot={false} name={`${lc(weapon)} ${lc(`STR_${mode.toUpperCase()}_SHOT`)}`} dataKey={`${mode}${suffix}`} stroke={colors[mode]} />);
+        }
+        if(data.data[0][compareKey]) {
+            series.push(<Line key={compareKey} type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc(`STR_${mode.toUpperCase()}_SHOT`)}`} dataKey={`${mode}${suffix}`} stroke={colors[`Compare${mode}`]} />);
+        }
+    }
+    return series;
+}
+
 export default function ResultChart({ data, mode, lc }) {
     const weapon = data.weaponEntry.type;
     const compareWeapon = data.compareWeaponEntry.type;
 
     return (
         <ResponsiveContainer width="90%" height="80%">
-            <LineChart
-                width={500}
-                height={300}
-                margin={{
-                    top: 5, right:30, left: 20, bottom: 5
-                }}
-                data={data.data}
-            >
-                <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="distance">
-                    <Label value="Distance" offset={-5} position="insideBottom" />
-                </XAxis>
-                <YAxis name={mode} label={{ value: mode, angle: -90, position: "insideLeft" }}/>
-                <Tooltip />
-                <Legend />
-                { data.data[0].AimedHitRatio !== undefined && mode === "HitRatio" && 
-                    <Line type="monoTone" dot={false} name={`${lc(weapon)} ${lc("STR_AIMED_SHOT")}`} dataKey="AimedHitRatio" stroke={colors.Aimed}/> }
-                { data.data[0].SnapHitRatio !== undefined && mode === "HitRatio" && 
-                    <Line type="monoTone" dot={false} name={`${lc(weapon)} ${lc("STR_SNAP_SHOT")}`} dataKey="SnapHitRatio" stroke={colors.Snap}/> }
-                { data.data[0].AutoHitRatio !== undefined && mode === "HitRatio" && 
-                    <Line type="monoTone" dot={false} name={`${lc(weapon)} ${lc("STR_AUTO_SHOT")}`} dataKey="AutoHitRatio" stroke={colors.Auto}/> }
-                { data.data[0].AimedDamage !== undefined && mode === "Damage" && 
-                    <Line type="monoTone" dot={false} name={`${lc(weapon)} ${lc("STR_AIMED_SHOT")}`} dataKey="AimedDamage" stroke={colors.Aimed}/> }
-                { data.data[0].SnapDamage !== undefined && mode === "Damage" && 
-                    <Line type="monoTone" dot={false} name={`${lc(weapon)} ${lc("STR_SNAP_SHOT")}`} dataKey="SnapDamage" stroke={colors.Snap}/> }
-                { data.data[0].AutoDamage !== undefined && mode === "Damage" && 
-                    <Line type="monoTone" dot={false} name={`${lc(weapon)} ${lc("STR_AUTO_SHOT")}`} dataKey="AutoDamage" stroke={colors.Auto}/> }
-                { data.data[0].CompareAimedHitRatio !== undefined && mode === "HitRatio" && 
-                    <Line type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc("STR_AIMED_SHOT")}`} dataKey="CompareAimedHitRatio" stroke={colors.CompareAimed}/> }
-                { data.data[0].CompareSnapHitRatio !== undefined && mode === "HitRatio" && 
-                    <Line type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc("STR_SNAP_SHOT")}`} dataKey="CompareSnapHitRatio" stroke={colors.CompareSnap}/> }
-                { data.data[0].CompareAutoHitRatio !== undefined && mode === "HitRatio" && 
-                    <Line type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc("STR_AUTO_SHOT")}`} dataKey="CompareAutoHitRatio" stroke={colors.CompareAuto}/> }
-                { data.data[0].CompareAimedDamage !== undefined && mode === "Damage" && 
-                    <Line type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc("STR_AIMED_SHOT")}`} dataKey="CompareAimedDamage" stroke={colors.CompareAimed}/> }
-                { data.data[0].CompareSnapDamage !== undefined && mode === "Damage" && 
-                    <Line type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc("STR_SNAP_SHOT")}`} dataKey="CompareSnapDamage" stroke={colors.CompareSnap}/> }
-                { data.data[0].CompareAutoDamage !== undefined && mode === "Damage" && 
-                    <Line type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc("STR_AUTO_SHOT")}`} dataKey="CompareAutoDamage" stroke={colors.CompareAuto}/> }
+            <LineChart data={data}>
+                <LineSeries data={data} lc={lc} suffix={mode} />
             </LineChart>
         </ResponsiveContainer>
     )

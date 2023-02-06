@@ -1,5 +1,5 @@
 import React from "react";
-import { MissingSprite } from "../components/ComponentUtils";
+import { MissingSprite } from "../components/ComponentUtils.js";
 
 const useSprite = (ruleset, file, width, height, zoom = 4) => (spriteRef, {key, ...extraProps} = {}) => {
     const sprite = ruleset.sprites[file];

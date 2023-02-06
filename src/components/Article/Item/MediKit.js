@@ -1,9 +1,9 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
-import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils";
-import Cost, { hasCost } from "./Cost";
+import useBonusString from "../../../hooks/useBonusString.js";
+import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy } from "../../ComponentUtils.js";
+import Cost, { hasCost } from "./Cost.js";
 
 const mediKitTargetMatrix = [
     ["STR_TARGET_FRIEND", "STR_TARGET_ON_THE_GROUND"],

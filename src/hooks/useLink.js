@@ -1,6 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import { NoLink } from "../components/ComponentUtils";
+import { NoLink } from "../components/ComponentUtils.js";
 
 const useLink = (version, lc) => id => (
     id instanceof NoLink ? 

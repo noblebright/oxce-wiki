@@ -1,11 +1,11 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
-import FacilitySprite from "./FacilitySprite";
+import FacilitySprite from "./FacilitySprite.js";
 import { BooleanValue, Percent, Money, Days, SectionHeader, SimpleValue, ListValue } from "../ComponentUtils.js";
-import useLocale from "../../hooks/useLocale";
-import useInventory from "../../hooks/useInventory";
-import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale.js";
+import useInventory from "../../hooks/useInventory.js";
+import useLink from "../../hooks/useLink.js";
 
 const getCost = (facilities, type) => Object.keys(facilities.buildCostItems).map(key => [key, facilities.buildCostItems[key][type]]);
 

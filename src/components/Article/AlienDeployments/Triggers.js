@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 import { SectionHeader, ListValue } from "../../ComponentUtils.js";
 
 function Trigger({ mission, value, lc, inventoryFn }) {

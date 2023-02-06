@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
-import useLocale from "../../hooks/useLocale";
-import useLink from "../../hooks/useLink";
-import SoldierBonus from "./SoldierBonus";
+import useLocale from "../../hooks/useLocale.js";
+import useLink from "../../hooks/useLink.js";
+import SoldierBonus from "./SoldierBonus.js";
 import { ListHeader, ListValue, SectionHeader } from "../ComponentUtils.js";
 
 function getCriteria(data, idx) {

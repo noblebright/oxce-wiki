@@ -1,7 +1,7 @@
 import React from "react";
-import { ListHeader, ListValue, SimpleValue, getUnitFaction } from "../../ComponentUtils";
-import Damage from "./Damage";
-import DamageAlter from "./DamageAlter";
+import { ListHeader, ListValue, SimpleValue, getUnitFaction } from "../../ComponentUtils.js";
+import Damage from "./Damage.js";
+import DamageAlter from "./DamageAlter.js";
 
 
 export default function Ammo({ ruleset, items, lc, linkFn, spriteFn }) {

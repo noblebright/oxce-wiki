@@ -1,11 +1,11 @@
 import React, {useState, useMemo} from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../hooks/useLink";
-import useLocale from "../../hooks/useLocale";
-import useBonusString from "../../hooks/useBonusString";
+import {Table} from "react-bootstrap";
+import useLink from "../../hooks/useLink.js";
+import useLocale from "../../hooks/useLocale.js";
+import useBonusString from "../../hooks/useBonusString.js";
 import { BooleanValue, KeyValue, ListValue, Percent, SimpleSelect, SectionHeader, ListHeader, SimpleValue, HeightStats, StatRecovery, UnitStats } from "../ComponentUtils.js";
-import { damageKeys } from "../../model/utils";
-import useImage from "../../hooks/useImage";
+import { damageKeys } from "../../model/utils.js";
+import useImage from "../../hooks/useImage.js";
 
 function ArmorRating({armors, lc}) {
     if(!armors) return null;

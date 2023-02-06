@@ -8,8 +8,7 @@
     },
     "release": {
       "outFile": "build/release.wasm",
-      "textFile": "build/release.wat",
-      "sourceMap": true,
+      "sourceMap": false,
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
@@ -17,6 +16,6 @@
     }
   },
   "options": {
-    "bindings": "esm"
+    "bindings": "raw"
   }
 }

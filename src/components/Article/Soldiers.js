@@ -1,9 +1,9 @@
 import React from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
 import { Percent, BooleanValue, Money, Hours, UnitStats, SectionHeader, SimpleValue, HeightStats, ListValue } from "../ComponentUtils.js";
-import useLocale from "../../hooks/useLocale";
-import useLink from "../../hooks/useLink";
+import useLocale from "../../hooks/useLocale.js";
+import useLink from "../../hooks/useLink.js";
 
 const dogfightLookup = {
     bravery: "STR_BRAVERY",

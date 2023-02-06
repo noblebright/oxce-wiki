@@ -1,11 +1,11 @@
 import React from "react";
-import Table from "react-bootstrap/table";
+import {Table} from "react-bootstrap";
 
-import useBonusString from "../../../hooks/useBonusString";
-import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils";
-import Damage from "./Damage";
-import DamageAlter from "./DamageAlter";
-import Cost, { hasCost } from "./Cost";
+import useBonusString from "../../../hooks/useBonusString.js";
+import { ListHeader, SimpleValue, BooleanValue, Actions, ActionValue, ActionHeader, Accuracy, getUnitFaction } from "../../ComponentUtils.js";
+import Damage from "./Damage.js";
+import DamageAlter from "./DamageAlter.js";
+import Cost, { hasCost } from "./Cost.js";
 
 const psiTargetMatrix = [
     "STR_XCOM",

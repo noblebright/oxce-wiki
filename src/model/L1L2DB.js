@@ -1,7 +1,7 @@
 import Dexie from "dexie";
-import { loadJSON } from "./utils";
-import GithubLoader from "./GithubLoader";
-import FallbackDB from "./FallbackDB";
+import { loadJSON } from "./utils.js";
+import GithubLoader from "./GithubLoader.js";
+import FallbackDB from "./FallbackDB.js";
 
 function initDexie() {
     const db = new Dexie("xcom");

@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import Table from "react-bootstrap/Table";
+import {Table} from "react-bootstrap";
 
 export const SectionHeader = ({label}) => (label ? <thead><tr className="table-dark"><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
 export const ListHeader = ({label}) => (<thead>{label && <tr className="table-secondary"><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);

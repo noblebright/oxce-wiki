@@ -1,5 +1,5 @@
 import {useEffect, useState, useCallback} from 'react';
-import { getMetadata, updateLanguage, clearDB } from "../model/L1L2Loader";
+import { getMetadata, updateLanguage, clearDB } from "../model/L1L2Loader.js";
 
 export default function useMetadata() {
     const [versions, setVersions] = useState();

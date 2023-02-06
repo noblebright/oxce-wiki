@@ -1,14 +1,14 @@
 import React, {useState, useEffect, useMemo} from "react";
-import Table from "react-bootstrap/Table";
-import useLink from "../../../hooks/useLink";
-import useLocale from "../../../hooks/useLocale";
-import useInventory from "../../../hooks/useInventory";
+import {Table} from "react-bootstrap";
+import useLink from "../../../hooks/useLink.js";
+import useLocale from "../../../hooks/useLocale.js";
+import useInventory from "../../../hooks/useInventory.js";
 import { BooleanValue, SectionHeader, SimpleValue, SimpleSelect, ListValue } from "../../ComponentUtils.js";
-import { getPossibleRaces } from "../../../model/compiler/UnitSourceMapper";
-import { Deployment, Reinforcements } from "./Deployment";
-import EnviroEffect from "./EnviroEffect";
-import StartingConditions from "./StartingConditions";
-import Triggers from "./Triggers";
+import { getPossibleRaces } from "../../../model/compiler/UnitSourceMapper.js";
+import { Deployment, Reinforcements } from "./Deployment.js";
+import EnviroEffect from "./EnviroEffect.js";
+import StartingConditions from "./StartingConditions.js";
+import Triggers from "./Triggers.js";
 
 function getMapItems(ruleset, entry) {
     const items = new Set(entry.$terrainItems);

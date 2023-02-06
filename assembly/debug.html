@@ -1,15 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script type="module">
-import { getTTK, add } from "./debug.js";
-
-console.time("ttk");
-const result = getTTK(40, 10, 1, 0, 200, 20, 0.5);
-document.body.innerText = JSON.stringify(result);
-console.timeEnd("ttk");
-
-</script>
+<style>
+table {
+	border-collapse: collapse;
+}
+.cell {
+	height: 11px;
+	width:  10px;
+	border: 1px solid black;
+	padding: 0;
+	border-collapse: collapse;
+}
+</style>
 </head>
-<body></body>
+<body>
+<div id="container">
+</div>
+<script type="module">
+    import { instantiate } from "./debug.js";
+
+    const { getTTK } = await instantiate(await WebAssembly.compileStreaming(await fetch("debug.wasm")), {});
+    const c = document.getElementById("container");
+    const modes = ["Rifle Aimed Shot", "Rifle Snap Shot", "Rifle Auto Shot", "Rifle Aimed Shot", "Rifle Snap Shot", "Rifle Auto Shot"];
+    function buildCell(val) {
+        return `<td class="cell" style="background-color: rgba(0,0,255,${val}"></td>`;
+    }
+    function buildRow(row) {
+        return `<tr>${row.map(x => buildCell(x)).join("")}</tr>`
+    }
+    function buildGraph(rows) {
+        return `<table><tbody>${rows.map(row => buildRow(row)).join("")}</tbody></table>`;
+    }
+    function render(mode) {
+        const rows = [];
+        for(let i = 1; i <= 50; i++) {
+            const result = getTTK(40, 10, 1, 0, 200, 20, 0.5);
+            for(let j = 1; j < result.length; j++) {
+                if(!rows[j - 1]) rows[j - 1] = [];
+                rows[j - 1][i - 1] = (result[j] ?? 0) * 10;
+            }
+        }
+        return `<article><header>${mode}</header>${buildGraph(rows)}</article>`;
+    }
+    console.time("ttk");
+    const content = modes.map(x => render(x)).join("");
+    c.innerHTML= content;
+    console.timeEnd("ttk");    
+</script>
+</body>
 </html>

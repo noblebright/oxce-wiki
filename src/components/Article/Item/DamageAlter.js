@@ -1,7 +1,7 @@
 import React from "react";
 
-import { SimpleValue, BooleanValue, Percent } from "../../ComponentUtils";
-import {defaultDTProps as defaultProps} from "../../../model/Constants";
+import { SimpleValue, BooleanValue, Percent } from "../../ComponentUtils.js";
+import {defaultDTProps as defaultProps} from "../../../model/Constants.js";
 
 function getRandomType(ruleset, randomType) {
     switch(randomType) {
