@@ -97,5 +97,5 @@ export function computeAccuracyInputs(ruleset, shotType, distance, state, weapon
     const targetHeight = targetEntry.standHeight;
     const targetWidth = unitWidths[targetArmor.loftempsSet[0]] ?? 7; //weird-shaped units we assume are 7 voxels wide (human)
 
-    return [targetWidth, targetHeight, acc, distance, shots];
+    return [shots, targetWidth, targetHeight, acc, distance];
 }

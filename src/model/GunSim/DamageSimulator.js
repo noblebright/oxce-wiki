@@ -174,6 +174,14 @@ class DamageSimulator {
     
         const effectivePower = power + getMultiplier(multipliers, adjustedStats);
         const effectiveArmor = Math.floor(armorRating * armorPen);
+
+        //expose this for TTK computation, we can throw it into average, since this stuff doesn't change.
+        const targetHealth = targetEntry.stats.health + (armorEntry.stats?.health ?? 0);
+        const range = typeof randomTypeHisto[randomType] === "function" ? randomTypeHisto[randomType](this.ruleset) : randomTypeHisto[randomType];
+
+        const randomBounds = typeof range === "function" ? [2, 1, 100] : [1, ...range];
+        this.TTKParams = [targetHealth, effectiveArmor, ...randomBounds, Math.floor(effectivePower)];
+        
         return this.#getDamageHistogram(randomType, effectivePower, resist, effectiveArmor) * penetratingDamageMultiplier;
     }
 

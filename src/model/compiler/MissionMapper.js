@@ -178,8 +178,8 @@ function compileSite(ruleset, scriptObj, missionObj, regions, race) {
         // Support for non-point areas: yes, but it is recommended to use one more wave attribute: `objectiveOnTheLandingSite: true`
         //   -> false: UFO always lands in the top-left corner of the area; site spawns randomly inside the area
         //   ->  true: UFO lands randomly inside the area; site spawns exactly on the UFO landing site
-        if(wave.siteType) {
-            addDeploymentData(ruleset, scriptObj.type, race, null, wave.siteType)
+        if(missionObj.siteType) {
+            addDeploymentData(ruleset, scriptObj.type, race, null, missionObj.siteType)
         }
         missionObj.waves.forEach(wave => {
             addDeploymentData(ruleset, scriptObj.type, race, wave.ufo, wave.ufo);

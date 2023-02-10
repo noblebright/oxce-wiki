@@ -2,6 +2,8 @@ import DamageSimulator from "./DamageSimulator.js";
 import { unitWidths, ShotType } from "../Constants.js";
 import { computeAccuracyInputs } from "./Simulator.js";
 import { mergeStats } from "./utils.js";
+
+//symlink to raw wasm binding
 import { instantiate } from "../wasmInterface.js";
 
 function hasCost(value, suffix) {
@@ -37,7 +39,7 @@ function getShotTypes(damageModel) {
     }    
 }
 
-function getShotsPerTurn(ruleset, state, key = "weapon") {
+function getAttemptsPerTurn(ruleset, state, key = "weapon") {
     const {soldier, armor, stat} = state;
     const entries = ruleset.entries;
     const weaponEntry = entries[state[key]].items;
@@ -62,8 +64,8 @@ let accuracyData;
 let getTTK;
 
 async function loadWASM() {
-    const stream = fetch("release.wasm");
-    const wasm = WebAssembly.compileStreaming(stream);
+    const stream = await fetch("/release.wasm");
+    const wasm = await WebAssembly.compileStreaming(stream);
     return instantiate(wasm, {});
 }
 
@@ -85,46 +87,69 @@ const widthOffsets = Object.values(unitWidths).reduce((acc, width, idx) => {
     return acc;
 }, {});
 
-function lookupAcc(accuracyData, targetWidth, targetHeight, acc, distance, shots) {
+function lookupAcc(accuracyData, targetWidth, targetHeight, acc, distance) {
     const offset =  widthOffsets[targetWidth] * 132000 + // 50 * 110 * 24
                     (targetHeight - 1) * 5500 + //height 1-24
                     acc * 50 +      //acc 0-109
                     (distance - 1); //distance 1-50
 
-    return accuracyData[offset] * shots  * 100 /  65535;
+    return accuracyData[offset] * 100 /  65535;
 }
 
 export function getChartData(ruleset, state) {
     const damageModel = new DamageSimulator(ruleset, state);
     const shotTypes = getShotTypes(damageModel);
-    const shotsPerTurnByType = getShotsPerTurn(ruleset, state);
+    // attempt = 1 mouse click, vs shot = 1 bullet/pellet
+    const attemptsPerTurnByType = getAttemptsPerTurn(ruleset, state);
 
     const compareDamageModel = state.compare && new DamageSimulator(ruleset, state, "compareWeapon", "compareAmmo");
     const compareShotTypes = state.compare && getShotTypes(compareDamageModel);
-    const compareShotsPerTurnByType = state.compare && getShotsPerTurn(ruleset, state, "compareWeapon");
+    const compareAttemptsPerTurnByType = state.compare && getAttemptsPerTurn(ruleset, state, "compareWeapon");
 
     const data = [];
 
     for(let distance = 1; distance <= 50; distance++) {
         const dataPoint = { distance };
         for(let shotType of shotTypes) {
-            const accuracyInputs = computeAccuracyInputs(ruleset, shotType, distance, state);
-            const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
-            const shotsPerTurn = shotsPerTurnByType[shotType];
+            const accuracyParameters = computeAccuracyInputs(ruleset, shotType, distance, state);
+            const [shotCount, ...accuracyInputs] = accuracyParameters;
+            const singleHitAccuracy = lookupAcc(accuracyData, ...accuracyInputs);
+            const hitRatio = singleHitAccuracy * shotCount;
+            const attemptsPerTurn = attemptsPerTurnByType[shotType];
+            const rangeModifiedDamage = damageModel.getRangeModifiedDamage(distance);
+            
             dataPoint[`${shotType}HitRatio`] = hitRatio;
-            dataPoint[`${shotType}Damage`] = damageModel.getRangeModifiedDamage(distance) * hitRatio / 100 * shotsPerTurn;
+            dataPoint[`${shotType}Damage`] = rangeModifiedDamage * hitRatio / 100 * attemptsPerTurn;
+            // function getTTK(health: i32, armor: i32, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64) : f64[] {
+            console.log(`${shotType}TTK_${distance}`, ...damageModel.TTKParams, singleHitAccuracy / 100);
+            const ttk = getTTK(...damageModel.TTKParams, singleHitAccuracy / 100);
+            dataPoint[`${shotType}TTK`] = ttk.length;
+            for(let i = 1; i < ttk.length; i++) {
+                dataPoint[`${shotType}TTK_${i}`] = ttk[i];
+            }
         }
         if(state.compare) {
             for(let shotType of compareShotTypes) {
-                const accuracyInputs = computeAccuracyInputs(ruleset, shotType, distance, state, "compareWeapon", "compareAmmo");
-                const hitRatio = lookupAcc(accuracyData, ...accuracyInputs);
-                const shotsPerTurn = compareShotsPerTurnByType[shotType];
+                const accuracyParameters = computeAccuracyInputs(ruleset, shotType, distance, state, "compareWeapon", "compareAmmo");
+                const [shotCount, ...accuracyInputs] = accuracyParameters;
+                const singleHitAccuracy = lookupAcc(accuracyData, ...accuracyInputs);
+                const hitRatio = singleHitAccuracy * shotCount;
+                const compareAttemptsPerTurn = compareAttemptsPerTurnByType[shotType];
+                const rangeModifiedDamage = compareDamageModel.getRangeModifiedDamage(distance);
+                
                 dataPoint[`Compare${shotType}HitRatio`] = hitRatio;
-                dataPoint[`Compare${shotType}Damage`] = compareDamageModel.getRangeModifiedDamage(distance) * hitRatio / 100 * shotsPerTurn;
+                dataPoint[`Compare${shotType}Damage`] = rangeModifiedDamage * hitRatio / 100 * compareAttemptsPerTurn;
+                const ttk = getTTK(...compareDamageModel.TTKParams, singleHitAccuracy / 100);
+                dataPoint[`Compare${shotType}TTK`] = ttk.length;
+                for(let i = 1; i < ttk.length; i++) {
+                    dataPoint[`Compare${shotType}TTK_${i}`] = ttk[i];
+                }
+
             }
         }
         data.push(dataPoint);
     }
+    window.chartData = data;
     return { data, weaponEntry: damageModel.weaponEntry, compareWeaponEntry: compareDamageModel?.weaponEntry };
 }
 

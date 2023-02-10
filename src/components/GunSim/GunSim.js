@@ -113,6 +113,7 @@ export default function GunSim({ ruleset, lang }) {
                 <Form.Select size="sm" value={mode} onChange={e => setMode(e.target.value)}>
                     <option value="HitRatio">Hit Ratio</option>
                     <option value="Damage">Damage</option>
+                    <option value="TTK">TTK</option>
                 </Form.Select>
                 { chartData ? <ResultChart data={chartData} mode={mode} lc={lc}/> : null }
             </div>

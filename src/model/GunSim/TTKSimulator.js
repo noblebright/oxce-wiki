@@ -33,9 +33,9 @@ function guessDepth(chances) {
 
 function calcRolls(low, high, armor, dmg, chancePerRoll, branchChance, rolls, i, dmgToOccurrence) {
     for(let i1 = low; i1 <= high; i1++) {
-        const healthDmg = i1 + dmg;
+        const d2 = i1 + dmg;
         if(i === rolls) {
-            addToMap(Math.max(0, healthDmg - armor), chancePerRoll + branchChance, dmgToOccurrence);
+            addToMap(Math.max(0, d2 - armor), chancePerRoll + branchChance, dmgToOccurrence);
         } else {
             calcRolls(low, high, armor, healthDmg, chancePerRoll, chancePerRoll + branchChance, rolls, i + 1, dmgToOccurrence);
         }
@@ -151,4 +151,4 @@ function getTTK(health, armor, rolls, lowLimit, highLimit, dmg, hitChance) {
     return result;
 }
 
-console.log(JSON.stringify(getTTK(40, 10, 1, 0, 200, 20, 0.5)));
+console.log(JSON.stringify(getTTK(35, 3, 1, 50, 200, 50, 1)));
