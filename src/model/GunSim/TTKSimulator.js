@@ -123,8 +123,11 @@ function calcHitsFaster(r) {
             }
         }
         killChance *= remaining;
-        remaining -= killChance;
         results[i + 1] = killChance;
+        remaining -= killChance;
+        if(remaining <= 0) {
+            break;
+        }
         killChance = 0;
         prev = next;
         next = Array(r.target.hp);
@@ -135,7 +138,7 @@ function calcHitsFaster(r) {
         console.log(`Hits: ${i} chance ${results[i]}`);
         noKill += results[i];
     }
-    noKill = 1 - noKill;
+    noKill = intMax(1 - noKill, 0);
     results[0] = noKill;
     console.log(`Hits more than ${r.depth} chance ${results[0]}`);
     const result = { chances: results, accuracy: 1 };

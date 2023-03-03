@@ -76,7 +76,7 @@ export function loadDependencies() {
             .then(buffer => { accuracyData = new Uint16Array(buffer)});
 
     // load WASM code
-    const wasm = loadWASM().then(iface => { getTTK = iface.getTTK; });
+    const wasm = loadWASM().then(iface => { getTTK = iface.getTTK; window.getTTK = getTTK; });
 
     // wait for both
     return Promise.all([accuracy, wasm]);

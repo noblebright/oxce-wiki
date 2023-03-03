@@ -162,8 +162,11 @@ function calcHitsFaster(r: Calc1Result) : Calc2Result{
             }
         }
         killChance *= remaining;
-        remaining -= killChance;
         results[i + 1] = killChance;
+        remaining -= killChance;
+        if(remaining <= 0) {
+            break;
+        }
         killChance = 0;
         prev = next;
         next = new Array(r.target.hp);
@@ -173,7 +176,7 @@ function calcHitsFaster(r: Calc1Result) : Calc2Result{
     for(let i:i32 = 1; i < results.length; i++) {
         noKill += results[i];
     }
-    noKill = 1 - noKill;
+    noKill = Math.max(1 - noKill, 0);
     results[0] = noKill;
     return new Calc2Result(results, 1);
 }
