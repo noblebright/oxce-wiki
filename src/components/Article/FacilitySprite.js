@@ -8,16 +8,17 @@ export default function FacilitySprite({ ruleset, file, id, size = 1}) {
         } else {
             return <MissingSprite size="128px"/>;
         }
-    } else if(size === 2) {
+    } else {
         if(!ruleset.sprites[file].files[`${id}`]) {
             return <MissingSprite size="256px"/>
         } else {
+            const chunks = [];
+            for(let i = 0; i < size ** 2; i++) {
+                chunks.push(<img key={i} src={ruleset.sprites[file].files[`${id + i}`]} alt=""/>)
+            }
             return (
-                <div className="facilitySprite">
-                    <img src={ruleset.sprites[file].files[`${id}`]} alt=""/>
-                    <img src={ruleset.sprites[file].files[`${id + 1}`]} alt=""/>
-                    <img src={ruleset.sprites[file].files[`${id + 2}`]} alt=""/>
-                    <img src={ruleset.sprites[file].files[`${id + 3}`]} alt=""/>
+                <div className="facilitySprite" style={{ "--facility-size": size }}>
+                    {chunks}
                 </div>
             );
         }
