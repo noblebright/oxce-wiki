@@ -1,6 +1,8 @@
 import React, { useCallback } from "react";
 import Table from "react-bootstrap/Table";
 
+import { truncateEpsilon } from "../model/utils";
+
 export const SectionHeader = ({label}) => (label ? <thead><tr className="table-dark"><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
 export const ListHeader = ({label}) => (<thead>{label && <tr className="table-secondary"><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
 
@@ -27,7 +29,7 @@ export const Money = x => `$${x}`;
 export const Hours = x => `${x} Hours`;
 export const Days = x => `${x} Days`;
 export const PerDay = x => `${x}/Day`;
-export const Percent = x => `${x}%`;
+export const Percent = x => `${truncateEpsilon(x)}%`;
 export const KeyValue = ([k, v]) => <span className="KeyValue"><span>{k}</span><span>{v}</span></span>;
 function statValue({min, max, stats}, field) {
     if(stats) return stats[field];
