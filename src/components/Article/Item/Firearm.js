@@ -133,14 +133,19 @@ function ReloadTimes({ items, lc }) {
         return null;
     }
     const ammoReloadValues = [];
-    actionTypes.filter(x => items[`conf${x}`]?.ammoSlot !== undefined).forEach(type => {
-        const slot = items[`conf${type}`]?.ammoSlot;
-        ammoReloadValues.push(<SimpleValue key={`${type}reload`} label={`Reload: ${lc(getActionKey(items, type))}`} value={items.ammo[slot].tuLoad}/>);
-        ammoReloadValues.push(<SimpleValue key={`${type}unload`}  label={`Unload: ${lc(getActionKey(items, type))}`} value={items.ammo[slot].tuUnload}/>)
-    });
+    if(customReloading) {
+        actionTypes.filter(x => items[`conf${x}`]?.ammoSlot !== undefined).forEach(type => {
+            const slot = items[`conf${type}`]?.ammoSlot;
+            ammoReloadValues.push(<SimpleValue key={`${type}reload`} label={`${lc("tuLoad")}: ${lc(getActionKey(items, type))}`} value={items.ammo[slot].tuLoad}/>);
+            ammoReloadValues.push(<SimpleValue key={`${type}unload`}  label={`${lc("tuUnload")}: ${lc(getActionKey(items, type))}`} value={items.ammo[slot].tuUnload}/>)
+        });
+    } else {
+        ammoReloadValues.push(<SimpleValue key={`reload`} label={lc("tuLoad")} value={items.tuLoad}/>);
+        ammoReloadValues.push(<SimpleValue key={`unload`} label={lc("tuUnload")} value={items.tuUnload}/>)
+    }
     return (
         <React.Fragment>
-            { customReloading ? ammoReloadValues : null }
+            { ammoReloadValues }
         </React.Fragment>
     );
 }
