@@ -71,7 +71,7 @@ function calcRolls(low: i32, high: i32, armor: i32, dmg: i32, chancePerRoll: f64
     }
 }
 
-type HitList = Array<HitChance | null>;
+type HitList = Array<HitChance>;
 
 function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64) : Calc1Result {
     const dmgToOccurrence = new Map<i32, f64>();
@@ -88,8 +88,8 @@ function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, h
     calcRolls(lowDmg, highDmg, t.armor, 0, chancePerRoll, 0, rolls, 1, dmgToOccurrence);
 
     const chances: HitChance[] = [];
-
     const keys = dmgToOccurrence.keys();
+
     for(let i = 0; i < keys.length; i++) {
         const key = keys[i];
         const value = dmgToOccurrence.get(key);
@@ -117,67 +117,36 @@ function adjust(max: i32, hitChances: HitChance[]) : HitList {
         entries.push(new HitChance(map.get(key), key));
     }
     entries.sort((a, b) => b.dmg - a.dmg);
-    return changetype<HitList>(entries);
+    return entries;
 }
 
 
 function calcHitsFaster(r: Calc1Result) : Calc2Result{
-    const shots = adjust(r.target.hp + r.target.armor, r.hitChances);
-    let prev = adjust(r.target.hp + r.target.armor, r.hitChances);
-    let next: HitList = new Array(r.target.hp);
-    let killChance:f64 = 0;
+    const target:Target = r.target;
+    const shots = adjust(target.hp + target.armor, r.hitChances);
+    let accumulatedDamage: f64[] = new Array(target.hp + 1);
+    accumulatedDamage[0] = 1;
     const results: f64[] = new Array(r.depth + 1);
 
-    for(let i = 0; i < prev.length; i++) {
-        const c = <HitChance> prev[i]; //assert this isn't null
-        if(c.dmg >= r.target.hp) {
-            killChance += c.chance;
-        }
-    }
-
-    results[1] = killChance;
-    let remaining: f64 = 1 - killChance;
-    killChance = 0;
-
-    for(let i = 1; i < r.depth; i++) {
-        for(let j = 0; j < shots.length; j++) {
-            const h = shots[j];
-            if(!h) continue;
-            for(let k = 0; k < prev.length; k++) {
-                let p = prev[k];
-                if(!p) p = new HitChance(1, 0);
-                let dmg = h.dmg + p.dmg;
-                let chance = h.chance * p.chance;
-                if(dmg >= r.target.hp) {
-                    killChance += chance;
-                } else {
-                    let n = next[dmg];
-                    if(!n) {
-                        n = new HitChance(chance, dmg);
-                        next[dmg] = n;
-                    } else {
-                        n.chance += chance;
-                    }
-                }
+    for(let depth = 1; depth <= r.depth; depth++) {
+        const next: f64[] = new Array(target.hp + 1);
+        for(let i = 0; i < shots.length; i++) {
+            const shot = shots[i];
+            for(let idx = 0; idx < accumulatedDamage.length; idx++) {
+                const dmg:i32 = intMin(idx + shot.dmg, target.hp);
+                next[dmg] += accumulatedDamage[idx] * shot.chance;
             }
         }
-        killChance *= remaining;
-        results[i + 1] = killChance;
-        remaining -= killChance;
-        if(remaining <= 0) {
-            break;
-        }
-        killChance = 0;
-        prev = next;
-        next = new Array(r.target.hp);
+        accumulatedDamage = next;
+        results[depth] = accumulatedDamage[target.hp];
     }
 
-    let noKill : f64 = 0;
-    for(let i:i32 = 1; i < results.length; i++) {
-        noKill += results[i];
+    let remaining: f64 = 1;
+    for(let i = results.length - 1; i > 0; i--) {
+        results[i] -= results[i-1];
+        remaining -= results[i];
     }
-    noKill = Math.max(1 - noKill, 0);
-    results[0] = noKill;
+    results[0] = remaining;
     return new Calc2Result(results, 1);
 }
 
