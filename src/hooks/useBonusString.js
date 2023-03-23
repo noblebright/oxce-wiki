@@ -1,3 +1,5 @@
+import { truncateEpsilon } from "../model/utils.js";
+
 const statTypes = {
     flatOne: { value: (x) => !Array.isArray(x) ? x : x.reduce((acc, item, idx) => acc += Math.pow(item, idx + 1), 0) },
     flatHundred: { value: (x) => !Array.isArray(x) ? 100 * x : x.reduce((acc, item, idx) => acc += 100 * Math.pow(item, idx + 1), 0) },
@@ -41,12 +43,12 @@ const useBonusString = lc => formula => {
     Object.keys(formula).forEach(key => {
         const statDef = statTypes[key];
         if(typeof statDef.value === "function") {
-            const value = statDef.value(formula[key]);
+            const value = truncateEpsilon(statDef.value(formula[key]));
             if(value > 0) bonuses.push(Math.abs(value));
             if(value < 0) penalties.push(Math.abs(value));    
          } else if(typeof formula[key] === "number") {
             const { value: labelKey, vFn, normalized, total } = statDef;
-            const value = formula[key];
+            const value = truncateEpsilon(formula[key]);
             const label = vFn ? vFn(lc) : lc(labelKey);
 
             const str = `${Math.abs(value)}${ normalized ? " * %" : " * "}${ total ? `${lc("STR_TOTAL")} `: ""}${label}`;
@@ -58,7 +60,7 @@ const useBonusString = lc => formula => {
             const label = vFn ? vFn(lc) : lc(labelKey);
 
             coefficients.forEach((co, idx) => {
-                const str = `${Math.abs(co)}${ normalized ? " * %" : " * "}${ total ? `${lc("STR_TOTAL")} `: ""}${vFn ? `(${label})` : label}${idx ? `^${idx + 1}`: ""}`;
+                const str = `${Math.abs(truncateEpsilon(co))}${ normalized ? " * %" : " * "}${ total ? `${lc("STR_TOTAL")} `: ""}${vFn ? `(${label})` : label}${idx ? `^${idx + 1}`: ""}`;
                 if(co > 0) bonuses.push(str);
                 if(co < 0) penalties.push(str);
             });

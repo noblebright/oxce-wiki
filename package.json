@@ -26,16 +26,17 @@
     "use-as-bind": "^0.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && npm run asbuild:release",
+    "start": "npm run asbuild && react-scripts start",
+    "build": "npm run asbuild && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "asbuild:debug": "asc assembly/index.ts --target debug",
     "asbuild:release": "asc assembly/index.ts --target release",
-    "asbuild": "npm run asbuild:debug && npm run asbuild:release"
+    "asbuild": "npm run asbuild:release && mv build/release.wasm public && mv build/release.js src/model/wasmInterface.js"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "ignorePatterns": ["wasmInterface.js"]
   },
   "browserslist": {
     "production": [

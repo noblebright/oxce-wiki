@@ -1,5 +1,6 @@
 import React from "react";
 import { BarChart, Bar, LineChart, Label, Line, XAxis, YAxis, Legend, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { truncateEpsilon } from "../../model/utils.js";
 
 const colors = {
     Aimed: "#08519c",
@@ -44,7 +45,7 @@ function LinearCharts({ data, mode, lc }) {
                 <XAxis dataKey="distance">
                     <Label value="Distance" offset={-5} position="insideBottom" />
                 </XAxis>
-                <YAxis label={{ value: mode, angle: -90, position: "insideLeft" }}/>
+                <YAxis label={{ value: mode, angle: -90, position: "insideLeft" }} />
                 <Tooltip />
                 <Legend />
                 { getLineSeries(data, lc, mode) }
@@ -68,7 +69,7 @@ function getStackedBars(mode) {
     return result;
 }
 
-function TTKChart({ data, mode, height, lc }) {
+function TTKChart({ data, mode, height }) {
     return (
         <>
             <div>{mode}</div>
@@ -85,7 +86,7 @@ function TTKChart({ data, mode, height, lc }) {
                     <XAxis dataKey="distance">
                         <Label value="Distance" offset={-5} position="insideBottom" />
                     </XAxis>
-                    <YAxis domain={[0, 1]} label={{ value: "Kill Probability", angle: -90, position: "insideLeft" }}/>
+                    <YAxis domain={[0, 1]} tickFormatter={truncateEpsilon} label={{ value: "Kill Probability", angle: -90, position: "insideLeft" }}/>
                     <Tooltip />
                     { getStackedBars(mode) }
                 </BarChart>

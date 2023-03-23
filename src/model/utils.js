@@ -73,3 +73,9 @@ export const makeObjectPath = (obj, keyPath) => {
     }
     return makeObjectPath(obj[head], rest);
 }
+
+export const truncateEpsilon = i => {
+    if(Math.abs(i) < 1.0e-10)
+        return 0;
+    return i.toPrecision(10) * 1;
+}

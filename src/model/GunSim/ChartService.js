@@ -2,6 +2,7 @@ import DamageSimulator from "./DamageSimulator.js";
 import { unitWidths, ShotType } from "../Constants.js";
 import { computeAccuracyInputs } from "./Simulator.js";
 import { mergeStats } from "./utils.js";
+import { truncateEpsilon } from "../utils.js";
 
 //symlink to raw wasm binding
 import { instantiate } from "../wasmInterface.js";
@@ -125,7 +126,7 @@ export function getChartData(ruleset, state) {
             const ttk = getTTK(...damageModel.TTKParams, singleHitAccuracy / 100);
             dataPoint[`${shotType}TTK`] = ttk.length;
             for(let i = 1; i < ttk.length; i++) {
-                dataPoint[`${shotType}TTK_${i}`] = ttk[i];
+                dataPoint[`${shotType}TTK_${i}`] = truncateEpsilon(ttk[i]);
             }
         }
         if(state.compare) {
@@ -142,7 +143,7 @@ export function getChartData(ruleset, state) {
                 const ttk = getTTK(...compareDamageModel.TTKParams, singleHitAccuracy / 100);
                 dataPoint[`Compare${shotType}TTK`] = ttk.length;
                 for(let i = 1; i < ttk.length; i++) {
-                    dataPoint[`Compare${shotType}TTK_${i}`] = ttk[i];
+                    dataPoint[`Compare${shotType}TTK_${i}`] = truncateEpsilon(ttk[i]);
                 }
 
             }
