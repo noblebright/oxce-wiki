@@ -60,20 +60,20 @@ function guessDepth(chances: i32) : i32 {
     return <i32>Math.ceil(Math.log(1_000_000_000_000) / Math.log(chances));
 }
 
-function calcRolls(low: i32, high: i32, armor: i32, dmg: i32, chancePerRoll: f64, branchChance: f64, rolls: i32, i: i32, dmgToOccurrence: Map<i32, f64>) : void {
+function calcRolls(low: i32, high: i32, armor: i32, dmg: i32, chancePerRoll: f64, branchChance: f64, rolls: i32, i: i32, dmgToOccurrence: Map<i32, f64>, penetratingDamageMultiplier: f64) : void {
     for(let i1:i32 = low; i1 <= high; i1++) {
-        const healthDmg: i32 = i1 + dmg;
+        const healthDmg: i32 = i1 + <i32> Math.floor(dmg * penetratingDamageMultiplier);
         if(i === rolls) {
             addToMap(intMax(0, healthDmg - armor), chancePerRoll + branchChance, dmgToOccurrence);
         } else {
-            calcRolls(low, high, armor, healthDmg, chancePerRoll, chancePerRoll + branchChance, rolls, i + 1, dmgToOccurrence);
+            calcRolls(low, high, armor, healthDmg, chancePerRoll, chancePerRoll + branchChance, rolls, i + 1, dmgToOccurrence, penetratingDamageMultiplier);
         }
     }
 }
 
 type HitList = Array<HitChance>;
 
-function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64) : Calc1Result {
+function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64, penetratingDamageMultiplier: f64) : Calc1Result {
     const dmgToOccurrence = new Map<i32, f64>();
 
     if(hitChance < 1) {
@@ -85,7 +85,7 @@ function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, h
     const dmgRolls = Math.floor((highDmg - lowDmg + 1) ** rolls);
     const chancePerRoll = hitChance / dmgRolls;
 
-    calcRolls(lowDmg, highDmg, t.armor, 0, chancePerRoll, 0, rolls, 1, dmgToOccurrence);
+    calcRolls(lowDmg, highDmg, t.armor, 0, chancePerRoll, 0, rolls, 1, dmgToOccurrence, penetratingDamageMultiplier);
 
     const chances: HitChance[] = [];
     const keys = dmgToOccurrence.keys();
@@ -150,9 +150,9 @@ function calcHitsFaster(r: Calc1Result) : Calc2Result{
     return new Calc2Result(results, 1);
 }
 
-function getTTK(health: i32, armor: i32, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64) : f64[] {
+function getTTK(health: i32, armor: i32, rolls: i32, lowLimit: i32, highLimit: i32, penetratingDamageMultiplier:f64, dmg: i32, hitChance: f64) : f64[] {
     const t = new Target(health, armor);
-    const r = calc1(t, rolls, lowLimit, highLimit, dmg, hitChance);
+    const r = calc1(t, rolls, lowLimit, highLimit, dmg, hitChance, penetratingDamageMultiplier);
     const result = calcHitsFaster(r);
     return result.chances;
 }

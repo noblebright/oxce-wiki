@@ -170,7 +170,7 @@ class DamageSimulator {
         // IgnoreDirection defaults to front armor
         const { armorRating, painImmune, resist } = getTargetStats(entries, damageType, targetEntry, ignoreDirection ? "front" : direction, isExplosive);
         const penetratingDamageMultiplier = this.#getDamageAlter("ToHealth", 1) * randomHealthFactor + 
-                                            this.#getDamageAlter("ToHealth", 0.25) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
+                                            this.#getDamageAlter("ToStun", 0.25) * ((ignorePainImmunity || !painImmune) ? 1 : 0) * randomStunFactor;
     
         const effectivePower = power + getMultiplier(multipliers, adjustedStats);
         const effectiveArmor = Math.floor(armorRating * armorPen);
@@ -180,7 +180,8 @@ class DamageSimulator {
         const range = typeof randomTypeHisto[randomType] === "function" ? randomTypeHisto[randomType](this.ruleset) : randomTypeHisto[randomType];
 
         const randomBounds = typeof range === "function" ? [2, 1, 100] : [1, ...range];
-        this.TTKParams = [targetHealth, effectiveArmor, ...randomBounds, Math.floor(effectivePower)];
+        this.TTKParams = [targetHealth, effectiveArmor, ...randomBounds, penetratingDamageMultiplier];
+        this.TTKPower = effectivePower * resist;
         
         return this.#getDamageHistogram(randomType, effectivePower, resist, effectiveArmor) * penetratingDamageMultiplier;
     }
@@ -191,6 +192,18 @@ class DamageSimulator {
         if(modifiedDistance <= 0) return this.basicDamage;
         const distanceModifier = -modifiedDistance * this.powerRangeObj.powerRangeReduction;
         return this.#getAverageDamage(distanceModifier + powerModifier);
+    }
+    
+    getTTKPower(distance) {
+        let power = this.TTKPower;
+        if(this.powerRangeObj) {
+            const modifiedDistance = distance - this.powerRangeObj.powerRangeThreshold;
+            if(modifiedDistance > 0) {
+                const distanceModifier = -modifiedDistance * this.powerRangeObj.powerRangeReduction;
+                power = this.TTKPower + distanceModifier;
+            }
+        }
+        return Math.floor(power);
     }
 }
 

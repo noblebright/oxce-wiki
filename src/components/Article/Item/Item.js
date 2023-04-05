@@ -130,7 +130,7 @@ export default function Item(props) {
         return null; //empty object.
     }
     const BattleComponent = componentMap[items.battleType] || DefaultComponent;
-    const foundFrom = items.specialType ? [...(items.$foundFrom ?? []), new NoLink("Map Terrrain")] : items.$foundFrom;
+    const foundFrom = items.specialType ? [...(items.$foundFrom ?? []), new NoLink("Map Terrain")] : items.$foundFrom;
     return (
         <React.Fragment>
         <Table bordered striped size="sm" className="auto-width">
