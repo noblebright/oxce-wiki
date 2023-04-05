@@ -74,26 +74,18 @@ img.facilitySprite {
 }
 
 div.facilitySprite {
+    display: grid;
+    --facility-size: 1;
+    grid-template-columns: repeat(var(--facility-size), 128px);
+    grid-template-rows: repeat(var(--facility-size), 128px);
     position: relative;
-    width: 256px;
-    height: 256px;
+    width: calc(var(--facility-size) * 32px * 4);
+    height: calc(var(--facility-size) * 32px * 4);
 }
 
 div.facilitySprite img {
     zoom: 4;
     image-rendering: pixelated;
-    position: absolute;
-}
-
-div.facilitySprite img:nth-child(2) {
-    left: 32px;
-}
-div.facilitySprite img:nth-child(3) {
-    top: 32px;
-}
-div.facilitySprite img:nth-child(4) {
-    left: 32px;
-    top: 32px;
 }
 
 .singleImage {
