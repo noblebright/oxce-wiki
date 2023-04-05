@@ -2,8 +2,6 @@ import React, { useCallback } from "react";
 import {Table} from "react-bootstrap";
 import { truncateEpsilon } from "../model/utils.js";
 
-import { truncateEpsilon } from "../model/utils";
-
 export const SectionHeader = ({label}) => (label ? <thead><tr className="table-dark"><th className="SectionHeader" colSpan="2">{label}</th></tr></thead> : null);
 export const ListHeader = ({label}) => (<thead>{label && <tr className="table-secondary"><th colSpan="2" className="ListHeader">{label}</th></tr>}</thead>);
 
