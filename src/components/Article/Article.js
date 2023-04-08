@@ -46,6 +46,7 @@ export default function Article({ ruleset, lang }) {
     const handleShow = () => setShowDebug(true);
     const handleHide = () => setShowDebug(false);
 
+    const ReactJsonComponent = ReactJson.default; //HACK: some weird thing is happening here with import resolution
     const articleProps = {ruleset, lang, id, version};
     return (
         <main className="articleContainer">
@@ -77,7 +78,7 @@ export default function Article({ ruleset, lang }) {
                     <Modal.Header closeButton>
                         <Modal.Title>Debug</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body className="debugPane"><ReactJson src={article}/></Modal.Body>
+                    <Modal.Body className="debugPane"><ReactJsonComponent src={article}/></Modal.Body>
                 </Modal>
             </article>
         </main>
