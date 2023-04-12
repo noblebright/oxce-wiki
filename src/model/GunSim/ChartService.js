@@ -123,7 +123,7 @@ export function getChartData(ruleset, state) {
             dataPoint[`${shotType}Damage`] = rangeModifiedDamage * hitRatio / 100 * attemptsPerTurn;
             // function getTTK(health: i32, armor: i32, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64) : f64[] {
             console.log(`${shotType}TTK_${distance}`, ...damageModel.TTKParams, singleHitAccuracy / 100);
-            const ttk = getTTK(...damageModel.TTKParams, damageModel.getTTKPower(distance), singleHitAccuracy / 100);
+            const ttk = getTTK(shotCount, ...damageModel.TTKParams, damageModel.getTTKPower(distance), singleHitAccuracy / 100);
             dataPoint[`${shotType}TTK`] = ttk.length;
             for(let i = 1; i < ttk.length; i++) {
                 dataPoint[`${shotType}TTK_${i}`] = truncateEpsilon(ttk[i]);
@@ -140,7 +140,7 @@ export function getChartData(ruleset, state) {
                 
                 dataPoint[`Compare${shotType}HitRatio`] = hitRatio;
                 dataPoint[`Compare${shotType}Damage`] = rangeModifiedDamage * hitRatio / 100 * compareAttemptsPerTurn;
-                const ttk = getTTK(...compareDamageModel.TTKParams, compareDamageModel.getTTKPower(distance), singleHitAccuracy / 100);
+                const ttk = getTTK(shotCount, ...compareDamageModel.TTKParams, compareDamageModel.getTTKPower(distance), singleHitAccuracy / 100);
                 dataPoint[`Compare${shotType}TTK`] = ttk.length;
                 for(let i = 1; i < ttk.length; i++) {
                     dataPoint[`Compare${shotType}TTK_${i}`] = truncateEpsilon(ttk[i]);

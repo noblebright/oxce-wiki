@@ -1,3 +1,6 @@
+// from https://github.com/t3chn0l0g1c/oxceRolls/blob/master/rollcalc/Calc.java
+// Used with permission
+
 function intMax(a:i32, b:i32): i32 {
     if(a > b) return a;
     return b;
@@ -31,11 +34,13 @@ class Calc1Result {
     depth: i32;
     hitChances: HitChance[];
     target: Target;
+    salvo: i32;
 
-    constructor(depth: i32, hitChances: HitChance[], target: Target) {
+    constructor(depth: i32, hitChances: HitChance[], target: Target, salvo: i32) {
         this.depth = depth;
         this.hitChances = hitChances;
         this.target = target;
+        this.salvo = salvo;
     }
 }
 
@@ -73,7 +78,7 @@ function calcRolls(low: i32, high: i32, armor: i32, dmg: i32, chancePerRoll: f64
 
 type HitList = Array<HitChance>;
 
-function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64, penetratingDamageMultiplier: f64) : Calc1Result {
+function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, hitChance: f64, penetratingDamageMultiplier: f64, salvo: i32) : Calc1Result {
     const dmgToOccurrence = new Map<i32, f64>();
 
     if(hitChance < 1) {
@@ -99,7 +104,7 @@ function calc1(t: Target, rolls: i32, lowLimit: i32, highLimit: i32, dmg: i32, h
     chances.sort((a, b) => b.dmg - a.dmg);
 
     const depthLimit = intMin(guessDepth(chances.length), 999);
-    return new Calc1Result(depthLimit, chances, t);
+    return new Calc1Result(depthLimit, chances, t, salvo);
 }
 
 function adjust(max: i32, hitChances: HitChance[]) : HitList {
@@ -129,15 +134,17 @@ function calcHitsFaster(r: Calc1Result) : Calc2Result{
     const results: f64[] = new Array(r.depth + 1);
 
     for(let depth = 1; depth <= r.depth; depth++) {
-        const next: f64[] = new Array(target.hp + 1);
-        for(let i = 0; i < shots.length; i++) {
-            const shot = shots[i];
-            for(let idx = 0; idx < accumulatedDamage.length; idx++) {
-                const dmg:i32 = intMin(idx + shot.dmg, target.hp);
-                next[dmg] += accumulatedDamage[idx] * shot.chance;
+        for(let i = 0; i < r.salvo; i++) {
+            const next: f64[] = new Array(target.hp + 1);
+            for(let i = 0; i < shots.length; i++) {
+                const shot = shots[i];
+                for(let idx = 0; idx < accumulatedDamage.length; idx++) {
+                    const dmg:i32 = intMin(idx + shot.dmg, target.hp);
+                    next[dmg] += accumulatedDamage[idx] * shot.chance;
+                }
             }
+            accumulatedDamage = next;
         }
-        accumulatedDamage = next;
         results[depth] = accumulatedDamage[target.hp];
     }
 
@@ -150,9 +157,9 @@ function calcHitsFaster(r: Calc1Result) : Calc2Result{
     return new Calc2Result(results, 1);
 }
 
-function getTTK(health: i32, armor: i32, rolls: i32, lowLimit: i32, highLimit: i32, penetratingDamageMultiplier:f64, dmg: i32, hitChance: f64) : f64[] {
+function getTTK(salvo:i32, health: i32, armor: i32, rolls: i32, lowLimit: i32, highLimit: i32, penetratingDamageMultiplier:f64, dmg: i32, hitChance: f64) : f64[] {
     const t = new Target(health, armor);
-    const r = calc1(t, rolls, lowLimit, highLimit, dmg, hitChance, penetratingDamageMultiplier);
+    const r = calc1(t, rolls, lowLimit, highLimit, dmg, hitChance, penetratingDamageMultiplier, salvo);
     const result = calcHitsFaster(r);
     return result.chances;
 }
