@@ -21,10 +21,10 @@ function getLineSeries(data, lc, suffix) { //HitRatio, Damage
         const key = `${mode}${suffix}`;
         const compareKey = `Compare${mode}${suffix}`;
         if(data.data[0][key]) {
-            series.push(<Line key={key} type="monoTone" dot={false} name={`${lc(weapon)} ${lc(`STR_${mode.toUpperCase()}_SHOT`)}`} dataKey={`${mode}${suffix}`} stroke={colors[mode]} />);
+            series.push(<Line key={key} type="monoTone" dot={false} name={`${lc(weapon)} ${lc(`STR_${mode.toUpperCase()}_SHOT`)}`} dataKey={key} stroke={colors[mode]} />);
         }
         if(data.data[0][compareKey]) {
-            series.push(<Line key={compareKey} type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc(`STR_${mode.toUpperCase()}_SHOT`)}`} dataKey={`${mode}${suffix}`} stroke={colors[`Compare${mode}`]} />);
+            series.push(<Line key={compareKey} type="monoTone" dot={false} name={`${lc(compareWeapon)} ${lc(`STR_${mode.toUpperCase()}_SHOT`)}`} dataKey={compareKey} stroke={colors[`Compare${mode}`]} />);
         }
     }
     return series;
