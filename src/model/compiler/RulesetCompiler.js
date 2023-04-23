@@ -382,6 +382,7 @@ export default function compile(rulesList, supportedLanguages) {
         backLink(ruleset.entries, key, [alienDeployments.unlockedResearch], "research", "$fromMission");
         backLinkSet(ruleset.entries, key, [alienDeployments.nextStage], "alienDeployments", "$prevStage");
         backLinkSet(ruleset.entries, key, [research.spawnedItem], "items", "$foundFrom");
+        backLinkSet(ruleset.entries, key, soldierTransformation.requiredItems && Object.keys(soldierTransformation.requiredItems), "items", "$transformComponent");
 
         mapCraftsWeapons(ruleset.lookups, entry);
         mapPrisons(ruleset.lookups, entry);

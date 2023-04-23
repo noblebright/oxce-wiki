@@ -146,6 +146,7 @@ export default function Item(props) {
             <ListValue label="Required to Use" values={items.requires}>{ linkFn }</ListValue>
             <ListValue label="Component Of" values={items.componentOf}>{ linkFn }</ListValue>
             <ListValue label="Builds Facility" values={items.$facilityComponent}>{ linkFn }</ListValue>
+            <ListValue label="Used in Transformation" values={items.$transformComponent}>{ linkFn }</ListValue>
             <ListValue label="Compatible Ammunition" values={items.$allCompatibleAmmo}>{ linkFn }</ListValue>
             <ListValue label="Craft Weapon Entry" values={items.$craftWeapons}>{ linkFn }</ListValue>
             <ListValue label="Craft Ammo For" values={items.$craftAmmo}>{ linkFn }</ListValue>
