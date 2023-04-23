@@ -367,6 +367,7 @@ export default function compile(rulesList, supportedLanguages) {
         backLink(ruleset.entries, key, manufacture.requires, "research", "manufacture");
         backLink(ruleset.entries, key, manufacture.producedItems && Object.keys(manufacture.producedItems), "items", "manufacture");
         backLink(ruleset.entries, key, manufacture.requiredItems && Object.keys(manufacture.requiredItems), "items", "componentOf");
+        backLink(ruleset.entries, key, facilities.buildCostItems && Object.keys(facilities.buildCostItems).filter(k => facilities.buildCostItems[k].build), "items", "$facilityComponent");
         backLink(ruleset.entries, key, [craftWeapons.launcher], "items", "$craftWeapons");
         backLink(ruleset.entries, key, [craftWeapons.clip], "items", "$craftAmmo");
         backLink(ruleset.entries, key, facilities.buildOverFacilities, "facilities", "upgradesTo");
