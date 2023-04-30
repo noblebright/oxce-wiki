@@ -12,8 +12,8 @@ function getWeightValues(weightObj) {
     const values = new Set();
     if(!weightObj) return values;
 
-    Object.values(weightObj).forEach(x => { //x is key-object pair of region/weight
-        Object.keys(x).forEach(v => {
+    Object.values(weightObj).forEach(x => { //x is object of key/weight
+        Object.keys(x).forEach(v => { 
             values.add(v);
         });
     });
@@ -77,6 +77,7 @@ function addDeploymentEntry(ruleset, deployment, script, race, craft) {
     }
     const data = ruleset.lookups.deploymentData[deployment];
     const scriptObj = ruleset.lookups.missionScripts[script];
+    if(!scriptObj) return;
     backLinkSections.forEach(([triggerSection, section]) => {
         if(scriptObj[triggerSection]) {
             backlinkTriggers(ruleset, scriptObj, triggerSection, section, deployment);
@@ -86,6 +87,10 @@ function addDeploymentEntry(ruleset, deployment, script, race, craft) {
     if(craft) data.crafts.add(craft);
     data.scripts.add(script);
 }
+
+const processedMissions = new Set();
+const extraMissions = new Set();
+const addExtraMission = k => extraMissions.add(k);
 
 function addDeploymentData(ruleset, script, race, craft, deployment, objective) {
     if(craft) {  // craft-based overrides
@@ -112,6 +117,12 @@ function addDeploymentData(ruleset, script, race, craft, deployment, objective) 
     if(!deploymentObj) {
         console.error(`Unable to find alienDeployment for key: ${deployment}`);
     } else {
+        const huntMissions = [...getWeightValues(deploymentObj.huntMissionWeights)];
+        const genMissions = deploymentObj.genMission ? Object.keys(deploymentObj.genMission) : [];
+        
+        huntMissions.forEach(addExtraMission);
+        genMissions.forEach(addExtraMission);
+
         while(deploymentObj) {
             addDeploymentEntry(ruleset, deployment, script, race, craft);
             if(deploymentObj.nextStage) {
@@ -191,37 +202,60 @@ function compileSite(ruleset, scriptObj, missionObj, regions, race) {
     }
 }
 
+function handleMission(mission, ruleset, script, regions, scriptRaces, processIfNoRace = false) {
+    const missionObj = ruleset.lookups.alienMissions[mission];
+    if(!missionObj) {
+        console.error(`Unable to find mission object ${mission} for script ${script.type}`);
+        return;
+    }
+    processedMissions.add(mission);
+    const missionRaces = getWeightValues(missionObj.raceWeights);
+    // force processing of intercept-only missions
+    const defaultedMissionRaces = processIfNoRace && !missionRaces.size ? new Set(["dummy"]) : missionRaces;
+    const possibleRaces = scriptRaces.size ? scriptRaces: defaultedMissionRaces;
+    possibleRaces.forEach(race => {
+        switch(missionObj.objective) {
+            case 2: // base-based missions
+            case 3: // site-based missions
+                compileSite(ruleset, script, missionObj, regions, race);
+                break;
+            default:
+                missionObj.waves.forEach(wave => {
+                    if(processIfNoRace && ruleset.entries[wave.ufo].hide !== false) {
+                        console.log(`unhiding ufo: ${wave.ufo}`);
+                        // set to false (as opposed to undefined) to force-show this ufo.
+                        // See RulesetCompiler for logic to hide deployments missing races.
+                        ruleset.entries[wave.ufo].hide = false;
+                    }
+                    addDeploymentData(ruleset, script.type, race, wave.ufo, wave.ufo);
+                });
+        }
+    })
+}
 export function compileMissions(ruleset) {
     Object.values(ruleset.lookups.missionScripts).forEach(script => {
         const missions = getWeightValues(script.missionWeights);
         const regions = getWeightValues(script.regionWeights);
         const scriptRaces = getWeightValues(script.raceWeights);
-        missions.forEach(mission => {
-            const missionObj = ruleset.lookups.alienMissions[mission];
-            if(!missionObj) {
-                console.error(`Unable to find mission object ${mission} for script ${script.type}`);
-                return;
-            }
-            const missionRaces = getWeightValues(missionObj.raceWeights);
-            const possibleRaces = scriptRaces.size ? scriptRaces: missionRaces;
-            possibleRaces.forEach(race => {
-                switch(missionObj.objective) {
-                    case 2: // base-based missions
-                    case 3: // site-based missions
-                        compileSite(ruleset, script, missionObj, regions, race);
-                        break;
-                    default:
-                        if(!missionObj.waves) debugger;
-                        missionObj.waves.forEach(wave => {
-                            addDeploymentData(ruleset, script.type, race, wave.ufo, wave.ufo);
-                        });
-                }
-            })
-        })
+        missions.forEach(mission => handleMission(mission, ruleset, script, regions, scriptRaces))
     });
+    extraMissions.forEach(mission => {
+        //skip already processed missions
+        if(processedMissions.has(mission)) return;
+
+        // force processing for intercept-only missions
+        console.log(mission);
+        handleMission(mission, ruleset, { type: `BASE_SPAWN$${mission}`}, new Set(), new Set(), true);
+    });
+
+    // cleanup mission cache
+    processedMissions.clear();
+    extraMissions.clear();
+
     // cleanup sets
     backlinkSets.forEach(([key, section]) => {
         ruleset.entries[key][section].$deploymentTrigger = [...ruleset.entries[key][section].$deploymentTrigger];
     });
+
     backlinkSets.length = 0;
 }

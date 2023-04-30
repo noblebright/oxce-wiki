@@ -433,7 +433,8 @@ export default function compile(rulesList, supportedLanguages) {
 
         backLink(ruleset.entries, key, entry.items?.$allCompatibleAmmo, "items", "ammoFor");
 
-        if(entry.alienDeployments && !getPossibleRaces(key, ruleset).size) {
+        // setting hide to false done to force show entries for intercept-only ufos
+        if(entry.alienDeployments && !getPossibleRaces(key, ruleset).size && entry.hide !== false) {
             entry.hide = true;
         }
 
