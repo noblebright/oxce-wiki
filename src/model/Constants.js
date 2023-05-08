@@ -17,7 +17,7 @@ export const defaultDTProps = [
         ToWound: 0,
         ToItem: 0,
         ToTile: 0,
-        ToStun: 2,
+        ToStun: 0,
         TileDamageMethod: 2
     },
     { //he
