@@ -64,7 +64,7 @@ export default function Units(props) {
                     <BooleanValue label="Is Living Weapon" value={units.livingWeapon}/>
                     <SimpleValue label="Living Weapon" value={livingWeaponLink}>{ linkFn }</SimpleValue>
                     <SimpleValue label="Melee Weapon" value={units.meleeWeapon}>{ linkFn }</SimpleValue>
-                    <SimpleValue label="Psi Weapon" value={units.psiWeapon || (units.stats.psiSkill ? "ALIEN_PSI_WEAPON" : undefined)}>{ linkFn }</SimpleValue>
+                    <SimpleValue label="Psi Weapon" value={units.psiWeapon || (units.stats?.psiSkill ? "ALIEN_PSI_WEAPON" : undefined)}>{ linkFn }</SimpleValue>
                     <BooleanValue label="Capturable" value={units.capturable}/>
                     <SimpleValue label="Morale Loss When Killed" value={units.moraleLossWhenKilled}>{ Percent }</SimpleValue>
                 </tbody>
