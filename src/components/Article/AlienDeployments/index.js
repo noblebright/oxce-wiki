@@ -1,3 +1,3 @@
-import AlienDeployments from "./AlienDeployments.js";
+import AlienDeployments from "./AlienDeployments.jsx";
 
 export default AlienDeployments;

@@ -1,3 +1,3 @@
-import GunSim from "./GunSim.js";
+import GunSim from "./GunSim.jsx";
 
 export default GunSim;

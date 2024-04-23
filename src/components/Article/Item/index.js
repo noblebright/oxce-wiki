@@ -1,3 +1,3 @@
-import Item from "./Item.js";
+import Item from "./Item.jsx";
 
 export default Item;

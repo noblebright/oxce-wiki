@@ -30,8 +30,8 @@ html, body, #root {
 }
 
 .ListHeader {
+  --bs-table-color: var(--bs-gray-100);
   --bs-table-bg: var(--bs-gray-600);
-  color: var(--bs-gray-100);
   font-weight: 600;
 }
 
