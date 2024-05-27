@@ -49,6 +49,7 @@ export default function Research({ruleset, lang, id, version}) {
             <ListValue label="Mission Reward" values={research.$fromMission}>{ linkFn }</ListValue>
             <ListValue label="Event Reward" values={research.$fromEvent}>{ linkFn }</ListValue>
             <ListValue label="Dependencies" values={research.dependencies}>{ linkFn }</ListValue>
+            <ListValue label="Requires" values={research.requires}>{ linkFn }</ListValue>
             <ListValue label="Leads To" values={research.leadsTo}>{ linkFn }</ListValue>
             <ListValue label="Disabled" values={research.disables}>{ linkFn }</ListValue>
             <ListValue label="Unlocked By" values={research.unlockedBy}>{linkFn}</ListValue>
