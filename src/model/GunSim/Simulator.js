@@ -85,10 +85,10 @@ export function computeAccuracyInputs(ruleset, shotType, distance, state, weapon
     const entries = ruleset.entries;
     const weaponEntry = entries[state[weaponKey]].items;
     const targetEntry = entries[target].units;
-    const soldierEntry = entries[soldier].soldiers;
+    const soldierEntry = entries[soldier].soldiers ?? entries[soldier].units;
     const armorEntry = entries[armor].armors;
     const ammoEntry = entries[state[ammoKey]]?.items;
-    const soldierStats = soldierEntry[stat];
+    const soldierStats = soldierEntry[stat] ?? soldierEntry["stats"];
     const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
     const acc = getAccuracy(ruleset, adjustedStats, weaponEntry, shotType, kneeling, oneHanded, distance);
     const shots = getShots(weaponEntry, ammoEntry, shotType);

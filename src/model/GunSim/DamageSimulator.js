@@ -152,9 +152,9 @@ class DamageSimulator {
         const entries = this.ruleset.entries;
         const {stat, soldier, armor, target, direction} = this.state;
         const targetEntry = entries[target].units;  //needed for armor info
-        const soldierEntry = entries[soldier].soldiers;  //needed for stats
+        const soldierEntry = entries[soldier].soldiers ?? entries[soldier].units;  //needed for stats
         const armorEntry = entries[armor].armors; //needed for stats
-        const soldierStats = soldierEntry[stat];
+        const soldierStats = soldierEntry[stat] ?? soldierEntry["stats"];
         const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
         const randomType = this.#getDamageAlter("RandomType", 8);
         const power = getBasePower(this.weaponEntry, this.ammoEntry ?? {}) + powerModifier;
