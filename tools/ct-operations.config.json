@@ -1,0 +1,19 @@
+{
+    "title": "Counter-Terrorist Operations",
+    "modules": [
+        {
+            "repo": "MeridianOXC/OpenXcom",
+            "branch": "oxce-plus",
+            "path": [
+                "bin/standard/xcom1",
+                "bin/common"
+            ]
+        },
+        {
+            "repo": "Inventorum-Development-Team/IDT_Counter_Terrorist_Operations",
+            "branch": "Arsenal"
+        }
+    ],
+    "contactURL": "https://discord.gg/DaQREsP",
+    "contactLabel": "IDT Discord"
+}
