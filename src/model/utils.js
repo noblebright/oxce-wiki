@@ -39,7 +39,7 @@ export const possibleLanguages = {
 
 window.auth = key => sessionStorage.setItem("auth", key);
 
-const load = (url, authed) => fetch(url, authed && sessionStorage.getItem("auth") ? { headers: { Authorization: `Basic ${sessionStorage.getItem("auth")}`}} : undefined);
+const load = (url, authed) => fetch(url, authed && sessionStorage.getItem("auth") ? { headers: { Authorization: `Basic ${sessionStorage.getItem("auth")}` } } : undefined);
 export const loadJSON = (url, authed) => load(url, authed).then(res => res.json());
 export const loadText = (url, authed) => load(url, authed).then(res => res.text());
 
@@ -66,16 +66,30 @@ export const damageKeys = [
 export const getDamageKey = x => damageKeys[x];
 
 export const makeObjectPath = (obj, keyPath) => {
-    if(!keyPath || !keyPath.length) { return obj }
+    if (!keyPath || !keyPath.length) { return obj }
     const [head, ...rest] = keyPath;
-    if(!obj[head]) {
+    if (!obj[head]) {
         obj[head] = {};
     }
     return makeObjectPath(obj[head], rest);
 }
 
 export const truncateEpsilon = i => {
-    if(Math.abs(i) < 1.0e-10)
+    if (Math.abs(i) < 1.0e-10)
         return 0;
     return i.toPrecision(10) * 1;
+}
+
+export function getBlastRadiusObj(alter, blastRadius) {
+    let blastRadiusObj = {};
+    if (!alter?.FixRadius) {
+        if (blastRadius !== undefined) {
+            blastRadiusObj.FixRadius = blastRadius;
+        }
+        if (blastRadius === 0) {
+            blastRadiusObj.RadiusEffectiveness = 0;
+            blastRadiusObj.IgnoreDirection = null;
+        }
+    }
+    return blastRadiusObj;
 }
