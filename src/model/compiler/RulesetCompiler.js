@@ -18,19 +18,19 @@ import { getDamageKey } from "../utils.js";
 
 const supportedSections = [
     // skip unrecoverable items, corpses, and unrecoverable corpses.  liveAlien seems to override recover = false.
-    { section: "items", key: "type", filter: (x, rs, key) => (x.recover !== false || x.liveAlien === true) && (x.battleType !== 11 || x.recoverCorpse !== false)},
+    { section: "items", key: "type", filter: (x, rs, key) => (x.recover !== false || x.liveAlien === true) && (x.battleType !== 11 || x.recoverCorpse !== false) },
     { section: "manufacture", key: "name" },
     { section: "research", key: "name" },
     { section: "facilities", key: "type" },
     { section: "crafts", key: "type" },
     { section: "craftWeapons", key: "type" },
-    { section: "alienDeployments", key: "type"}, // deployments must be before ufos, because ufo are filtered based on deployment
+    { section: "alienDeployments", key: "type" }, // deployments must be before ufos, because ufo are filtered based on deployment
     { section: "ufos", key: "type", filter: (x, rs, key) => (rs[key].alienDeployments) }, // hide all the ufos that are used in site-based missions
     { section: "units", key: "type" },
     { section: "soldiers", key: "type" },
-    { section: "soldierTransformation", key: "name"},
-    { section: "commendations", key: "type"},
-    { section: "events", key: "name"},
+    { section: "soldierTransformation", key: "name" },
+    { section: "commendations", key: "type" },
+    { section: "events", key: "name" },
     { section: "armors", key: "type" },
     { section: "alienRaces", key: "id", filter: (x, rs, key) => (Object.keys(rs[key]).length > 1) }, //filter is run post-add, so there will always be at least one section.
     { section: "ufopaedia", key: "id", omit: (x, rs, key) => (rs[key]) }
@@ -53,35 +53,35 @@ function generateSection(ruleset, rules, metadata) {
     const { section: sectionName, key: keyField, filter, omit } = metadata;
 
     const sectionData = rules[sectionName] || [];
-    
+
     sectionData.forEach(entry => {
         const name = entry[keyField];
 
-        if(entry.delete) { //process delete
-            if(ruleset[entry.delete]){ // delete the section
+        if (entry.delete) { //process delete
+            if (ruleset[entry.delete]) { // delete the section
                 delete ruleset[entry.delete][sectionName];
             }
-            if(ruleset[entry.delete] && // if there are no sections left for this key, delete the key
+            if (ruleset[entry.delete] && // if there are no sections left for this key, delete the key
                 !Object.keys(ruleset[entry.delete])
                     .filter(x => x !== "hide").length) {
                 delete ruleset[entry.delete];
             }
             return;
         }
-        if(!name) { //malformed entry
+        if (!name) { //malformed entry
             return;
         }
-        if(omit && !omit(entry, ruleset, name)) {
+        if (omit && !omit(entry, ruleset, name)) {
             //don't compile this section.
             return;
         }
-        if(!ruleset[name]) {
+        if (!ruleset[name]) {
             ruleset[name] = { [sectionName]: entry };
         } else {
             const mergedEntry = Object.assign({}, deepmerge(ruleset[name][sectionName], entry, { clone: false, customMerge })); //if there's an existing entry, merge new data into it.
             Object.assign(ruleset[name], { [sectionName]: mergedEntry });
         }
-        if(filter && !filter(entry, ruleset, name)) {
+        if (filter && !filter(entry, ruleset, name)) {
             ruleset[name].hide = true;
         }
     });
@@ -91,30 +91,30 @@ function generateLookup(ruleset, rules, metadata) {
     const { section: sectionName, key: keyField, omit } = metadata;
 
     const sectionData = rules[sectionName] || [];
-    
-    if(!ruleset[sectionName]) {
+
+    if (!ruleset[sectionName]) {
         ruleset[sectionName] = {};
     }
-    
+
     const lookup = ruleset[sectionName];
 
     sectionData.forEach(entry => {
         const name = entry[keyField];
 
-        if(entry.delete) { //process delete
-            if(lookup[entry.delete]){
+        if (entry.delete) { //process delete
+            if (lookup[entry.delete]) {
                 delete lookup[entry.delete];
             }
             return;
         }
-        if(!name) { //malformed entry
+        if (!name) { //malformed entry
             return;
         }
-        if(omit && !omit(entry, ruleset, name)) {
+        if (omit && !omit(entry, ruleset, name)) {
             //don't compile this section.
             return;
         }
-        if(!lookup[name]) {
+        if (!lookup[name]) {
             lookup[name] = entry;
         } else {
             lookup[name] = deepmerge(lookup[name], entry, { clone: false, customMerge });
@@ -123,18 +123,18 @@ function generateLookup(ruleset, rules, metadata) {
 }
 
 function generateAssets(ruleset, assets) {
-    if(!assets) return;
+    if (!assets) return;
 
     assets.forEach(asset => {
         const name = asset.typeSingle || asset.type;
-        if(asset.delete && ruleset[asset.delete]) { //process delete
+        if (asset.delete && ruleset[asset.delete]) { //process delete
             delete ruleset[asset.delete];
             return;
         }
-        if(!name) { //malformed entry
+        if (!name) { //malformed entry
             return;
         }
-        if(!ruleset[name]) {
+        if (!ruleset[name]) {
             ruleset[name] = asset;
         } else {
             ruleset[name] = deepmerge(ruleset[name], asset, { clone: false });
@@ -145,9 +145,9 @@ function generateAssets(ruleset, assets) {
 const backlinkSets = [];
 
 function backLinkSet(entries, id, list, targetSection, field) {
-    if(!list) return;
+    if (!list) return;
 
-    for(let key of list) {
+    for (let key of list) {
         let back = entries[key]?.[targetSection];
         if (!back) continue;
         back[field] = back[field] || new Set();
@@ -159,7 +159,7 @@ function backLinkSet(entries, id, list, targetSection, field) {
 function backLink(entries, id, list, targetSection, field) {
     const entry = entries[id];
     const items = typeof list === "function" ? list(entry) : list;
-    
+
     if (!items) return;
 
     for (let key of items) {
@@ -174,12 +174,12 @@ function getCompatibleAmmo(entry) {
     const ammo = new Set();
     const item = entry.items || {};
 
-    if(item.compatibleAmmo) {
+    if (item.compatibleAmmo) {
         item.compatibleAmmo.forEach(x => ammo.add(x));
     }
-    if(item.ammo) {
+    if (item.ammo) {
         Object.values(item.ammo).forEach(def => {
-            if(def.compatibleAmmo) {
+            if (def.compatibleAmmo) {
                 def.compatibleAmmo.forEach(x => ammo.add(x));
             }
         });
@@ -189,13 +189,13 @@ function getCompatibleAmmo(entry) {
 
 function getKillCriteriaItems(ruleset, killCriteria) {
     const items = new Set();
-    if(!killCriteria) {
+    if (!killCriteria) {
         return null;
     }
     killCriteria.forEach(orCriteria => {
         orCriteria.forEach(([count, details]) => {
             details.forEach(detail => {
-                if(ruleset[detail]?.items) {
+                if (ruleset[detail]?.items) {
                     items.add(detail);
                 }
             });
@@ -207,7 +207,7 @@ function getKillCriteriaItems(ruleset, killCriteria) {
 function getRandomBonusResearch(units) {
     const oneFree = units.getOneFree ?? [];
     const research = new Set(oneFree);
-    if(units.getOneFreeProtected) {
+    if (units.getOneFreeProtected) {
         Object.keys(units.getOneFreeProtected).forEach(k => {
             units.getOneFreeProtected[k].forEach(r => research.add(r));
         });
@@ -216,11 +216,11 @@ function getRandomBonusResearch(units) {
 }
 
 function addToCategory(ruleset, category, key, extraProps = {}) {
-    if(!ruleset.entries[category]) {
+    if (!ruleset.entries[category]) {
         ruleset.entries[category] = {};
         ruleset.lookups.categories.push(category);
     }
-    if(!ruleset.entries[category].category) {
+    if (!ruleset.entries[category].category) {
         ruleset.entries[category].category = {
             entries: []
         };
@@ -232,8 +232,8 @@ function addToCategory(ruleset, category, key, extraProps = {}) {
 function generateCategory(ruleset, key) {
     const entry = ruleset.entries[key];
     const items = entry.items;
-    
-    if(!items?.categories) return;
+
+    if (!items?.categories) return;
     items.categories.forEach(category => {
         addToCategory(ruleset, category, key);
     });
@@ -251,7 +251,7 @@ function resolveRefNode(entries, key) {
     const entry = entries[key];
     Object.keys(entry).forEach(sectionKey => {
         const section = entry[sectionKey];
-        if(section.refNode) {
+        if (section.refNode) {
             entry[sectionKey] = Object.assign({}, section.refNode, section);
         }
     });
@@ -259,12 +259,12 @@ function resolveRefNode(entries, key) {
 
 export default function compile(rulesList, supportedLanguages) {
     const ruleset = { languages: {}, entries: {}, sprites: {}, sounds: {}, globalVars: {}, lookups: {} };
-    
+
     //add languages
     console.time("l10n");
     supportedLanguages.forEach(lang => {
         ruleset.languages[lang] = rulesList.reduce((acc, module) => {
-            if(module[lang]) {
+            if (module[lang]) {
                 acc = deepmerge(acc, module[lang]);
             }
             return acc;
@@ -275,12 +275,12 @@ export default function compile(rulesList, supportedLanguages) {
     //add globalVars
     globalKeys.forEach(key => {
         rulesList.forEach(rules => {
-            if(rules[key] !== undefined) {
+            if (rules[key] !== undefined) {
                 ruleset.globalVars[key] = rules[key];
             }
         });
     });
-    
+
     //add entries
     console.time("entries");
     supportedSections.forEach(metadata => {
@@ -288,7 +288,7 @@ export default function compile(rulesList, supportedLanguages) {
             generateSection(ruleset.entries, rules, metadata);
         });
     });
-    for(const key in ruleset.entries) {
+    for (const key in ruleset.entries) {
         resolveRefNode(ruleset.entries, key);
     }
     console.timeEnd("entries");
@@ -300,7 +300,7 @@ export default function compile(rulesList, supportedLanguages) {
             generateLookup(ruleset.lookups, rules, metadata);
         });
     });
-    for(const key in ruleset.lookups) {
+    for (const key in ruleset.lookups) {
         resolveRefNode(ruleset.lookups, key);
     }
     console.timeEnd("lookups")
@@ -338,7 +338,7 @@ export default function compile(rulesList, supportedLanguages) {
 
     //add backreferences
     console.time("backrefs");
-    for(let key in ruleset.entries) {
+    for (let key in ruleset.entries) {
         const entry = ruleset.entries[key];
         const research = entry.research || {};
         const manufacture = entry.manufacture || {};
@@ -354,7 +354,7 @@ export default function compile(rulesList, supportedLanguages) {
         const commendations = entry.commendations || {};
 
         generateCategory(ruleset, key);
-        
+
         backLink(ruleset.entries, key, research.dependencies, "research", "leadsTo");
         backLink(ruleset.entries, key, ruleset.lookups.startingConditions[alienDeployments.startingCondition]?.allowedCraft, "crafts", "$specialMissionAllowed");
         backLink(ruleset.entries, key, getRandomBonusResearch(research), "research", "$randomBonusSources");
@@ -388,10 +388,10 @@ export default function compile(rulesList, supportedLanguages) {
         mapPrisons(ruleset.lookups, entry);
         mapServices(entry, key);
 
-        if(ufos.raceBonus) {
+        if (ufos.raceBonus) {
             Object.entries(ufos.raceBonus).forEach(([race, data]) => {
-                if(data.craftCustomDeploy) {
-                    if(!ufos.$hasVariants) {
+                if (data.craftCustomDeploy) {
+                    if (!ufos.$hasVariants) {
                         ufos.$hasVariants = [];
                     }
                     ufos.$hasVariants.push([race, data.craftCustomDeploy]);
@@ -404,37 +404,41 @@ export default function compile(rulesList, supportedLanguages) {
         }
 
         // Vanilla HWP style
-        if(entry.items?.fixedWeapon && units.type) {
+        if (entry.items?.fixedWeapon && units.type) {
             ruleset.lookups.hwps.push(key);
         }
 
         // Add categories for damage types
-        if(entry.items) {
+        if (entry.items) {
             const compatibleAmmo = getCompatibleAmmo(entry);
-            const selfDamageTypes = getSelfDamageTypes(entry.items);
+            const selfDamageTypes = new Set(getSelfDamageTypes(entry.items));
+            if (compatibleAmmo) {
+                entry.items.$allCompatibleAmmo = compatibleAmmo;
+                compatibleAmmo.forEach(ammo => {
+                    if (!ruleset.entries[ammo]?.items) {
+                        console.error(`Invalid compatibleAmmo entry ${ammo} for ${key}`);
+                        return;
+                    }
+                    const ammoDamageTypes = getSelfDamageTypes(ruleset.entries[ammo].items);
+                    ammoDamageTypes.forEach(damageType => {
+                        selfDamageTypes.add(damageType);
+                    });
+                });
+            }
             selfDamageTypes.forEach(damageType => {
                 addToCategory(ruleset, damageType, key, { damageType: true });
             });
-            if(compatibleAmmo) {
-                entry.items.$allCompatibleAmmo = compatibleAmmo;
-                compatibleAmmo.forEach(ammo => {
-                    const ammoDamageTypes = getSelfDamageTypes(ruleset.entries[ammo]);
-                    ammoDamageTypes.forEach(damageType => {
-                        addToCategory(ruleset, damageType, key, { damageType: true });
-                    });     
-                });
-            }
         }
 
         // Add category for commendations
-        if(entry.commendations) {
+        if (entry.commendations) {
             addToCategory(ruleset, "STR_COMMENDATIONS", key);
         }
 
         backLink(ruleset.entries, key, entry.items?.$allCompatibleAmmo, "items", "ammoFor");
 
         // setting hide to false done to force show entries for intercept-only ufos
-        if(entry.alienDeployments && !getPossibleRaces(key, ruleset).size && entry.hide !== false) {
+        if (entry.alienDeployments && !getPossibleRaces(key, ruleset).size && entry.hide !== false) {
             entry.hide = true;
         }
 
@@ -449,7 +453,7 @@ export default function compile(rulesList, supportedLanguages) {
     resolveServices(ruleset);
 
     backlinkSets.forEach(([obj, key]) => { //convert Sets back into Arrays
-        if(obj[key] instanceof Set) {
+        if (obj[key] instanceof Set) {
             obj[key] = [...obj[key]];
         }
     });
