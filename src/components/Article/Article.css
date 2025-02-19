@@ -129,11 +129,8 @@ div.facilitySprite img {
     margin-left: 10px;
 }
 
-.EventTrigger {
-    clear: both;
-}
-
 .EventTrigger .TriggerLabel {
+    clear: both;
     float: left;
 }
 
