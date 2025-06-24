@@ -112,8 +112,14 @@ function addDeploymentEntry(ruleset, deployment, script, race, craft) {
 }
 
 const processedMissions = new Set();
-const extraMissions = new Set();
-const addExtraMission = (k) => extraMissions.add(k);
+let extraMissions = {};
+const addExtraMission = (ruleset, source, k, race) => {
+  const missionObj = ruleset.lookups.alienMissions[k];
+  missionObj.$spawnedFrom ??= new Set();
+  missionObj.$spawnedFrom.add(source);
+  extraMissions[k] ??= new Set();
+  extraMissions[k].add(race);
+};
 
 function addDeploymentData(
   ruleset,
@@ -156,8 +162,12 @@ function addDeploymentData(
       ? Object.keys(deploymentObj.genMission)
       : [];
 
-    huntMissions.forEach(addExtraMission);
-    genMissions.forEach(addExtraMission);
+    huntMissions.forEach((mission) =>
+      addExtraMission(ruleset, deployment, mission, race)
+    );
+    genMissions.forEach((mission) =>
+      addExtraMission(ruleset, deployment, mission, race)
+    );
 
     while (deploymentObj) {
       addDeploymentEntry(ruleset, deployment, script, race, craft);
@@ -341,25 +351,24 @@ export function compileMissions(ruleset) {
       handleMission(mission, ruleset, script, regions, scriptRaces)
     );
   });
-  extraMissions.forEach((mission) => {
+  Object.entries(extraMissions).forEach(([mission, races]) => {
     //skip already processed missions
     if (processedMissions.has(mission)) return;
 
+    // create synthetic missionScript for base-spawned missions
+    const missionObj = ruleset.lookups.alienMissions[mission];
+    const baseSpawnScript = {
+      type: `BASE_SPAWN$${mission}`,
+      $spawnedFrom: [...missionObj.$spawnedFrom],
+    };
+    ruleset.lookups.missionScripts[baseSpawnScript.type] ??= baseSpawnScript;
     // force processing for intercept-only missions
-    console.log(mission);
-    handleMission(
-      mission,
-      ruleset,
-      { type: `BASE_SPAWN$${mission}` },
-      new Set(),
-      new Set(),
-      true
-    );
+    handleMission(mission, ruleset, baseSpawnScript, new Set(), races, true);
   });
 
   // cleanup mission cache
   processedMissions.clear();
-  extraMissions.clear();
+  extraMissions = {};
 
   // cleanup sets
   backlinkSets.forEach(([key, section]) => {
