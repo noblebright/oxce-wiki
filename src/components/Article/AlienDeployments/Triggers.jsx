@@ -1,12 +1,14 @@
 import React, { useCallback } from "react";
 import { Table } from "react-bootstrap";
 import { SectionHeader, ListValue } from "../../ComponentUtils.jsx";
+import useLink from "../../../hooks/useLink.jsx";
 
-function Trigger({ mission, value, lc, inventoryFn }) {
+function Trigger({ mission, value, version, lc, inventoryFn }) {
   const booleanInventory = useCallback(
     ([k, v]) => inventoryFn([k, `${v}`]),
     [inventoryFn]
   );
+  const linkFn = useLink(version, lc);
   return (
     <React.Fragment>
       <SectionHeader label={`Mission Triggers: ${lc(mission)}`} />
@@ -36,7 +38,9 @@ function Trigger({ mission, value, lc, inventoryFn }) {
         label="XCOM Base In Country"
         values={value.xcomBaseInCountryTriggers}
       />
-      <ListValue label="Spawned From Base" values={value.$spawnedFrom} />
+      <ListValue label="Spawned From Base" values={value.$spawnedFrom}>
+        {linkFn}
+      </ListValue>
     </React.Fragment>
   );
 }
@@ -73,7 +77,7 @@ function getTriggers(lookups, id) {
   return hasTriggers ? triggers : null;
 }
 
-export default function Triggers({ ruleset, lc, inventoryFn, id }) {
+export default function Triggers({ ruleset, lc, version, inventoryFn, id }) {
   const triggers = getTriggers(ruleset.lookups, id);
   if (!triggers) return null;
 
@@ -85,6 +89,7 @@ export default function Triggers({ ruleset, lc, inventoryFn, id }) {
           mission={missionId}
           value={triggerObj}
           lc={lc}
+          version={version}
           inventoryFn={inventoryFn}
         />
       ))}
