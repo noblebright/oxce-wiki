@@ -155,8 +155,12 @@ function addDeploymentData(
   }
   let deploymentObj = ruleset.entries[deployment]?.alienDeployments;
   if (!deploymentObj) {
-    console.error(`Unable to find alienDeployment for key: ${deployment}`);
+    // This is only a warning, because it's expected behavior for e.g. fight-to-the-death HK UFOs
+    console.warn(`Unable to find alienDeployment for key: ${deployment}`);
   } else {
+    const upgradeMissions = [
+      ...getWeightValues(deploymentObj.alienBaseUpgrades),
+    ];
     const huntMissions = [...getWeightValues(deploymentObj.huntMissionWeights)];
     const genMissions = deploymentObj.genMission
       ? Object.keys(deploymentObj.genMission)
@@ -169,6 +173,17 @@ function addDeploymentData(
       addExtraMission(ruleset, deployment, mission, race)
     );
 
+    upgradeMissions.forEach((mission) => {
+      //Synthetic mission for base upgrade deployments
+      const missionName = `UPGRADE$${mission}`;
+      ruleset.lookups.alienMissions[missionName] ??= {
+        type: missionName,
+        objective: 2,
+        $synthetic: true,
+        siteType: mission,
+      };
+      addExtraMission(ruleset, deployment, missionName, race);
+    });
     while (deploymentObj) {
       addDeploymentEntry(ruleset, deployment, script, race, craft);
       if (deploymentObj.nextStage) {
@@ -227,7 +242,13 @@ function handleTextureDeployment(
 // Comments below from: https://openxcom.org/forum/index.php/topic,6557.msg104669.html#msg104669
 function compileSite(ruleset, scriptObj, missionObj, regions, race) {
   if (missionObj.objective === 2 && !missionObj.waves) {
-    addDeploymentData(ruleset, scriptObj.siteType ?? scriptObj.type, race);
+    addDeploymentData(
+      ruleset,
+      scriptObj.type,
+      race,
+      undefined,
+      missionObj.siteType ?? scriptObj.type
+    );
     return;
   }
   if (
@@ -359,6 +380,7 @@ export function compileMissions(ruleset) {
     const missionObj = ruleset.lookups.alienMissions[mission];
     const baseSpawnScript = {
       type: `BASE_SPAWN$${mission}`,
+      $synthetic: true,
       $spawnedFrom: [...missionObj.$spawnedFrom],
     };
     ruleset.lookups.missionScripts[baseSpawnScript.type] ??= baseSpawnScript;
