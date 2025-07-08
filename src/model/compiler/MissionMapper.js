@@ -338,6 +338,7 @@ function handleMission(
   const possibleRaces = scriptRaces.size ? scriptRaces : defaultedMissionRaces;
   possibleRaces.forEach((race) => {
     switch (missionObj.objective) {
+      case 1: // infiltrations, work the same as terror (type 3) site-based missions
       case 2: // base-based missions
       case 3: // site-based missions
         compileSite(ruleset, script, missionObj, regions, race);
