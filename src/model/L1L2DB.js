@@ -75,8 +75,8 @@ class L1L2DB {
             async () => this.db.versions.get(repo),
             async () => {
                 const loader = new GithubLoader(repo);
-                const versions = await loader.loadVersions(branchName);
                 console.log(`fetching version info for ${repo}...`);
+                const versions = await loader.loadVersions(branchName);
                 const row = { repo, lastFetched: Date.now(), versions }
                 this.db.versions.put(row);
                 return row;
