@@ -9,7 +9,7 @@ function getAccuracy(
   shotType,
   kneeling,
   oneHanded,
-  distance
+  distance,
 ) {
   let acc = weapon[`accuracy${shotType}`];
   let modifier = 0.0;
@@ -79,7 +79,7 @@ export function getShotgunMultipler(
   ruleset,
   state,
   weaponKey = "weapon",
-  ammoKey = "ammo"
+  ammoKey = "ammo",
 ) {
   const entries = ruleset.entries;
   const weapon = entries[state[weaponKey]].items;
@@ -113,10 +113,10 @@ export function getShotgunMultipler(
     Math.max(
       // pellets beyond the first * (100 - spread) * choke%
       (pellets - 1) * (100 - shotgunSpread) * 0.01 * shotgunChoke * 0.01,
-      0
+      0,
     );
   console.log(
-    `1 + Math.max((${pellets} - 1) * (100 - ${shotgunSpread}) * 0.01 * ${shotgunChoke} * 0.01, 0) = ${multiplier}`
+    `1 + Math.max((${pellets} - 1) * (100 - ${shotgunSpread}) * 0.01 * ${shotgunChoke} * 0.01, 0) = ${multiplier}`,
   );
   return multiplier;
 }
@@ -127,16 +127,20 @@ export function computeAccuracyInputs(
   distance,
   state,
   weaponKey = "weapon",
-  ammoKey = "ammo"
+  ammoKey = "ammo",
 ) {
-  const { stat, soldier, armor, target, kneeling, oneHanded } = state;
+  const { statType, soldier, armor, target, kneeling, oneHanded, customStats } =
+    state;
   const entries = ruleset.entries;
   const weaponEntry = entries[state[weaponKey]].items;
   const targetEntry = entries[target].units;
   const soldierEntry = entries[soldier].soldiers ?? entries[soldier].units;
   const armorEntry = entries[armor].armors;
   const ammoEntry = entries[state[ammoKey]]?.items;
-  const soldierStats = soldierEntry[stat] ?? soldierEntry["stats"];
+  const soldierStats =
+    statType === "custom"
+      ? customStats
+      : (soldierEntry[statType] ?? soldierEntry["stats"]);
   const adjustedStats = mergeStats(soldierStats, armorEntry.stats);
   const acc = getAccuracy(
     ruleset,
@@ -145,7 +149,7 @@ export function computeAccuracyInputs(
     shotType,
     kneeling,
     oneHanded,
-    distance
+    distance,
   );
   const shots = getShots(weaponEntry, ammoEntry, shotType);
 

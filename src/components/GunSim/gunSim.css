@@ -3,6 +3,21 @@
     flex-direction: row;
     height: 100%;
     overflow: hidden;
+    .statContainer {
+        display: flex;
+        gap: 0.5rem
+    }
+    .CustomStats {
+        columns: 2;
+        border: 1px solid;
+        padding: 1rem;
+    }
+    .CustomStats:popover-open {
+        position: fixed;
+        position-area: bottom span-left;
+        margin: 0.5rem 0;
+        position-anchor: --gunSim-custom-stats;
+    }
 }
 
 .GunSimSidebar {
@@ -16,4 +31,8 @@
     flex-shrink: 1;
     flex-basis: 1px;
     word-break: break-word;
+}
+
+#gunSimCustomStatAnchor {
+    anchor-name: --gunSim-custom-stats;
 }
