@@ -130,7 +130,7 @@ export default function GunSim({ ruleset, lang }) {
               onChange={(e, statKey) =>
                 setCustomStats({
                   ...customStats,
-                  [statKey]: e.target.value * 1 ?? 0,
+                  [statKey]: isNaN(e.target.value * 1) ? 0 : e.target.value * 1,
                 })
               }
               lc={lc}
