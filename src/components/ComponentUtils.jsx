@@ -99,7 +99,7 @@ export const UnitStats = ({
           <SimpleValue
             key={key}
             showZero={showZero}
-            label={lc(statNames[label])}
+            label={lc(statNames[key])}
             value={statValue(stats, bonusStats, key)}
           />
         ))}
