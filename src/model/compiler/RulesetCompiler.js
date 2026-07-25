@@ -97,12 +97,17 @@ function generateSection(ruleset, rules, metadata) {
       //don't compile this section.
       return;
     }
+
+    const resolvedEntry = entry.refNode
+      ? { ...entry.refNode, ...entry }
+      : entry;
+
     if (!ruleset[name]) {
-      ruleset[name] = { [sectionName]: entry };
+      ruleset[name] = { [sectionName]: resolvedEntry };
     } else {
       const mergedEntry = Object.assign(
         {},
-        deepmerge(ruleset[name][sectionName], entry, {
+        deepmerge(ruleset[name][sectionName], resolvedEntry, {
           clone: false,
           customMerge,
         }),
@@ -144,10 +149,13 @@ function generateLookup(ruleset, rules, metadata) {
       //don't compile this section.
       return;
     }
+    const resolvedEntry = entry.refNode
+      ? { ...entry.refNode, ...entry }
+      : entry;
     if (!lookup[name]) {
-      lookup[name] = entry;
+      lookup[name] = resolvedEntry;
     } else {
-      lookup[name] = deepmerge(lookup[name], entry, {
+      lookup[name] = deepmerge(lookup[name], resolvedEntry, {
         clone: false,
         customMerge,
       });
@@ -293,16 +301,6 @@ const globalKeys = [
   "hireScientistsRequiresBaseFunc",
 ];
 
-function resolveRefNode(entries, key) {
-  const entry = entries[key];
-  Object.keys(entry).forEach((sectionKey) => {
-    const section = entry[sectionKey];
-    if (section.refNode) {
-      entry[sectionKey] = Object.assign({}, section.refNode, section);
-    }
-  });
-}
-
 export default function compile(rulesList, supportedLanguages) {
   const ruleset = {
     languages: {},
@@ -341,9 +339,6 @@ export default function compile(rulesList, supportedLanguages) {
       generateSection(ruleset.entries, rules, metadata);
     });
   });
-  for (const key in ruleset.entries) {
-    resolveRefNode(ruleset.entries, key);
-  }
   console.timeEnd("entries");
 
   //add lookups
@@ -353,9 +348,6 @@ export default function compile(rulesList, supportedLanguages) {
       generateLookup(ruleset.lookups, rules, metadata);
     });
   });
-  for (const key in ruleset.lookups) {
-    resolveRefNode(ruleset.lookups, key);
-  }
   console.timeEnd("lookups");
 
   console.time("assets");
