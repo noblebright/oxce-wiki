@@ -1,13 +1,27 @@
 import React, { useCallback } from "react";
 import { Table } from "react-bootstrap";
-import { SectionHeader, ListValue } from "../../ComponentUtils.jsx";
+import {
+  SectionHeader,
+  ContainerValue,
+  ListValue,
+} from "../../ComponentUtils.jsx";
 import useLink from "../../../hooks/useLink.jsx";
 
 function Trigger({ mission, value, version, lc, inventoryFn }) {
   const booleanInventory = useCallback(
     ([k, v]) => inventoryFn([k, `${v}`]),
-    [inventoryFn]
+    [inventoryFn],
   );
+  if (mission === "$retaliation") {
+    return (
+      <React.Fragment>
+        <SectionHeader label="Mission Triggers" />
+        <tbody>
+          <ContainerValue>{lc("STR_ALIEN_RETALIATION")}</ContainerValue>
+        </tbody>
+      </React.Fragment>
+    );
+  }
   const linkFn = useLink(version, lc);
   return (
     <React.Fragment>
@@ -57,12 +71,13 @@ function getTriggers(lookups, id) {
   const triggers = {};
   const deploymentData = lookups.deploymentData[id];
   let hasTriggers = false;
-
+  let hasRetaliation = false;
   //eslint-disable-next-line no-unused-expressions
   deploymentData?.scripts.forEach((script) => {
     const scriptObj = lookups.missionScripts[script];
     const triggerConditions = {};
     let hasConditions = false;
+    if (scriptObj.$retaliation) hasRetaliation = true;
     triggerKeys.forEach((key) => {
       if (scriptObj[key]) {
         triggerConditions[key] = scriptObj[key];
@@ -74,6 +89,11 @@ function getTriggers(lookups, id) {
       triggers[script] = triggerConditions;
     }
   });
+  // condense retaliations into one trigger entry
+  if (hasRetaliation) {
+    hasTriggers = true;
+    triggers.$retaliation = true;
+  }
   return hasTriggers ? triggers : null;
 }
 

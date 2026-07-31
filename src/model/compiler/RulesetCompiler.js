@@ -3,6 +3,7 @@ import {
   initializeLookups,
   processGlobe,
   compileMissions,
+  addRetaliationMission,
 } from "./MissionMapper.js";
 import { mapItemSources } from "./ItemSourceMapper.js";
 import { mapEventScripts } from "./EventMapper.js";
@@ -399,6 +400,7 @@ export default function compile(rulesList, supportedLanguages) {
     const alienDeployments = entry.alienDeployments || {};
     const soldierTransformation = entry.soldierTransformation || {};
     const commendations = entry.commendations || {};
+    const alienRaces = entry.alienRaces ?? {};
 
     generateCategory(ruleset, key);
 
@@ -571,6 +573,7 @@ export default function compile(rulesList, supportedLanguages) {
     mapCraftsWeapons(ruleset.lookups, entry);
     mapPrisons(ruleset.lookups, entry);
     mapServices(entry, key);
+    addRetaliationMission(ruleset, alienRaces);
 
     if (ufos.raceBonus) {
       Object.entries(ufos.raceBonus).forEach(([race, data]) => {

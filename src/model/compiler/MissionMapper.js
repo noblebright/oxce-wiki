@@ -1,4 +1,8 @@
-const LOOKUP_TABLES = ["deploymentsByGlobeTexture", "deploymentData"];
+const LOOKUP_TABLES = [
+  "deploymentsByGlobeTexture",
+  "deploymentData",
+  "alienRetaliations",
+];
 
 export function initializeLookups(lookups) {
   LOOKUP_TABLES.forEach((x) => {
@@ -26,7 +30,7 @@ export function processGlobe(lookups, rules) {
   rules.globe?.textures?.forEach?.((texture) => {
     if (!texture.deployments) return; //normal terrain, e.g. desert
     lookups.deploymentsByGlobeTexture[texture.id] = Object.keys(
-      texture.deployments
+      texture.deployments,
     );
   });
 }
@@ -37,7 +41,7 @@ function getGlobeTextures(regions, ruleset, scriptObj, spawnZone = -1) {
     const regionObj = ruleset.lookups.regions[region];
     if (!regionObj) {
       console.error(
-        `Region ${region} not found, referenced by ${scriptObj.type}`
+        `Region ${region} not found, referenced by ${scriptObj.type}`,
       );
       return;
     }
@@ -68,12 +72,12 @@ function backlinkTriggers(
   scriptObj,
   triggerSection,
   section,
-  deployment
+  deployment,
 ) {
   Object.keys(scriptObj[triggerSection]).forEach((key) => {
     if (!ruleset.entries[key][section]) {
       console.warn(
-        `Unknown ${section} "${key}" found in missionScript ${scriptObj.type}`
+        `Unknown ${section} "${key}" found in missionScript ${scriptObj.type}`,
       );
       return;
     }
@@ -91,13 +95,12 @@ const backLinkSections = [
 ];
 
 function addDeploymentEntry(ruleset, deployment, script, race, craft) {
-  if (!ruleset.lookups.deploymentData[deployment]) {
-    ruleset.lookups.deploymentData[deployment] = {
-      races: new Set(),
-      crafts: new Set(),
-      scripts: new Set(),
-    };
-  }
+  ruleset.lookups.deploymentData[deployment] ??= {
+    races: new Set(),
+    crafts: new Set(),
+    scripts: new Set(),
+  };
+
   const data = ruleset.lookups.deploymentData[deployment];
   const scriptObj = ruleset.lookups.missionScripts[script];
   if (!scriptObj) return;
@@ -127,14 +130,14 @@ function addDeploymentData(
   race,
   craft,
   deployment,
-  objective
+  objective,
 ) {
   if (craft) {
     // craft-based overrides
     const craftObj = ruleset.entries[craft]?.ufos;
     if (!craftObj) {
       console.error(
-        `Unable to find entry for ufo ${craft}, referenced from script ${script}`
+        `Unable to find entry for ufo ${craft}, referenced from script ${script}`,
       );
     } else {
       if (craftObj.raceBonus?.[race]) {
@@ -167,10 +170,10 @@ function addDeploymentData(
       : [];
 
     huntMissions.forEach((mission) =>
-      addExtraMission(ruleset, deployment, mission, race)
+      addExtraMission(ruleset, deployment, mission, race),
     );
     genMissions.forEach((mission) =>
-      addExtraMission(ruleset, deployment, mission, race)
+      addExtraMission(ruleset, deployment, mission, race),
     );
 
     upgradeMissions.forEach((mission) => {
@@ -191,7 +194,7 @@ function addDeploymentData(
           ruleset.entries[deploymentObj.nextStage]?.alienDeployments;
         if (!deploymentObj) {
           console.error(
-            `Unable to find alienDeployment for key: ${deployment}`
+            `Unable to find alienDeployment for key: ${deployment}`,
           );
         }
       } else {
@@ -207,7 +210,7 @@ function handleTextureDeployment(
   missionObj,
   regions,
   race,
-  craft = null
+  craft = null,
 ) {
   if (missionObj.siteType) {
     // Option B
@@ -216,7 +219,7 @@ function handleTextureDeployment(
       scriptObj.type,
       race,
       craft,
-      missionObj.siteType
+      missionObj.siteType,
     );
   } else {
     // Option A
@@ -224,7 +227,7 @@ function handleTextureDeployment(
       regions,
       ruleset,
       scriptObj,
-      missionObj.spawnZone
+      missionObj.spawnZone,
     );
     globeDeployments.forEach((deploymentId) => {
       addDeploymentData(
@@ -233,7 +236,7 @@ function handleTextureDeployment(
         race,
         craft,
         deploymentId,
-        true
+        true,
       );
     });
   }
@@ -247,7 +250,7 @@ function compileSite(ruleset, scriptObj, missionObj, regions, race) {
       scriptObj.type,
       race,
       undefined,
-      missionObj.siteType ?? scriptObj.type
+      missionObj.siteType ?? scriptObj.type,
     );
     return;
   }
@@ -296,11 +299,12 @@ function compileSite(ruleset, scriptObj, missionObj, regions, race) {
         scriptObj.type,
         race,
         null,
-        missionObj.siteType
+        missionObj.siteType,
       );
     }
     missionObj.waves.forEach((wave) => {
       addDeploymentData(ruleset, scriptObj.type, race, wave.ufo, wave.ufo);
+      ruleset.lookups.alienRetaliations[race] = true; // This race has manned at least one UFO, and therefore can trigger retaliation if shot down
       if (wave.objective) {
         handleTextureDeployment(
           ruleset,
@@ -308,7 +312,7 @@ function compileSite(ruleset, scriptObj, missionObj, regions, race) {
           missionObj,
           regions,
           race,
-          wave.ufo
+          wave.ufo,
         );
       }
     });
@@ -321,12 +325,12 @@ function handleMission(
   script,
   regions,
   scriptRaces,
-  processIfNoRace = false
+  processIfNoRace = false,
 ) {
   const missionObj = ruleset.lookups.alienMissions[mission];
   if (!missionObj) {
     console.error(
-      `Unable to find mission object ${mission} for script ${script.type}`
+      `Unable to find mission object ${mission} for script ${script.type}`,
     );
     return;
   }
@@ -355,10 +359,12 @@ function handleMission(
         };
 
         if (missionObj.spawnUfo) {
+          ruleset.lookups.alienRetaliations[race] = true; // This race has manned at least one UFO, and therefore can trigger retaliation if shot down
           processUfo(missionObj.spawnUfo);
         }
 
         missionObj.waves.forEach((wave) => {
+          ruleset.lookups.alienRetaliations[race] = true; // This race has manned at least one UFO, and therefore can trigger retaliation if shot down
           processUfo(wave.ufo);
         });
     }
@@ -370,7 +376,7 @@ export function compileMissions(ruleset) {
     const regions = getWeightValues(script.regionWeights);
     const scriptRaces = getWeightValues(script.raceWeights);
     missions.forEach((mission) =>
-      handleMission(mission, ruleset, script, regions, scriptRaces)
+      handleMission(mission, ruleset, script, regions, scriptRaces),
     );
   });
   Object.entries(extraMissions).forEach(([mission, races]) => {
@@ -401,4 +407,34 @@ export function compileMissions(ruleset) {
   });
 
   backlinkSets.length = 0;
+}
+
+export function addRetaliationMission(ruleset, alienRaces) {
+  if (
+    !alienRaces?.retaliationMissionWeights || // no retaliations defined
+    !ruleset.lookups.alienRetaliations[alienRaces.id] // never in a ufo to shoot down
+  )
+    return;
+  // weighted mission names, see: https://openxcom.org/forum/index.php/topic,9496.0.html
+  const missions = getWeightValues(alienRaces.retaliationMissionWeights);
+
+  missions.forEach((missionKey) => {
+    // create synthetic missionScript for retaliation-spawned missions
+    const retaliationSpawnScript = {
+      type: `RETALIATION_SPAWN$${alienRaces.id}`,
+      $synthetic: true,
+      $retaliation: true,
+    };
+
+    ruleset.lookups.missionScripts[retaliationSpawnScript.type] ??=
+      retaliationSpawnScript;
+    handleMission(
+      missionKey,
+      ruleset,
+      retaliationSpawnScript,
+      new Set(),
+      new Set([alienRaces.id]), // retaliation overrides race to the race that got shot down.
+      true,
+    );
+  });
 }
