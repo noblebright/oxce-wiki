@@ -53,6 +53,7 @@ export function mapItemSources(backLinkSet, ruleset, key) {
   const units = entry.units || {};
   const armors = entry.armors || {};
   const crafts = entry.crafts || {};
+  const events = entry.events || {};
 
   //Items from UFOs
   const [ufoItems, ufoRandomItems] =
@@ -105,6 +106,24 @@ export function mapItemSources(backLinkSet, ruleset, key) {
     "$foundFrom",
   );
 
+  //Items from Events
+  const flatEventItemsSet = ["everyItemList", "randomItemList"].reduce((acc, x) => {
+    (events[x] ?? []).forEach(item => acc.add(item));
+    return acc;
+  }, new Set());
+  const dictionaryEventItemsSet = ["everyMultiItemList", "randomMultiItemList", "weightedItemList"].reduce((acc, x) => {
+    Object.keys(events[x] ?? {}).forEach(item => acc.add(item));
+    return acc;
+  }, new Set());
+
+  backLinkSet(
+    ruleset.entries,
+    key,
+    [...flatEventItemsSet, ...dictionaryEventItemsSet],
+    "items",
+    "$foundFrom"
+  );
+  
   //Items from Armors
   const builtIns = armors.builtInWeapons ?? [];
   const armorSpecials = armors.specialWeapon ? [armors.specialWeapon] : [];
