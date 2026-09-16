@@ -2,7 +2,9 @@ import React, { useCallback } from "react";
 import { Table } from "react-bootstrap";
 import {
   SectionHeader,
+  SimpleValue,
   ContainerValue,
+  Percent,
   ListValue,
 } from "../../ComponentUtils.jsx";
 import useLink from "../../../hooks/useLink.jsx";
@@ -25,7 +27,21 @@ function Trigger({ mission, value, version, lc, inventoryFn }) {
   const linkFn = useLink(version, lc);
   return (
     <React.Fragment>
-      <SectionHeader label={`Mission Triggers: ${lc(mission)}`} />
+      <SectionHeader label={`Mission Script: ${lc(mission)}`} />
+      <tbody>
+        <SimpleValue label="Execution Odds" value={value.executionOdds}>{Percent}</SimpleValue>
+        <SimpleValue label="First Month" value={value.firstMonth}/>
+        <SimpleValue label="Last Month" value={value.lastMonth}/>
+        <SimpleValue label="Start Delay" value={value.startDelay}/>
+        <SimpleValue label="Random Delay" value={value.randomDelay}/>
+        <SimpleValue label="Minimum Difficulty" value={value.minDifficulty}/>
+        <SimpleValue label="Maximum Difficulty" value={value.maxDifficulty}/>
+        <SimpleValue label="Minimum Score" value={value.minScore}/>
+        <SimpleValue label="Maximum Score" value={value.maxScore}/>
+        <SimpleValue label="Minimum Funds" value={value.minFunds}/>
+        <SimpleValue label="Maximum Funds" value={value.maxFunds}/>
+        <SimpleValue label="Max Runs" value={value.maxRuns === -1 ? undefined : value.maxRuns}/>
+      </tbody>
       <ListValue
         label="Research Triggers"
         values={Object.entries(value.researchTriggers || {})}
@@ -45,6 +61,18 @@ function Trigger({ mission, value, version, lc, inventoryFn }) {
         {booleanInventory}
       </ListValue>
       <ListValue
+        label="Soldier Type Triggers"
+        values={Object.entries(value.soldierTypeTriggers || {})}
+      >
+        {booleanInventory}
+      </ListValue>
+      <ListValue
+        label="Pact Country Triggers"
+        values={Object.entries(value.pactCountryTriggers || {})}
+      >
+        {booleanInventory}
+      </ListValue>
+      <ListValue
         label="XCOM Base In Region"
         values={value.xcomBaseInRegionTriggers}
       />
@@ -58,43 +86,22 @@ function Trigger({ mission, value, version, lc, inventoryFn }) {
     </React.Fragment>
   );
 }
-const triggerKeys = [
-  "researchTriggers",
-  "itemTriggers",
-  "facilityTriggers",
-  "xcomBaseInRegionTriggers",
-  "xcomBaseInCountryTriggers",
-  "$spawnedFrom",
-];
 
 function getTriggers(lookups, id) {
   const triggers = {};
   const deploymentData = lookups.deploymentData[id];
-  let hasTriggers = false;
   let hasRetaliation = false;
   //eslint-disable-next-line no-unused-expressions
   deploymentData?.scripts.forEach((script) => {
     const scriptObj = lookups.missionScripts[script];
-    const triggerConditions = {};
-    let hasConditions = false;
     if (scriptObj.$retaliation) hasRetaliation = true;
-    triggerKeys.forEach((key) => {
-      if (scriptObj[key]) {
-        triggerConditions[key] = scriptObj[key];
-        hasConditions = true;
-      }
-    });
-    if (hasConditions) {
-      hasTriggers = true;
-      triggers[script] = triggerConditions;
-    }
+    triggers[script] = scriptObj;
   });
   // condense retaliations into one trigger entry
   if (hasRetaliation) {
-    hasTriggers = true;
     triggers.$retaliation = true;
   }
-  return hasTriggers ? triggers : null;
+  return triggers;
 }
 
 export default function Triggers({ ruleset, lc, version, inventoryFn, id }) {
