@@ -14,7 +14,7 @@
 
 article header {
     font-size: 24px;
-    border-bottom: 1px solid #777;
+    border-bottom: 1px solid var(--bs-border-color);
     margin-bottom: 1em;
 }
 
