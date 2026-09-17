@@ -119,6 +119,24 @@ const Hamburger = (props) => (
   </svg>
 );
 
+function ThemeToggle({ theme, setTheme }) {
+  const isDark = theme === "dark";
+
+  return (
+    <button
+      type="button"
+      className="themeToggle"
+      aria-pressed={isDark}
+      aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
+      title={`Switch to ${isDark ? "light" : "dark"} theme`}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+    >
+      <span aria-hidden="true">{isDark ? "☀" : "☾"}</span>
+      <span>{isDark ? "Light" : "Dark"}</span>
+    </button>
+  );
+}
+
 const CategoryDropdown = ({ lang, version, ruleset }) => {
   const lc = useLocale(lang, ruleset);
   const displayStr = (key) =>
@@ -146,7 +164,7 @@ const CategoryDropdown = ({ lang, version, ruleset }) => {
   );
 };
 
-export default function Ruleset({ lang, setLanguage, versions }) {
+export default function Ruleset({ lang, setLanguage, versions, theme, setTheme }) {
   const { version } = useParams();
   const { result, status, statusKey } = useRuleset(version, versions);
 
@@ -200,6 +218,7 @@ export default function Ruleset({ lang, setLanguage, versions }) {
               </LinkContainer>
             </Nav>
             <Nav>
+              <ThemeToggle theme={theme} setTheme={setTheme} />
               {!isMobile && (
                 <NavDropdown
                   title={possibleLanguages[lang]}
