@@ -220,6 +220,9 @@ function handleCommand(
 
   const terrainObj = ruleset.lookups.terrains[terrainKey];
 
+  if(!terrainObj) {
+    console.error(`Unknown terrain key: ${terrainKey}`);
+  }
   if (command.blocks !== undefined) {
     // direct index of blocks. could be numeric 0
     // concat handles both array and non-arrays
